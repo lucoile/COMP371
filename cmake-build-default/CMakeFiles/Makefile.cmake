@@ -7,7 +7,6 @@ set(CMAKE_DEPENDS_GENERATOR "Unix Makefiles")
 # The top level Makefile was generated from the following files:
 set(CMAKE_MAKEFILE_DEPENDS
   "CMakeCache.txt"
-  "/Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.16/Modules/BasicConfigVersion-AnyNewerVersion.cmake.in"
   "/Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.16/Modules/BasicConfigVersion-SameMajorVersion.cmake.in"
   "/Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.16/Modules/CMakeCInformation.cmake"
   "/Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.16/Modules/CMakeCXXInformation.cmake"
@@ -19,7 +18,6 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.16/Modules/CMakeInitializeConfigs.cmake"
   "/Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.16/Modules/CMakeLanguageInformation.cmake"
   "/Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.16/Modules/CMakePackageConfigHelpers.cmake"
-  "/Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.16/Modules/CMakeParseArguments.cmake"
   "/Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.16/Modules/CMakeSystemSpecificInformation.cmake"
   "/Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.16/Modules/CMakeSystemSpecificInitialize.cmake"
   "/Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.16/Modules/CheckCSourceCompiles.cmake"
@@ -53,7 +51,6 @@ set(CMAKE_MAKEFILE_DEPENDS
   "CMakeFiles/3.16.5/CMakeCXXCompiler.cmake"
   "CMakeFiles/3.16.5/CMakeSystem.cmake"
   "../lib/glad/CMakeLists.txt"
-  "../lib/glew/CMakeLists.txt"
   "../lib/glfw/CMake/MacOSXBundleInfo.plist.in"
   "../lib/glfw/CMake/modules/FindVulkan.cmake"
   "../lib/glfw/CMakeLists.txt"
@@ -64,18 +61,6 @@ set(CMAKE_MAKEFILE_DEPENDS
   "../lib/glfw/src/glfw3Config.cmake.in"
   "../lib/glfw/src/glfw_config.h.in"
   "../lib/glfw/tests/CMakeLists.txt"
-  "../lib/glm/CMakeLists.txt"
-  "../lib/glm/cmake/CMakePackageConfigHelpers.cmake"
-  "../lib/glm/cmake/GNUInstallDirs.cmake"
-  "../lib/glm/cmake/glm.pc.in"
-  "../lib/glm/cmake/glmBuildConfig.cmake.in"
-  "../lib/glm/cmake/glmConfig.cmake.in"
-  "../lib/glm/glm/CMakeLists.txt"
-  "../lib/glm/test/CMakeLists.txt"
-  "../lib/glm/test/bug/CMakeLists.txt"
-  "../lib/glm/test/core/CMakeLists.txt"
-  "../lib/glm/test/gtc/CMakeLists.txt"
-  "../lib/glm/test/gtx/CMakeLists.txt"
   )
 
 # The corresponding makefile is:
@@ -92,14 +77,6 @@ set(CMAKE_MAKEFILE_PRODUCTS
   "lib/glfw/src/CMakeFiles/CMakeDirectoryInformation.cmake"
   "lib/glfw/examples/CMakeFiles/CMakeDirectoryInformation.cmake"
   "lib/glfw/tests/CMakeFiles/CMakeDirectoryInformation.cmake"
-  "lib/glew/CMakeFiles/CMakeDirectoryInformation.cmake"
-  "lib/glm/CMakeFiles/CMakeDirectoryInformation.cmake"
-  "lib/glm/glm/CMakeFiles/CMakeDirectoryInformation.cmake"
-  "lib/glm/test/CMakeFiles/CMakeDirectoryInformation.cmake"
-  "lib/glm/test/bug/CMakeFiles/CMakeDirectoryInformation.cmake"
-  "lib/glm/test/core/CMakeFiles/CMakeDirectoryInformation.cmake"
-  "lib/glm/test/gtc/CMakeFiles/CMakeDirectoryInformation.cmake"
-  "lib/glm/test/gtx/CMakeFiles/CMakeDirectoryInformation.cmake"
   )
 
 # Dependency information for all targets:
@@ -137,9 +114,4 @@ set(CMAKE_DEPEND_INFO_FILES
   "lib/glfw/tests/CMakeFiles/monitors.dir/DependInfo.cmake"
   "lib/glfw/tests/CMakeFiles/events.dir/DependInfo.cmake"
   "lib/glfw/tests/CMakeFiles/icon.dir/DependInfo.cmake"
-  "lib/glew/CMakeFiles/libglewmx_shared.dir/DependInfo.cmake"
-  "lib/glew/CMakeFiles/libglew_shared.dir/DependInfo.cmake"
-  "lib/glew/CMakeFiles/libglewmx_static.dir/DependInfo.cmake"
-  "lib/glew/CMakeFiles/libglew_static.dir/DependInfo.cmake"
-  "lib/glm/glm/CMakeFiles/glm_dummy.dir/DependInfo.cmake"
   )

@@ -585,71 +585,6 @@ icon/fast:
 	$(MAKE) -f lib/glfw/tests/CMakeFiles/icon.dir/build.make lib/glfw/tests/CMakeFiles/icon.dir/build
 .PHONY : icon/fast
 
-#=============================================================================
-# Target rules for targets named libglewmx_shared
-
-# Build rule for target.
-libglewmx_shared: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 libglewmx_shared
-.PHONY : libglewmx_shared
-
-# fast build rule for target.
-libglewmx_shared/fast:
-	$(MAKE) -f lib/glew/CMakeFiles/libglewmx_shared.dir/build.make lib/glew/CMakeFiles/libglewmx_shared.dir/build
-.PHONY : libglewmx_shared/fast
-
-#=============================================================================
-# Target rules for targets named libglew_shared
-
-# Build rule for target.
-libglew_shared: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 libglew_shared
-.PHONY : libglew_shared
-
-# fast build rule for target.
-libglew_shared/fast:
-	$(MAKE) -f lib/glew/CMakeFiles/libglew_shared.dir/build.make lib/glew/CMakeFiles/libglew_shared.dir/build
-.PHONY : libglew_shared/fast
-
-#=============================================================================
-# Target rules for targets named libglewmx_static
-
-# Build rule for target.
-libglewmx_static: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 libglewmx_static
-.PHONY : libglewmx_static
-
-# fast build rule for target.
-libglewmx_static/fast:
-	$(MAKE) -f lib/glew/CMakeFiles/libglewmx_static.dir/build.make lib/glew/CMakeFiles/libglewmx_static.dir/build
-.PHONY : libglewmx_static/fast
-
-#=============================================================================
-# Target rules for targets named libglew_static
-
-# Build rule for target.
-libglew_static: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 libglew_static
-.PHONY : libglew_static
-
-# fast build rule for target.
-libglew_static/fast:
-	$(MAKE) -f lib/glew/CMakeFiles/libglew_static.dir/build.make lib/glew/CMakeFiles/libglew_static.dir/build
-.PHONY : libglew_static/fast
-
-#=============================================================================
-# Target rules for targets named glm_dummy
-
-# Build rule for target.
-glm_dummy: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 glm_dummy
-.PHONY : glm_dummy
-
-# fast build rule for target.
-glm_dummy/fast:
-	$(MAKE) -f lib/glm/glm/CMakeFiles/glm_dummy.dir/build.make lib/glm/glm/CMakeFiles/glm_dummy.dir/build
-.PHONY : glm_dummy/fast
-
 src/main.o: src/main.cpp.o
 
 .PHONY : src/main.o
@@ -722,11 +657,6 @@ help:
 	@echo "... monitors"
 	@echo "... events"
 	@echo "... icon"
-	@echo "... libglewmx_shared"
-	@echo "... libglew_shared"
-	@echo "... libglewmx_static"
-	@echo "... libglew_static"
-	@echo "... glm_dummy"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"

@@ -4,7 +4,7 @@
 # compile CXX with /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++
 CXX_FLAGS =  -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk   -Wall -std=gnu++11
 
-CXX_DEFINES = -DGLEW_STATIC
+CXX_DEFINES = 
 
-CXX_INCLUDES = -I/Users/thomas/Documents/COMP371/cmake-build-default/lib/glad/include -I/Users/thomas/Documents/COMP371/lib/glfw/include -I/Users/thomas/Documents/COMP371/lib/glew/include -I/Users/thomas/Documents/COMP371/lib/glm 
+CXX_INCLUDES = -I/Users/thomas/Documents/COMP371/cmake-build-default/lib/glad/include -I/Users/thomas/Documents/COMP371/lib/glfw/include 
 

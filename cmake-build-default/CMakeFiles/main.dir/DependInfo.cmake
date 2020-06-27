@@ -8,24 +8,16 @@ set(CMAKE_DEPENDS_CHECK_CXX
   )
 set(CMAKE_CXX_COMPILER_ID "AppleClang")
 
-# Preprocessor definitions for this target.
-set(CMAKE_TARGET_DEFINITIONS_CXX
-  "GLEW_STATIC"
-  )
-
 # The include file search paths:
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
   "lib/glad/include"
   "../lib/glfw/include"
-  "../lib/glew/include"
-  "../lib/glm"
   )
 
 # Targets to which this target links.
 set(CMAKE_TARGET_LINKED_INFO_FILES
   "/Users/thomas/Documents/COMP371/cmake-build-default/lib/glad/CMakeFiles/glad.dir/DependInfo.cmake"
   "/Users/thomas/Documents/COMP371/cmake-build-default/lib/glfw/src/CMakeFiles/glfw.dir/DependInfo.cmake"
-  "/Users/thomas/Documents/COMP371/cmake-build-default/lib/glew/CMakeFiles/libglew_static.dir/DependInfo.cmake"
   )
 
 # Fortran module output directory.
