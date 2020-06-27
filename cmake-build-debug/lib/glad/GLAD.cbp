@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="GLAD"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;CMake Files\lib\;CMake Files\lib\glad\;CMake Files\lib\glfw\;CMake Files\lib\glfw\CMake\;CMake Files\lib\glfw\CMake\modules\;CMake Files\lib\glfw\src\;CMake Files\lib\glfw\examples\;CMake Files\lib\glfw\tests\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/Users/narrapangan/Documents/COMP371/cmake-build-debug/lib/glad"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/Users/narrapangan/Documents/COMP371/cmake-build-debug/lib/glad/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/Users/narrapangan/Documents/COMP371/cmake-build-debug/lib/glad/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/Users/narrapangan/Documents/COMP371/cmake-build-debug/lib/glad/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/Users/narrapangan/Documents/COMP371/cmake-build-debug/lib/glad/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="glad">
+				<Option output="/Users/narrapangan/Documents/COMP371/cmake-build-debug/lib/glad/libglad.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/narrapangan/Documents/COMP371/cmake-build-debug/lib/glad"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/Users/narrapangan/Documents/COMP371/cmake-build-debug/lib/glad-master/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/bin/../include/c++/v1"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/11.0.3/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/Users/narrapangan/Documents/COMP371/cmake-build-debug/lib/glad/Makefile&quot;  VERBOSE=1 glad"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/Users/narrapangan/Documents/COMP371/cmake-build-debug/lib/glad/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/Users/narrapangan/Documents/COMP371/cmake-build-debug/lib/glad/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/Users/narrapangan/Documents/COMP371/cmake-build-debug/lib/glad/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="glad/fast">
+				<Option output="/Users/narrapangan/Documents/COMP371/cmake-build-debug/lib/glad/libglad.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/narrapangan/Documents/COMP371/cmake-build-debug/lib/glad"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/Users/narrapangan/Documents/COMP371/cmake-build-debug/lib/glad-master/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/bin/../include/c++/v1"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/11.0.3/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/Users/narrapangan/Documents/COMP371/cmake-build-debug/lib/glad/Makefile&quot;  VERBOSE=1 glad/fast"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/Users/narrapangan/Documents/COMP371/cmake-build-debug/lib/glad/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/Users/narrapangan/Documents/COMP371/cmake-build-debug/lib/glad/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/Users/narrapangan/Documents/COMP371/cmake-build-debug/lib/glad/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="glad-generate-files">
+				<Option working_dir="/Users/narrapangan/Documents/COMP371/cmake-build-debug/lib/glad"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j12 -f &quot;/Users/narrapangan/Documents/COMP371/cmake-build-debug/lib/glad/Makefile&quot;  VERBOSE=1 glad-generate-files"/>
+					<CompileFile command="/usr/bin/make -j12 -f &quot;/Users/narrapangan/Documents/COMP371/cmake-build-debug/lib/glad/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j12 -f &quot;/Users/narrapangan/Documents/COMP371/cmake-build-debug/lib/glad/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j12 -f &quot;/Users/narrapangan/Documents/COMP371/cmake-build-debug/lib/glad/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/Users/narrapangan/Documents/COMP371/cmake-build-debug/lib/glad-master/include/glad/glad.h">
+			<Option target="glad"/>
+		</Unit>
+		<Unit filename="/Users/narrapangan/Documents/COMP371/cmake-build-debug/lib/glad-master/src/glad.c">
+			<Option target="glad"/>
+		</Unit>
+		<Unit filename="/Users/narrapangan/Documents/COMP371/cmake-build-debug/lib/glad-master/src/glad.c.rule">
+			<Option target="glad"/>
+		</Unit>
+		<Unit filename="/Users/narrapangan/Documents/COMP371/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="/Users/narrapangan/Documents/COMP371/lib/glad/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\lib\glad\"/>
+		</Unit>
+		<Unit filename="/Users/narrapangan/Documents/COMP371/lib/glfw/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\lib\glfw\"/>
+		</Unit>
+		<Unit filename="/Users/narrapangan/Documents/COMP371/lib/glfw/cmake_uninstall.cmake.in">
+			<Option virtualFolder="CMake Files\lib\glfw\"/>
+		</Unit>
+		<Unit filename="/Users/narrapangan/Documents/COMP371/lib/glfw/CMake/MacOSXBundleInfo.plist.in">
+			<Option virtualFolder="CMake Files\lib\glfw\CMake\"/>
+		</Unit>
+		<Unit filename="/Users/narrapangan/Documents/COMP371/lib/glfw/CMake/modules/FindVulkan.cmake">
+			<Option virtualFolder="CMake Files\lib\glfw\CMake\modules\"/>
+		</Unit>
+		<Unit filename="/Users/narrapangan/Documents/COMP371/lib/glfw/src/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\lib\glfw\src\"/>
+		</Unit>
+		<Unit filename="/Users/narrapangan/Documents/COMP371/lib/glfw/src/glfw3.pc.in">
+			<Option virtualFolder="CMake Files\lib\glfw\src\"/>
+		</Unit>
+		<Unit filename="/Users/narrapangan/Documents/COMP371/lib/glfw/src/glfw3Config.cmake.in">
+			<Option virtualFolder="CMake Files\lib\glfw\src\"/>
+		</Unit>
+		<Unit filename="/Users/narrapangan/Documents/COMP371/lib/glfw/src/glfw_config.h.in">
+			<Option virtualFolder="CMake Files\lib\glfw\src\"/>
+		</Unit>
+		<Unit filename="/Users/narrapangan/Documents/COMP371/lib/glfw/examples/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\lib\glfw\examples\"/>
+		</Unit>
+		<Unit filename="/Users/narrapangan/Documents/COMP371/lib/glfw/tests/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\lib\glfw\tests\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>

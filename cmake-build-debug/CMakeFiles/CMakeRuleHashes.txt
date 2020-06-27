@@ -1,0 +1,4 @@
+# Hashes of file build rules.
+c30f9cd8ced7d75a537fecb35bd2e17a lib/glad-master/src/glad.c
+dbc0a16e5171c05c4f731dd1862d3913 lib/glad/CMakeFiles/glad-generate-files
+1a7e0e5c73288109cb4a13cdfeaf4678 lib/glfw/CMakeFiles/uninstall

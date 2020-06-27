@@ -1,0 +1,1 @@
+/Library/Developer/CommandLineTools/usr/bin/c++  -g -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names  CMakeFiles/main.dir/src/main.cpp.o  -o main  lib/glad/libglad.a lib/glfw/src/libglfw3.a -framework Cocoa -framework IOKit -framework CoreFoundation -framework CoreVideo 
