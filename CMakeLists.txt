@@ -23,5 +23,5 @@ target_link_libraries(main PRIVATE glfw)
 #target_link_libraries(main PRIVATE libglew_static)
 #
 ## glm
-#add_subdirectory(lib/glm EXCLUDE_FROM_ALL)
-#target_link_libraries(main PRIVATE glm)
+add_subdirectory(lib/glm EXCLUDE_FROM_ALL)
+target_link_libraries(main PRIVATE glm)
