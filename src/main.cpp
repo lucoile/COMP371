@@ -36,6 +36,9 @@ bool firstMouse = true;
 float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
 
+// Render type
+GLenum type = GL_TRIANGLES;
+
 int main()
 {
     // glfw: initialize and configure
@@ -257,7 +260,7 @@ int main()
                 //float angle = 20.0f * i;
                 //model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
                 ourShader.setMat4("model", model);
-                glDrawArrays(GL_TRIANGLES, 0, 250);
+                glDrawArrays(type, 0, 250);
             }
 
         }
@@ -294,6 +297,13 @@ void processInput(GLFWwindow *window)
         camera.ProcessKeyboard(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         camera.ProcessKeyboard(RIGHT, deltaTime);
+
+    if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
+        type = GL_POINTS;
+    if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
+        type = GL_LINES;
+    if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS)
+        type = GL_TRIANGLES;
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
