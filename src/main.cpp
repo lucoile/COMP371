@@ -83,7 +83,7 @@ int main()
 
     // build and compile our shader zprogram
     // ------------------------------------
-    Shader ourShader("../res/shaders/camera.vs", "../res/shaders/camera.fs");
+    Shader ourShader("../res/shaders/camera.vert", "../res/shaders/camera.frag");
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
@@ -262,7 +262,6 @@ int main()
                 ourShader.setMat4("model", model);
                 glDrawArrays(type, 0, 250);
             }
-
         }
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
