@@ -1,7 +1,6 @@
 // COMP371 - Project
 // main.cpp
 // Created by Thomas Buffard on 6/26/20.
-#define STB_IMAGE_IMPLEMENTATION
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -10,10 +9,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "stb_image.h"
-#include "filesystem.h"
 #include "shader_m.h"
 #include "camera.h"
+#include "texture.h"
 
 #include <iostream>
 
@@ -79,9 +77,9 @@ int main() {
     Shader lineShader("../res/shaders/line.vert", "../res/shaders/line.frag");
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
-    float vertices[] = {
+    float gridVertices[] = {
             -0.1f, -0.1f, -0.1f, 0.0f, 0.0f,
-            0.1f, -0.1f, -0.1f, 1.0f, 0.0f,`
+            0.1f, -0.1f, -0.1f, 1.0f, 0.0f,
             0.1f, 0.1f, -0.1f, 1.0f, 1.0f,
             0.1f, 0.1f, -0.1f, 1.0f, 1.0f,
             -0.1f, 0.1f, -0.1f, 0.0f, 1.0f,
@@ -155,7 +153,7 @@ int main() {
     // Cube
     glBindVertexArray(gridVAO);
     glBindBuffer(GL_ARRAY_BUFFER, gridVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(gridVertices), gridVertices, GL_STATIC_DRAW);
 
     // Position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) 0);
@@ -188,36 +186,12 @@ int main() {
 
 
     // Load and Create a texture
-    unsigned int texture1;
+    Texture texture1("res/textures/dirt.jpg");
 
-    // Texture 1
-    glGenTextures(1, &texture1);
-    glBindTexture(GL_TEXTURE_2D, texture1);
-
-    // Set the texture wrapping parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-    // Set texture filtering parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    // Load image, create texture and generate mipmaps
-    int width, height, nrChannels;
-    stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
-    unsigned char *data = stbi_load(FileSystem::getPath("res/textures/dirt.jpg").c_str(), &width, &height, &nrChannels,
-                                    0);
-    if (data) {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    } else {
-        std::cout << "Failed to load texture" << std::endl;
-    }
-    stbi_image_free(data);
 
     // Tell opengl for each sampler to which texture unit it belongs to (only has to be done once)
     gridShader.use();
-    gridShader.setInt("texture1", 0);
+
 
     // Render Loop
     while (!glfwWindowShouldClose(window)) {
@@ -260,8 +234,7 @@ int main() {
         gridShader.setMat4("view", view);
 
         // Bind textures on corresponding texture units
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture1);
+        texture1.bind();
 
         // Render boxes
         glBindVertexArray(gridVAO);
