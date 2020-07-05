@@ -128,9 +128,9 @@ int main() {
             0.0f, 0.0f, 0.0f,   1.0f, 0.0f, 0.0f,       // red x-axis line
             0.0f, 0.0f, 0.0f,   0.0f, 1.0f, 0.0f,       // green y-axis line
             0.0f, 0.0f, 0.0f,   0.0f, 0.0f, 1.0f,       // blue z-axis line
-            5.0f, 0.0f, 0.0f,   1.0f, 0.0f, 0.0f,
-            0.0f, 5.0f, 0.0f,   0.0f, 1.0f, 0.0f,
-            0.0f, 0.0f, 5.0f,   1.0f, 0.0f, 0.0f
+            0.5f, 0.0f, 0.0f,   1.0f, 0.0f, 0.0f,
+            0.0f, 0.5f, 0.0f,   0.0f, 1.0f, 0.0f,
+            0.0f, 0.0f, 0.5f,   1.0f, 0.0f, 0.0f
     };
     unsigned int linesIndices[] = {
             0, 3,   // red x-axis line
@@ -163,6 +163,7 @@ int main() {
     // Texture coordinate attribute
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) (3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+
 
     // Lines
     unsigned int lineEBO, lineVAO, lineVBO;
@@ -235,9 +236,9 @@ int main() {
         // Activate line shader
         lineShader.use();
         // Draw lines
-        glLineWidth(1.0f);
+        glLineWidth(5.0f);
         glBindVertexArray(lineVAO);
-        glDrawElements(GL_LINES, 3, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_LINES, 6, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
 
         // Bind textures on corresponding texture units
