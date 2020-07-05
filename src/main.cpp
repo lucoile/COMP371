@@ -75,13 +75,13 @@ int main() {
     glEnable(GL_DEPTH_TEST);
 
     // Build and Compile our Shader Program
-    Shader ourShader("../res/shaders/grid.vert", "../res/shaders/grid.frag");
+    Shader gridShader("../res/shaders/grid.vert", "../res/shaders/grid.frag");
     Shader lineShader("../res/shaders/line.vert", "../res/shaders/line.frag");
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     float vertices[] = {
             -0.1f, -0.1f, -0.1f, 0.0f, 0.0f,
-            0.1f, -0.1f, -0.1f, 1.0f, 0.0f,
+            0.1f, -0.1f, -0.1f, 1.0f, 0.0f,`
             0.1f, 0.1f, -0.1f, 1.0f, 1.0f,
             0.1f, 0.1f, -0.1f, 1.0f, 1.0f,
             -0.1f, 0.1f, -0.1f, 0.0f, 1.0f,
@@ -147,13 +147,14 @@ int main() {
         }
     }
 
-    unsigned int VBO, VAO;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
+    unsigned int gridVAO;
+    unsigned int gridVBO;
+    glGenVertexArrays(1, &gridVAO);
+    glGenBuffers(1, &gridVBO);
 
     // Cube
-    glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBindVertexArray(gridVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, gridVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     // Position attribute
@@ -215,8 +216,8 @@ int main() {
     stbi_image_free(data);
 
     // Tell opengl for each sampler to which texture unit it belongs to (only has to be done once)
-    ourShader.use();
-    ourShader.setInt("texture1", 0);
+    gridShader.use();
+    gridShader.setInt("texture1", 0);
 
     // Render Loop
     while (!glfwWindowShouldClose(window)) {
@@ -254,16 +255,16 @@ int main() {
 
         // Render grid
         // Activate shader
-        ourShader.use();
-        ourShader.setMat4("projection", projection);
-        ourShader.setMat4("view", view);
+        gridShader.use();
+        gridShader.setMat4("projection", projection);
+        gridShader.setMat4("view", view);
 
         // Bind textures on corresponding texture units
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture1);
 
         // Render boxes
-        glBindVertexArray(VAO);
+        glBindVertexArray(gridVAO);
         for (auto & cubePosition : cubePositions) {
             for (auto & j : cubePosition) {
                 // calculate the model matrix for each object and pass it to shader before drawing
@@ -271,7 +272,7 @@ int main() {
                 model = glm::translate(model, j);
                 //float angle = 20.0f * i;
                 //model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-                ourShader.setMat4("model", model);
+                gridShader.setMat4("model", model);
                 glDrawArrays(type, 0, 250);
             }
         }
@@ -282,8 +283,8 @@ int main() {
     }
 
     // De-allocate all resources once they've outlived their purpose:
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
+    glDeleteVertexArrays(1, &gridVAO);
+    glDeleteBuffers(1, &gridVBO);
     glDeleteBuffers(1, &lineEBO);
 
     // Terminate, clearing all previously allocated GLFW resources.
