@@ -76,50 +76,41 @@ int main() {
     Shader gridShader("../res/shaders/grid.vert", "../res/shaders/grid.frag");
     Shader lineShader("../res/shaders/line.vert", "../res/shaders/line.frag");
 
-    // set up vertex data (and buffer(s)) and configure vertex attributes
-    float gridVertices[] = {
-            -0.1f, -0.1f, -0.1f, 0.0f, 0.0f,
-            0.1f, -0.1f, -0.1f, 1.0f, 0.0f,
-            0.1f, 0.1f, -0.1f, 1.0f, 1.0f,
-            0.1f, 0.1f, -0.1f, 1.0f, 1.0f,
-            -0.1f, 0.1f, -0.1f, 0.0f, 1.0f,
-            -0.1f, -0.1f, -0.1f, 0.0f, 0.0f,
-
-            -0.1f, -0.1f, 0.1f, 0.0f, 0.0f,
-            0.1f, -0.1f, 0.1f, 1.0f, 0.0f,
-            0.1f, 0.1f, 0.1f, 1.0f, 1.0f,
-            0.1f, 0.1f, 0.1f, 1.0f, 1.0f,
-            -0.1f, 0.1f, 0.1f, 0.0f, 1.0f,
-            -0.1f, -0.1f, 0.1f, 0.0f, 0.0f,
-
-            -0.1f, 0.1f, 0.1f, 1.0f, 0.0f,
-            -0.1f, 0.1f, -0.1f, 1.0f, 1.0f,
-            -0.1f, -0.1f, -0.1f, 0.0f, 1.0f,
-            -0.1f, -0.1f, -0.1f, 0.0f, 1.0f,
-            -0.1f, -0.1f, 0.1f, 0.0f, 0.0f,
-            -0.1f, 0.1f, 0.1f, 1.0f, 0.0f,
-
-            0.1f, 0.1f, 0.1f, 1.0f, 0.0f,
-            0.1f, 0.1f, -0.1f, 1.0f, 1.0f,
-            0.1f, -0.1f, -0.1f, 0.0f, 1.0f,
-            0.1f, -0.1f, -0.1f, 0.0f, 1.0f,
-            0.1f, -0.1f, 0.1f, 0.0f, 0.0f,
-            0.1f, 0.1f, 0.1f, 1.0f, 0.0f,
-
-            -0.1f, -0.1f, -0.1f, 0.0f, 1.0f,
-            0.1f, -0.1f, -0.1f, 1.0f, 1.0f,
-            0.1f, -0.1f, 0.1f, 1.0f, 0.0f,
-            0.1f, -0.1f, 0.1f, 1.0f, 0.0f,
-            -0.1f, -0.1f, 0.1f, 0.0f, 0.0f,
-            -0.1f, -0.1f, -0.1f, 0.0f, 1.0f,
-
-            -0.1f, 0.1f, -0.1f, 0.0f, 1.0f,
-            0.1f, 0.1f, -0.1f, 1.0f, 1.0f,
-            0.1f, 0.1f, 0.1f, 1.0f, 0.0f,
-            0.1f, 0.1f, 0.1f, 1.0f, 0.0f,
-            -0.1f, 0.1f, 0.1f, 0.0f, 0.0f,
-            -0.1f, 0.1f, -0.1f, 0.0f, 1.0f
+    float squareVertices[] = {
+//          Vertices            Colors
+            0.0f, 0.0f, 0.0f,   1.0f, 0.0f, 0.0f,  //0
+            0.5f, 0.0f, 0.0f,   1.0f, 0.0f, 0.0f,  //1
+            0.0f, 0.0f, 0.5f,   1.0f, 0.0f, 0.0f,  //2
+            0.5f, 0.0f, 0.5f,   1.0f, 0.0f, 0.0f   //3
     };
+
+    unsigned int squareIndices[] = {
+            0, 1,
+            0, 2,
+            2, 3,
+            1, 3,
+    };
+
+    // Square
+    unsigned int squareEBO, squareVAO, squareVBO;
+    glGenVertexArrays(1, &squareVAO);
+    glGenBuffers(1, &squareVBO);
+    glGenBuffers(1, &squareEBO);
+
+    glBindVertexArray(squareVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, squareVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(squareVertices), squareVertices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, squareEBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(squareIndices), squareIndices, GL_STATIC_DRAW);
+
+    // Position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) 0);
+    glEnableVertexAttribArray(0);
+    // Color attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) (3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
 
     float linesVertices[] = {
 //          Vertices            Colors
@@ -135,33 +126,6 @@ int main() {
             1, 4,   // green y-axis line
             2, 5    // blue z-axis line
     };
-
-    // World space positions of our cubes
-    glm::vec3 cubePositions[100][100];
-
-    for (unsigned int i = 0; i < 100; i++) {
-        for (unsigned int j = 0; j < 100; j++) {
-            cubePositions[i][j] = glm::vec3((float) i / 5, 0.0f, (float) j / 5);
-        }
-    }
-
-    unsigned int gridVAO;
-    unsigned int gridVBO;
-    glGenVertexArrays(1, &gridVAO);
-    glGenBuffers(1, &gridVBO);
-
-    // Cube
-    glBindVertexArray(gridVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, gridVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(gridVertices), gridVertices, GL_STATIC_DRAW);
-
-    // Position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) 0);
-    glEnableVertexAttribArray(0);
-
-    // Texture coordinate attribute
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) (3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
 
 
     // Lines
@@ -184,14 +148,11 @@ int main() {
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) (3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
-
     // Load and Create a texture
     Texture texture1("res/textures/dirt.jpg");
 
-
     // Tell opengl for each sampler to which texture unit it belongs to (only has to be done once)
     gridShader.use();
-
 
     // Render Loop
     while (!glfwWindowShouldClose(window)) {
@@ -226,29 +187,22 @@ int main() {
         glDrawElements(GL_LINES, 6, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
 
-
         // Render grid
         // Activate shader
         gridShader.use();
         gridShader.setMat4("projection", projection);
         gridShader.setMat4("view", view);
 
-        // Bind textures on corresponding texture units
-        texture1.bind();
+        glBindVertexArray(squareVAO);
 
-        // Render boxes
-        glBindVertexArray(gridVAO);
-        for (auto & cubePosition : cubePositions) {
-            for (auto & j : cubePosition) {
-                // calculate the model matrix for each object and pass it to shader before drawing
-                glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-                model = glm::translate(model, j);
-                //float angle = 20.0f * i;
-                //model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-                gridShader.setMat4("model", model);
-                glDrawArrays(type, 0, 250);
-            }
+        for (unsigned int i = 0; i < 10; i++) {
+            // calculate the model matrix for each object and pass it to shader before drawing
+            glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
+            model = glm::translate(model, glm::vec3((i , 0.0f, 0.0f)));
+            gridShader.setMat4("model", model);
+            glDrawElements(GL_LINES, 8, GL_UNSIGNED_INT, 0);
         }
+        //glBindVertexArray(0);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         glfwSwapBuffers(window);
@@ -256,8 +210,6 @@ int main() {
     }
 
     // De-allocate all resources once they've outlived their purpose:
-    glDeleteVertexArrays(1, &gridVAO);
-    glDeleteBuffers(1, &gridVBO);
     glDeleteBuffers(1, &lineEBO);
 
     // Terminate, clearing all previously allocated GLFW resources.
