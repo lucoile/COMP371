@@ -75,7 +75,7 @@ int main() {
     glEnable(GL_DEPTH_TEST);
 
     // Build and Compile our Shader Program
-    Shader ourShader("../res/shaders/camera.vert", "../res/shaders/camera.frag");
+    Shader ourShader("../res/shaders/grid.vert", "../res/shaders/grid.frag");
     Shader lineShader("../res/shaders/line.vert", "../res/shaders/line.frag");
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
@@ -232,31 +232,35 @@ int main() {
         glClearColor(0.529f, 0.808f, 0.98f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        // Pass projection matrix to shader (note that in this case it could change every frame)
+        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float) SCR_WIDTH / (float) SCR_HEIGHT, 0.1f,
+                                                100.0f);
+
+        // Camera/view transformation
+        glm::mat4 view = camera.get_view_matrix();
+
+
         // Render lines
         // Activate line shader
         lineShader.use();
+        lineShader.setMat4("projection", projection);
+        lineShader.setMat4("view", view);
+
         // Draw lines
-        glLineWidth(5.0f);
         glBindVertexArray(lineVAO);
         glDrawElements(GL_LINES, 6, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
 
+
+        // Render grid
+        // Activate shader
+        ourShader.use();
+        ourShader.setMat4("projection", projection);
+        ourShader.setMat4("view", view);
+
         // Bind textures on corresponding texture units
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture1);
-
-
-        // Activate shader
-        ourShader.use();
-
-        // Pass projection matrix to shader (note that in this case it could change every frame)
-        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float) SCR_WIDTH / (float) SCR_HEIGHT, 0.1f,
-                                                100.0f);
-        ourShader.setMat4("projection", projection);
-
-        // Camera/view transformation
-        glm::mat4 view = camera.get_view_matrix();
-        ourShader.setMat4("view", view);
 
         // Render boxes
         glBindVertexArray(VAO);
