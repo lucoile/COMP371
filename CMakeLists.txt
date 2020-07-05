@@ -5,6 +5,7 @@ project (COMP371)
 # The main executable
 add_executable(main
         src/main.cpp
+        src/texture.cpp
         )
 set_property(TARGET main PROPERTY CXX_STANDARD 11)
 target_compile_options(main PRIVATE -Wall)
