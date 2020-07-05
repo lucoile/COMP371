@@ -40,3 +40,6 @@
 
 # CLion settings
 /.idea
+
+# Python interpreter
+/venv
