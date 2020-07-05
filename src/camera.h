@@ -64,8 +64,8 @@ public:
         } else if (movement == ZOOM) {
             Position += Front * yoffset;
         } else if (movement == TILT) {
-            Yaw += xoffset;
-            Pitch += yoffset;
+            Yaw += xoffset * 10;
+            Pitch += yoffset * 10;
 
             if (Pitch > 89.0f)
                 Pitch = 89.0f;
