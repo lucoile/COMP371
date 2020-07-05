@@ -79,6 +79,7 @@ int main() {
 
     // Build and Compile our Shader Program
     Shader ourShader("../res/shaders/camera.vert", "../res/shaders/camera.frag");
+    Shader lineShader("../res/shaders/line.vert", "../res/shaders/line.frag");
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     float vertices[] = {
@@ -125,6 +126,21 @@ int main() {
             -0.1f, 0.1f, -0.1f, 0.0f, 1.0f
     };
 
+    float linesVertices[] = {
+//          Vertices            Colors
+            0.0f, 0.0f, 0.0f,   1.0f, 0.0f, 0.0f,       // red x-axis line
+            0.0f, 0.0f, 0.0f,   0.0f, 1.0f, 0.0f,       // green y-axis line
+            0.0f, 0.0f, 0.0f,   0.0f, 0.0f, 1.0f,       // blue z-axis line
+            5.0f, 0.0f, 0.0f,   1.0f, 0.0f, 0.0f,
+            0.0f, 5.0f, 0.0f,   0.0f, 1.0f, 0.0f,
+            0.0f, 0.0f, 5.0f,   1.0f, 0.0f, 0.0f
+    };
+    unsigned int linesIndices[] = {
+            0, 3,   // red x-axis line
+            1, 4,   // green y-axis line
+            2, 5    // blue z-axis line
+    };
+
     // World space positions of our cubes
     glm::vec3 cubePositions[100][100];
 
@@ -138,8 +154,8 @@ int main() {
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
 
+    // Cube
     glBindVertexArray(VAO);
-
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
@@ -150,6 +166,27 @@ int main() {
     // Texture coordinate attribute
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) (3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+
+    // Lines
+    unsigned int lineEBO, lineVAO, lineVBO;
+    glGenVertexArrays(1, &lineVAO);
+    glGenBuffers(1, &lineVBO);
+    glGenBuffers(1, &lineEBO);
+
+    glBindVertexArray(lineVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, lineVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(linesVertices), linesVertices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, lineEBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(linesIndices), linesIndices, GL_STATIC_DRAW);
+
+    // Position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) 0);
+    glEnableVertexAttribArray(0);
+    // Color attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) (3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
 
     // Load and Create a texture
     unsigned int texture1;
@@ -197,9 +234,19 @@ int main() {
         glClearColor(0.529f, 0.808f, 0.98f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        // Render lines
+        // Activate line shader
+        lineShader.use();
+        // Draw lines
+        glLineWidth(1.0f);
+        glBindVertexArray(lineVAO);
+        glDrawElements(GL_LINES, 3, GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
+
         // Bind textures on corresponding texture units
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture1);
+
 
         // Activate shader
         ourShader.use();
@@ -235,6 +282,7 @@ int main() {
     // De-allocate all resources once they've outlived their purpose:
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &lineEBO);
 
     // Terminate, clearing all previously allocated GLFW resources.
     glfwTerminate();
