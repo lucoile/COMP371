@@ -219,6 +219,8 @@ int main() {
 
     // De-allocate all resources once they've outlived their purpose:
     glDeleteBuffers(1, &lineEBO);
+    glDeleteBuffers(1, &squareEBO);
+    glDeleteBuffers(1, &squareVAO);
 
     // Terminate, clearing all previously allocated GLFW resources.
     glfwTerminate();
