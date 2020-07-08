@@ -83,6 +83,7 @@ int main() {
     // Build and Compile our Shader Program
     Shader gridShader("../res/shaders/grid.vert", "../res/shaders/grid.frag");
     Shader lineShader("../res/shaders/line.vert", "../res/shaders/line.frag");
+    Shader modelShader("../res/shaders/model.vert", "../res/shaders/model.frag");
 
     float squareVertices[] = {
 //          Vertices            Colors
@@ -237,9 +238,6 @@ int main() {
 
         glBindVertexArray(squareVAO);
 
-        glBindVertexArray(modelVAO);
-        glDrawElements(GL_LINES, 6, GL_UNSIGNED_INT, 0);
-        glBindVertexArray(0);
 
         for (unsigned int i = 0; i < 10; i++) {
             // calculate the model matrix for each object and pass it to shader before drawing
@@ -249,6 +247,15 @@ int main() {
             glDrawElements(GL_LINES, 8, GL_UNSIGNED_INT, 0);
         }
         //glBindVertexArray(0);
+
+        // Render models
+        modelShader.use();
+        modelShader.setMat4("projection", projection);
+        modelShader.setMat4("view", view);
+
+        glBindVertexArray(modelVAO);
+        glDrawElements(GL_LINES, 6, GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         glfwSwapBuffers(window);
