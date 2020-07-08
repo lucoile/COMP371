@@ -32,6 +32,7 @@ std::vector<float> read_csv(std::string filename);
 // Settings
 const unsigned int SCR_WIDTH = 1024;
 const unsigned int SCR_HEIGHT = 768;
+const float ULEN = 0.1f; // Unit Length
 
 // Camera
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
@@ -87,10 +88,10 @@ int main() {
 
     float squareVertices[] = {
 //          Vertices            Colors
-            0.0f, 0.0f, 0.0f,   1.0f, 0.0f, 0.0f,  //0
-            0.5f, 0.0f, 0.0f,   1.0f, 0.0f, 0.0f,  //1
-            0.0f, 0.0f, 0.5f,   1.0f, 0.0f, 0.0f,  //2
-            0.5f, 0.0f, 0.5f,   1.0f, 0.0f, 0.0f   //3
+            0.0f, 0.0f, 0.0f,   0.0f, 0.407f, 0.478f,  // Point 0
+            ULEN, 0.0f, 0.0f,   0.0f, 0.407f, 0.478f,  // Point 1
+            0.0f, 0.0f, ULEN,   0.0f, 0.407f, 0.478f,  // Point 2
+            ULEN, 0.0f, ULEN,   0.0f, 0.407f, 0.478f   // Point 3
     };
 
     unsigned int squareIndices[] = {
@@ -99,6 +100,15 @@ int main() {
             2, 3,
             1, 3,
     };
+
+    // Generate Grid Positions from Center
+    glm::vec3 gridPositions[100][100];
+
+    for (int i = -50; i < 50; i++) {
+        for ( int j = -50; j < 50; j++) {
+            gridPositions[i+50][j+50] = glm::vec3((float) i / (1/ULEN), 0.0f, (float) j / (1/ULEN));
+        }
+    }
 
     // Square
     unsigned int squareEBO, squareVAO, squareVBO;
@@ -120,22 +130,20 @@ int main() {
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) (3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
-
     float linesVertices[] = {
-//          Vertices            Colors
-            0.0f, 0.0f, 0.0f,   1.0f, 0.0f, 0.0f,       // red x-axis line
-            0.0f, 0.0f, 0.0f,   0.0f, 1.0f, 0.0f,       // green y-axis line
-            0.0f, 0.0f, 0.0f,   0.0f, 0.0f, 1.0f,       // blue z-axis line
-            0.5f, 0.0f, 0.0f,   1.0f, 0.0f, 0.0f,
-            0.0f, 0.5f, 0.0f,   0.0f, 1.0f, 0.0f,
-            0.0f, 0.0f, 0.5f,   1.0f, 0.0f, 0.0f
+//          Vertices                  Colors
+            0.0f,   0.0f,   0.0f,     1.0f, 0.0f, 0.0f,       // red x-axis line
+            0.0f,   0.0f,   0.0f,     0.0f, 1.0f, 0.0f,       // green y-axis line
+            0.0f,   0.0f,   0.0f,     0.0f, 0.0f, 1.0f,       // blue z-axis line
+            ULEN*5, 0.0f,   0.0f,     1.0f, 0.0f, 0.0f,
+            0.0f,   ULEN*5, 0.0f,     0.0f, 1.0f, 0.0f,
+            0.0f,   0.0f,   ULEN*5,   0.0f, 0.0f, 1.0f
     };
     unsigned int linesIndices[] = {
             0, 3,   // red x-axis line
             1, 4,   // green y-axis line
             2, 5    // blue z-axis line
     };
-
 
     // Lines
     unsigned int lineEBO, lineVAO, lineVBO;
@@ -208,16 +216,15 @@ int main() {
         process_input(window);
 
         // Render
-        glClearColor(0.529f, 0.808f, 0.98f, 1.0f);
+        glClearColor(0.0f, 0.0784f, 0.1607f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Pass projection matrix to shader (note that in this case it could change every frame)
-        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float) SCR_WIDTH / (float) SCR_HEIGHT, 0.1f,
+        glm::mat4 projection = glm::perspective(45.0f, (float) SCR_WIDTH / (float) SCR_HEIGHT, 0.1f,
                                                 100.0f);
 
         // Camera/view transformation
         glm::mat4 view = camera.get_view_matrix();
-
 
         // Render lines
         // Activate line shader
@@ -237,16 +244,16 @@ int main() {
         gridShader.setMat4("view", view);
 
         glBindVertexArray(squareVAO);
+        for (unsigned int i = 0; i < 100; i++) {
+            for (unsigned int j = 0; j < 100; j++) {
+                glm::mat4 model = glm::mat4(1.0f); //Use Identity Matrix to bring back to original
+                model = glm::translate(model, gridPositions[i][j]);
+                gridShader.setMat4("model", model);
 
-
-        for (unsigned int i = 0; i < 10; i++) {
-            // calculate the model matrix for each object and pass it to shader before drawing
-            glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-            model = glm::translate(model, glm::vec3((i , 0.0f, 0.0f)));
-            gridShader.setMat4("model", model);
-            glDrawElements(GL_LINES, 8, GL_UNSIGNED_INT, 0);
+                glDrawElements(GL_LINES, 8, GL_UNSIGNED_INT, nullptr);
+            }
         }
-        //glBindVertexArray(0);
+        glBindVertexArray(0);
 
         // Render models
         modelShader.use();
@@ -264,6 +271,8 @@ int main() {
 
     // De-allocate all resources once they've outlived their purpose:
     glDeleteBuffers(1, &lineEBO);
+    glDeleteBuffers(1, &squareEBO);
+    glDeleteBuffers(1, &squareVAO);
 
     // Terminate, clearing all previously allocated GLFW resources.
     glfwTerminate();
