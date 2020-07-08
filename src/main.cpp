@@ -191,15 +191,6 @@ int main() {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
     glEnableVertexAttribArray(0);
 
-    //
-//    // Position attribute
-//    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) 0);
-//    glEnableVertexAttribArray(0);
-//    // Color attribute
-//    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) (3 * sizeof(float)));
-//    glEnableVertexAttribArray(1);
-
-
     // Load and Create a texture
     Texture texture1("res/textures/dirt.jpg");
 
@@ -262,7 +253,7 @@ int main() {
         modelShader.setMat4("view", view);
 
         glBindVertexArray(modelVAO);
-        glDrawElements(GL_TRIANGLES, 500, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, sizeof(modelVertices)/sizeof(float), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
