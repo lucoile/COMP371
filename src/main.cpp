@@ -423,6 +423,42 @@ void process_input(GLFWwindow *window) {
         type = GL_LINES;
     } else if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) {
         type = GL_TRIANGLES;
+    } else if(glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS){
+        //TODO: Select Model 1
+    } else if(glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS){
+        //TODO: Select Model 2
+    } else if(glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS){
+        //TODO: Select Model 3
+    } else if(glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS){
+        //TODO: Select Model 4
+    } else if(glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS){
+        //TODO: Select Model 5
+    } else if(glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS){
+        //TODO: Rotate around x axis positively
+    } else if(glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS){
+        //TODO: Rotate around x axis negatively
+    } else if(glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS){
+        //TODO: Rotate around y axis positively
+    } else if(glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS){
+        //TODO: Rotate around y axis negatively
+    } else if(glfwGetKey(window, GLFW_KEY_HOME) == GLFW_PRESS){
+        //TODO: Reset to Initial World Position and Orientation
+    } else if(glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS){
+        //TODO: Scale up Selected Model
+    } else if(glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS){
+        //TODO: Scale down Selected Model
+    } else if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS){
+        //TODO: Move Selected Model Up Unit Length
+    } else if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS){
+        //TODO: Move Selected Model Left Unit Length
+    } else if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS){
+        //TODO: Move Selected Model Right Unit Length
+    } else if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS){
+        //TODO: Move Selected Model Down Unit Length
+    } else if(glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS){
+        //TODO: Rotate Selected Model left 5 degrees
+    } else if(glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS){
+        //TODO: Rotate Selected Model right 5 degrees
     }
 }
 
