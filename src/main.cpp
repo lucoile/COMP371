@@ -346,31 +346,31 @@ int main() {
 //        modelVertices = translationMatrix * modelVertices;
 
         glBindVertexArray(modelH6VAO);
-        glDrawElements(GL_TRIANGLES, sizeof(vertH6), GL_UNSIGNED_INT, 0);
+        glDrawElements(type, sizeof(vertH6), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
 
         modelShader.setMat4("translation", translations[1]);
 
         glBindVertexArray(modelJ5VAO);
-        glDrawElements(GL_TRIANGLES, sizeof(vertJ5), GL_UNSIGNED_INT, 0);
+        glDrawElements(type, sizeof(vertJ5), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
 
         modelShader.setMat4("translation", translations[2]);
 
         glBindVertexArray(modelN5VAO);
-        glDrawElements(GL_TRIANGLES, sizeof(vertN5), GL_UNSIGNED_INT, 0);
+        glDrawElements(type, sizeof(vertN5), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
 
         modelShader.setMat4("translation", translations[3]);
 
         glBindVertexArray(modelO8VAO);
-        glDrawElements(GL_TRIANGLES, sizeof(vertO8), GL_UNSIGNED_INT, 0);
+        glDrawElements(type, sizeof(vertO8), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
 
         modelShader.setMat4("translation", translations[4]);
 
         glBindVertexArray(modelR1VAO);
-        glDrawElements(GL_TRIANGLES, sizeof(vertR1), GL_UNSIGNED_INT, 0);
+        glDrawElements(type, sizeof(vertR1), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
