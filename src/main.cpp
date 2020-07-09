@@ -188,23 +188,89 @@ int main() {
     };
 
     // Models
-    unsigned int modelEBO[5], modelVAO[5], modelVBO[5];
-    glGenVertexArrays(5, modelVAO);
-    glGenBuffers(5, modelVBO);
-    glGenBuffers(5, modelEBO);
+//    unsigned int modelEBO[5], modelVAO[5], modelVBO[5];
+//    glGenVertexArrays(5, modelVAO);
+//    glGenBuffers(5, modelVBO);
+//    glGenBuffers(5, modelEBO);
 
-    for (int i = 0; i < 5; i++) {
-        glBindVertexArray(modelVAO[i]);
-        glBindBuffer(GL_ARRAY_BUFFER, modelVBO[i]);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(modelVertices[i]), modelVertices[i], GL_STATIC_DRAW);
+    unsigned int modelH6EBO, modelH6VAO, modelH6VBO;
+    unsigned int modelJ5EBO, modelJ5VAO, modelJ5VBO;
+    unsigned int modelN5EBO, modelN5VAO, modelN5VBO;
+    unsigned int modelO8EBO, modelO8VAO, modelO8VBO;
+    unsigned int modelR1EBO, modelR1VAO, modelR1VBO;
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelEBO[i]);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(modelIndices[i]), modelIndices[i], GL_STATIC_DRAW);
+    glGenVertexArrays(1, &modelH6VAO);
+    glGenBuffers(1, &modelH6VBO);
+    glGenBuffers(1, &modelH6EBO);
 
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
-        glEnableVertexAttribArray(0);
-    }
+    glGenVertexArrays(1, &modelJ5VAO);
+    glGenBuffers(1, &modelJ5VBO);
+    glGenBuffers(1, &modelJ5EBO);
 
+    glGenVertexArrays(1, &modelN5VAO);
+    glGenBuffers(1, &modelN5VBO);
+    glGenBuffers(1, &modelN5EBO);
+
+    glGenVertexArrays(1, &modelO8VAO);
+    glGenBuffers(1, &modelO8VBO);
+    glGenBuffers(1, &modelO8EBO);
+
+    glGenVertexArrays(1, &modelR1VAO);
+    glGenBuffers(1, &modelR1VBO);
+    glGenBuffers(1, &modelR1EBO);
+
+
+//    for (int i = 0; i < 5; i++) {
+//        glBindVertexArray(modelVAO[i]);
+//        glBindBuffer(GL_ARRAY_BUFFER, modelVBO[i]);
+//        glBufferData(GL_ARRAY_BUFFER, sizeof(modelVertices[i]), modelVertices[i], GL_STATIC_DRAW);
+//
+//        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelEBO[i]);
+//        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(modelIndices[i]), modelIndices[i], GL_STATIC_DRAW);
+//
+//        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
+//        glEnableVertexAttribArray(0);
+//    }
+
+    glBindVertexArray(modelH6VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, modelH6VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertH6), vertH6, GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelH6EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indexH6), indexH6, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
+    glEnableVertexAttribArray(0);
+
+    glBindVertexArray(modelJ5VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, modelJ5VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertJ5), vertJ5, GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJ5EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indexJ5), indexJ5, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
+    glEnableVertexAttribArray(0);
+
+    glBindVertexArray(modelN5VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, modelN5VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertN5), vertJ5, GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelN5EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indexN5), indexN5, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
+    glEnableVertexAttribArray(0);
+
+    glBindVertexArray(modelO8VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, modelO8VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertO8), vertO8, GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelO8EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indexO8), indexO8, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
+    glEnableVertexAttribArray(0);
+
+    glBindVertexArray(modelR1VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, modelR1VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertR1), vertR1, GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelR1EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indexR1), indexR1, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
+    glEnableVertexAttribArray(0);
     // Load and Create a texture
     Texture texture1("res/textures/dirt.jpg");
 
@@ -266,8 +332,28 @@ int main() {
         modelShader.setMat4("projection", projection);
         modelShader.setMat4("view", view);
 
-        glBindVertexArray(modelVAO[0]);
-        glDrawElements(GL_TRIANGLES, sizeof(modelVertices[0]), GL_UNSIGNED_INT, 0);
+//        glm::mat4 translationMatrix = glm::translate(glm::mat4(), glm::vec3(10.0f, 0.0f, 0.0f));
+//        modelShader.setMat4("translationMatrix", translationMatrix);
+//        modelVertices = translationMatrix * modelVertices;
+
+        glBindVertexArray(modelH6VAO);
+        glDrawElements(GL_TRIANGLES, sizeof(vertH6), GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
+
+        glBindVertexArray(modelJ5VAO);
+        glDrawElements(GL_TRIANGLES, sizeof(vertJ5), GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
+
+        glBindVertexArray(modelN5VAO);
+        glDrawElements(GL_TRIANGLES, sizeof(vertN5), GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
+
+        glBindVertexArray(modelO8VAO);
+        glDrawElements(GL_TRIANGLES, sizeof(vertO8), GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
+
+        glBindVertexArray(modelR1VAO);
+        glDrawElements(GL_TRIANGLES, sizeof(vertR1), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
