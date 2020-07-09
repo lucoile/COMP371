@@ -250,7 +250,7 @@ int main() {
 
     glBindVertexArray(modelN5VAO);
     glBindBuffer(GL_ARRAY_BUFFER, modelN5VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertN5), vertJ5, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertN5), vertN5, GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelN5EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indexN5), indexN5, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
@@ -271,6 +271,16 @@ int main() {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indexR1), indexR1, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
     glEnableVertexAttribArray(0);
+
+    // Translation matrices for models
+    glm::mat4 translations[] = {
+            glm::translate(glm::mat4(1.0f), glm::vec3(40*ULEN, ULEN, 45*ULEN)),
+            glm::translate(glm::mat4(1.0f), glm::vec3(-40*ULEN, ULEN, 45*ULEN)),
+            glm::translate(glm::mat4(1.0f), glm::vec3(40*ULEN, ULEN, -45*ULEN)),
+            glm::translate(glm::mat4(1.0f), glm::vec3(-40*ULEN, ULEN, -45*ULEN)),
+            glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, ULEN, 0.0f))
+    };
+
     // Load and Create a texture
     Texture texture1("res/textures/dirt.jpg");
 
@@ -332,25 +342,32 @@ int main() {
         modelShader.setMat4("projection", projection);
         modelShader.setMat4("view", view);
 
-//        glm::mat4 translationMatrix = glm::translate(glm::mat4(), glm::vec3(10.0f, 0.0f, 0.0f));
-//        modelShader.setMat4("translationMatrix", translationMatrix);
+        modelShader.setMat4("translation", translations[0]);
 //        modelVertices = translationMatrix * modelVertices;
 
         glBindVertexArray(modelH6VAO);
         glDrawElements(GL_TRIANGLES, sizeof(vertH6), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
 
+        modelShader.setMat4("translation", translations[1]);
+
         glBindVertexArray(modelJ5VAO);
         glDrawElements(GL_TRIANGLES, sizeof(vertJ5), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
+
+        modelShader.setMat4("translation", translations[2]);
 
         glBindVertexArray(modelN5VAO);
         glDrawElements(GL_TRIANGLES, sizeof(vertN5), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
 
+        modelShader.setMat4("translation", translations[3]);
+
         glBindVertexArray(modelO8VAO);
         glDrawElements(GL_TRIANGLES, sizeof(vertO8), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
+
+        modelShader.setMat4("translation", translations[4]);
 
         glBindVertexArray(modelR1VAO);
         glDrawElements(GL_TRIANGLES, sizeof(vertR1), GL_UNSIGNED_INT, 0);
