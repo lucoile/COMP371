@@ -260,10 +260,10 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
     lastY = ypos;
 
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
-        camera.process_mouse_movement(xoffset, yoffset, PAN);
+        camera.process_mouse_movement(xoffset, 0, PAN);
     } else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
         camera.process_mouse_movement(0, yoffset, ZOOM);
     } else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS) {
-        camera.process_mouse_movement(xoffset, yoffset, TILT);
+        camera.process_mouse_movement(0, yoffset, TILT);
     }
 }
