@@ -691,19 +691,19 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     }
     if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
         //TODO: Rotate around x axis positively
-        worldOrientation = glm::rotate(worldOrientation, glm::radians(1.0f), glm::vec3(ULEN, 0.0f, 0.0f));
+        worldOrientation = glm::rotate(worldOrientation, glm::radians(1.0f), glm::vec3(0.0f, ULEN, 0.0f));
     }
     if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
         //TODO: Rotate around x axis negatively
-        worldOrientation = glm::rotate(worldOrientation, glm::radians(-1.0f), glm::vec3(ULEN, 0.0f, 0.0f));
+        worldOrientation = glm::rotate(worldOrientation, glm::radians(-1.0f), glm::vec3(0.0f, ULEN, 0.0f));
     }
     if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
         //TODO: Rotate around y axis positively
-        worldOrientation = glm::rotate(worldOrientation, glm::radians(1.0f), glm::vec3(0.0f, ULEN, 0.0f));
+        worldOrientation = glm::rotate(worldOrientation, glm::radians(1.0f), glm::vec3(ULEN, 0.0f, 0.0f));
     }
     if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
         //TODO: Rotate around y axis negatively
-        worldOrientation = glm::rotate(worldOrientation, glm::radians(-1.0f), glm::vec3(0.0f, ULEN, 0.0f));
+        worldOrientation = glm::rotate(worldOrientation, glm::radians(-1.0f), glm::vec3(ULEN, 0.0f, 0.0f));
     }
     if (glfwGetKey(window, GLFW_KEY_HOME) == GLFW_PRESS) {
         for(int i = 0; i < 5; i++){
