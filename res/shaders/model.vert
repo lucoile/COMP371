@@ -11,5 +11,5 @@ uniform mat4 world;
 
 void main()
 {
-    gl_Position =  projection * view * translation * rotation * scaling * world * vec4(aPos, 1.0f);
+    gl_Position =  projection * view * world * translation * rotation * scaling *  vec4(aPos, 1.0f);
 }

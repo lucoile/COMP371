@@ -517,7 +517,6 @@ int main() {
         lineShader.use();
         lineShader.setMat4("projection", projection);
         lineShader.setMat4("view", view);
-        lineShader.setMat4("world", worldOrientation);
 
         // Draw lines
         glBindVertexArray(lineVAO);
@@ -529,6 +528,7 @@ int main() {
         gridShader.use();
         gridShader.setMat4("projection", projection);
         gridShader.setMat4("view", view);
+        gridShader.setMat4("world", worldOrientation);
 
         glBindVertexArray(squareVAO);
         for (auto &gridPosition : gridPositions) {
