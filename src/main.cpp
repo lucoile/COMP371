@@ -99,7 +99,7 @@ glm::mat4 scalings[] = {
         glm::scale(glm::mat4(1.0f), glm::vec3(1.0, 1.0, 1.0))
 };
 
-glm::mat4 view;
+glm::mat4 defaultView;
 
 
 int main() {
@@ -525,7 +525,6 @@ int main() {
 
     // Tell opengl for each sampler to which texture unit it belongs to (only has to be done once)
     gridShader.use();
-
     // Render Loop
     while (!glfwWindowShouldClose(window)) {
         // Per Frame Time Logic
@@ -545,7 +544,7 @@ int main() {
                                                 100.0f);
 
         // Camera/view transformation
-        view = camera.get_view_matrix();
+        glm::mat4 view = camera.get_view_matrix();
 
         // Render lines
         // Activate line shader
@@ -740,7 +739,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
             rotations[i] = defaultRotations[i];
             scalings[i] = defaultScalings[i];
         }
-        //TODO: Reset to Initial World Position and Orientation
+        camera = Camera(glm::vec3(0.0f, 0.1f, 2.0f));
     }
     if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS) {
         scalings[selectedModel] = glm::scale(scalings[selectedModel], glm::vec3(1.0f + ULEN, 1.0f + ULEN, 1.0f + ULEN));
