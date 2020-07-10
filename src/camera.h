@@ -41,40 +41,6 @@ public:
     float MouseSensitivity;
     float Zoom;
 
-    // constructor with vectors
-    explicit Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f),
-           float yaw = YAW, float pitch = PITCH) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED),
-                                                   MouseSensitivity(SENSITIVITY), Zoom(ZOOM) {
-        Position = position;
-        WorldUp = up;
-        Yaw = yaw;
-        Pitch = pitch;
-        update_camera_vectors();
-    }
-
-    // returns the view matrix calculated using Euler Angles and the LookAt Matrix
-    glm::mat4 get_view_matrix() const {
-        return glm::lookAt(Position, Position + Front, Up);
-    }
-
-    // processes input received from a mouse input system. Expects the offset value in both the x and y direction.
-    void process_mouse_movement(float xoffset, float yoffset, Camera_Movement movement) {
-        xoffset *= MouseSensitivity;
-        yoffset *= MouseSensitivity;
-        if (movement == PAN) {
-            Position += Right * xoffset;
-            Position += Up * yoffset;
-        } else if (movement == ZOOM) {
-            Position += Front * yoffset;
-        } else if (movement == TILT) {
-            Yaw += xoffset * 10;
-            Pitch += yoffset * 10;
-
-            if (Pitch > 89.0f)
-                Pitch = 89.0f;
-            if (Pitch < -89.0f)
-                Pitch = -89.0f;
-        }
     // constructor with vector
     Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f),
            glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f),
