@@ -6,8 +6,10 @@ uniform mat4 projection;
 uniform mat4 translation;
 uniform mat4 rotation;
 uniform mat4 scaling;
+uniform mat4 world;
+
 
 void main()
 {
-    gl_Position =  projection * view * translation * rotation * scaling * vec4(aPos, 1.0f);
+    gl_Position =  projection * view * world * translation * rotation * scaling *  vec4(aPos, 1.0f);
 }

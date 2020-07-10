@@ -101,6 +101,8 @@ glm::mat4 scalings[] = {
 
 glm::mat4 defaultView;
 
+glm::mat4 worldOrientation = glm::mat4(1.0f);
+
 
 int main() {
     // glfw: initialize and configure
@@ -526,6 +528,7 @@ int main() {
         gridShader.use();
         gridShader.setMat4("projection", projection);
         gridShader.setMat4("view", view);
+        gridShader.setMat4("world", worldOrientation);
 
         glBindVertexArray(squareVAO);
         for (auto &gridPosition : gridPositions) {
@@ -543,6 +546,7 @@ int main() {
         modelShader.use();
         modelShader.setMat4("projection", projection);
         modelShader.setMat4("view", view);
+        modelShader.setMat4("world", worldOrientation);
 
         modelShader.setMat4("translation", translations[0]);
         modelShader.setMat4("rotation", rotations[0]);
@@ -687,46 +691,59 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     }
     if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
         //TODO: Rotate around x axis positively
+        worldOrientation = glm::rotate(worldOrientation, glm::radians(1.0f), glm::vec3(ULEN, 0.0f, 0.0f));
     }
     if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
         //TODO: Rotate around x axis negatively
+        worldOrientation = glm::rotate(worldOrientation, glm::radians(-1.0f), glm::vec3(ULEN, 0.0f, 0.0f));
     }
     if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
         //TODO: Rotate around y axis positively
+        worldOrientation = glm::rotate(worldOrientation, glm::radians(1.0f), glm::vec3(0.0f, ULEN, 0.0f));
     }
     if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
         //TODO: Rotate around y axis negatively
+        worldOrientation = glm::rotate(worldOrientation, glm::radians(-1.0f), glm::vec3(0.0f, ULEN, 0.0f));
     }
     if (glfwGetKey(window, GLFW_KEY_HOME) == GLFW_PRESS) {
         for(int i = 0; i < 5; i++){
             translations[i] = defaultTranslations[i];
             rotations[i] = defaultRotations[i];
             scalings[i] = defaultScalings[i];
+            worldOrientation = glm::mat4(1.0f);
         }
         camera = Camera(glm::vec3(0.0f, 0.1f, 2.0f));
     }
-    if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS) {
+    if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS){
         scalings[selectedModel] = glm::scale(scalings[selectedModel], glm::vec3(1.0f + ULEN, 1.0f + ULEN, 1.0f + ULEN));
     }
     if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) {
         scalings[selectedModel] = glm::scale(scalings[selectedModel], glm::vec3(1.0f - ULEN, 1.0f - ULEN, 1.0f - ULEN));
     }
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+    if ((glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+            && ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+            || (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))) {
         translations[selectedModel] =  glm::translate(translations[selectedModel], glm::vec3(0, 0 ,-ULEN));
     }
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+    if ((glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+            && ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+            || (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))) {
         translations[selectedModel] =  glm::translate(translations[selectedModel], glm::vec3(-ULEN, 0 ,0));
     }
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+    if ((glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+            && ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+            || (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))) {
         translations[selectedModel] =  glm::translate(translations[selectedModel], glm::vec3(0, 0 ,ULEN));
     }
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+    if ((glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+            && ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+            || (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))) {
         translations[selectedModel] =  glm::translate(translations[selectedModel], glm::vec3(ULEN, 0 ,0));
     }
-    if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS) {
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
         rotations[selectedModel] = glm::rotate(rotations[selectedModel], glm::radians(5.0f), glm::vec3(0.0, 1.0, 0.0));
     }
-    if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) {
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
         rotations[selectedModel] = glm::rotate(rotations[selectedModel], glm::radians(-5.0f), glm::vec3(0.0, 1.0, 0.0));
     }
 }
