@@ -27,7 +27,7 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 
 void process_input(GLFWwindow *window);
 
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
 
 std::vector<float> read_csv(const std::string &filename);
 
@@ -98,8 +98,6 @@ glm::mat4 scalings[] = {
         glm::scale(glm::mat4(1.0f), glm::vec3(1.0, 1.0, 1.0)),
         glm::scale(glm::mat4(1.0f), glm::vec3(1.0, 1.0, 1.0))
 };
-
-glm::mat4 defaultView;
 
 glm::mat4 worldOrientation = glm::mat4(1.0f);
 
@@ -223,9 +221,6 @@ int main() {
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *) (3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
-//    std::vector<float> modelVAO1 = read_csv("../res/models/alphanumeric_vertices.csv");
-//    std::vector<float> modelEBO1 = read_csv("../res/models/alphanumeric_elements.csv");
-
     // Alphanumberic model data
     float vertH6[] = {0.074075, -0.050000, 0.050000, 0.174075, -0.050000, 0.050000, 0.074075, 0.050000, 0.050000,
                       0.174075, 0.050000, 0.050000, 0.074075, 0.050000, -0.050000, 0.174075, 0.050000, -0.050000,
@@ -275,8 +270,52 @@ int main() {
                               70, 60, 55, 68, 68, 55, 71, 69, 68, 73, 73, 68, 72, 66, 74, 68, 68, 74, 72, 66, 67, 74,
                               74, 67, 75, 67, 69, 75, 75, 69, 73, 71, 70, 77, 77, 70, 76, 70, 67, 76, 76, 67, 78, 67,
                               66, 78, 78, 66, 79, 66, 71, 79, 79, 71, 77};
-    float vertJ5[] = {-0.325565, -0.050000, 0.050000, -0.236164, -0.050000, 0.050000, -0.325565, 0.450000, 0.050000, -0.236164, 0.450000, 0.050000, -0.325565, 0.450000, -0.050000, -0.236164, 0.450000, -0.050000, -0.325565, -0.050000, -0.050000, -0.236164, -0.050000, -0.050000, -0.236164, 0.357072, 0.050000, -0.325565, 0.350000, 0.050000, -0.325565, 0.350000, -0.050000, -0.236164, 0.357072, -0.050000, -0.212963, 0.259301, 0.050000, -0.325565, 0.250000, 0.050000, -0.325565, 0.250000, -0.050000, -0.212963, 0.259301, -0.050000, -0.236164, 0.139011, 0.050000, -0.325565, 0.150000, 0.050000, -0.325565, 0.150000, -0.050000, -0.236164, 0.139011, -0.050000, -0.236164, 0.050000, 0.050000, -0.325565, 0.050000, 0.050000, -0.325565, 0.050000, -0.050000, -0.236164, 0.050000, -0.050000, -0.132116, -0.048058, -0.050000, -0.132116, -0.048058, 0.050000, -0.032142, -0.045795, -0.050000, -0.032142, -0.045795, 0.050000, -0.236164, 0.050000, -0.050000, -0.236164, 0.050000, 0.050000, -0.236164, 0.139011, -0.050000, -0.236164, 0.139011, 0.050000, -0.051039, 0.449769, -0.050000, -0.051039, 0.449769, 0.050000, -0.151039, 0.449923, -0.050000, -0.151039, 0.449923, 0.050000, 0.363836, -0.050000, 0.050000, 0.363836, 0.050000, 0.050000, 0.363836, 0.050000, -0.050000, 0.363836, -0.050000, -0.050000, 0.263836, 0.050000, 0.050000, 0.263836, 0.050000, -0.050000, 0.263836, -0.050000, -0.050000, 0.263836, -0.050000, 0.050000, 0.263836, 0.150000, 0.050000, 0.363836, 0.150000, 0.050000, 0.363836, 0.150000, -0.050000, 0.263836, 0.150000, -0.050000, 0.263836, 0.250000, 0.050000, 0.363836, 0.250000, 0.050000, 0.363836, 0.250000, -0.050000, 0.263836, 0.250000, -0.050000, 0.163836, 0.150000, 0.050000, 0.163836, 0.150000, -0.050000, 0.163836, 0.250000, 0.050000, 0.163836, 0.250000, -0.050000, 0.063836, 0.150000, 0.050000, 0.063836, 0.150000, -0.050000, 0.063836, 0.250000, 0.050000, 0.063836, 0.250000, -0.050000, 0.163836, 0.350000, 0.050000, 0.163836, 0.350000, -0.050000, 0.063836, 0.350000, -0.050000, 0.063836, 0.350000, 0.050000, 0.163836, 0.450000, 0.050000, 0.163836, 0.450000, -0.050000, 0.063836, 0.450000, -0.050000, 0.063836, 0.450000, 0.050000, 0.363836, 0.350000, 0.050000, 0.363836, 0.350000, -0.050000, 0.363836, 0.450000, -0.050000, 0.363836, 0.450000, 0.050000, 0.063836, 0.050000, -0.050000, 0.063836, -0.050000, -0.050000, 0.063836, -0.050000, 0.050000, 0.063836, 0.050000, 0.050000};
-    unsigned int indexJ5[] = {0, 1, 21, 21, 1, 20, 2, 3, 4, 4, 3, 5, 22, 23, 6, 6, 23, 7, 6, 7, 0, 0, 7, 1, 1, 7, 20, 20, 7, 23, 6, 0, 22, 22, 0, 21, 9, 8, 2, 2, 8, 3, 10, 9, 4, 4, 9, 2, 5, 11, 4, 4, 11, 10, 8, 11, 3, 3, 11, 5, 12, 8, 13, 13, 8, 9, 14, 13, 10, 10, 13, 9, 10, 11, 14, 14, 11, 15, 33, 32, 35, 35, 32, 34, 17, 16, 13, 13, 16, 12, 18, 17, 14, 14, 17, 13, 15, 19, 14, 14, 19, 18, 25, 24, 27, 27, 24, 26, 20, 16, 21, 21, 16, 17, 22, 21, 18, 18, 21, 17, 18, 19, 22, 22, 19, 23, 29, 28, 31, 31, 28, 30, 16, 19, 25, 25, 19, 24, 15, 26, 19, 19, 26, 24, 15, 12, 26, 26, 12, 27, 12, 16, 27, 27, 16, 25, 29, 20, 28, 20, 23, 28, 28, 23, 30, 23, 19, 30, 30, 19, 31, 19, 16, 31, 31, 16, 29, 16, 20, 29, 12, 15, 33, 33, 15, 32, 11, 34, 15, 15, 34, 32, 11, 8, 34, 34, 8, 35, 8, 12, 35, 35, 12, 33, 36, 39, 37, 37, 39, 38, 48, 49, 51, 51, 49, 50, 42, 41, 39, 39, 41, 38, 43, 42, 36, 36, 42, 39, 40, 43, 37, 37, 43, 36, 40, 37, 44, 44, 37, 45, 37, 38, 45, 45, 38, 46, 38, 41, 46, 46, 41, 47, 41, 40, 47, 47, 40, 44, 44, 45, 48, 48, 45, 49, 45, 46, 49, 49, 46, 50, 46, 47, 50, 50, 47, 51, 57, 56, 59, 59, 56, 58, 47, 44, 53, 53, 44, 52, 44, 48, 52, 52, 48, 54, 48, 51, 54, 54, 51, 55, 51, 47, 55, 55, 47, 53, 53, 52, 57, 57, 52, 56, 52, 54, 56, 56, 54, 58, 64, 65, 67, 67, 65, 66, 55, 53, 59, 59, 53, 57, 54, 55, 60, 60, 55, 61, 55, 59, 61, 61, 59, 62, 59, 58, 62, 62, 58, 63, 58, 54, 63, 63, 54, 60, 68, 69, 71, 71, 69, 70, 61, 62, 65, 65, 62, 66, 62, 63, 66, 66, 63, 67, 63, 60, 67, 67, 60, 64, 60, 61, 68, 68, 61, 69, 61, 65, 69, 69, 65, 70, 65, 64, 70, 70, 64, 71, 64, 60, 71, 71, 60, 68, 72, 73, 75, 75, 73, 74, 41, 42, 72, 72, 42, 73, 42, 43, 73, 73, 43, 74, 43, 40, 74, 74, 40, 75, 40, 41, 75, 75, 41, 72};
+    float vertJ5[] = {-0.325565, -0.050000, 0.050000, -0.236164, -0.050000, 0.050000, -0.325565, 0.450000, 0.050000,
+                      -0.236164, 0.450000, 0.050000, -0.325565, 0.450000, -0.050000, -0.236164, 0.450000, -0.050000,
+                      -0.325565, -0.050000, -0.050000, -0.236164, -0.050000, -0.050000, -0.236164, 0.357072, 0.050000,
+                      -0.325565, 0.350000, 0.050000, -0.325565, 0.350000, -0.050000, -0.236164, 0.357072, -0.050000,
+                      -0.212963, 0.259301, 0.050000, -0.325565, 0.250000, 0.050000, -0.325565, 0.250000, -0.050000,
+                      -0.212963, 0.259301, -0.050000, -0.236164, 0.139011, 0.050000, -0.325565, 0.150000, 0.050000,
+                      -0.325565, 0.150000, -0.050000, -0.236164, 0.139011, -0.050000, -0.236164, 0.050000, 0.050000,
+                      -0.325565, 0.050000, 0.050000, -0.325565, 0.050000, -0.050000, -0.236164, 0.050000, -0.050000,
+                      -0.132116, -0.048058, -0.050000, -0.132116, -0.048058, 0.050000, -0.032142, -0.045795, -0.050000,
+                      -0.032142, -0.045795, 0.050000, -0.236164, 0.050000, -0.050000, -0.236164, 0.050000, 0.050000,
+                      -0.236164, 0.139011, -0.050000, -0.236164, 0.139011, 0.050000, -0.051039, 0.449769, -0.050000,
+                      -0.051039, 0.449769, 0.050000, -0.151039, 0.449923, -0.050000, -0.151039, 0.449923, 0.050000,
+                      0.363836, -0.050000, 0.050000, 0.363836, 0.050000, 0.050000, 0.363836, 0.050000, -0.050000,
+                      0.363836, -0.050000, -0.050000, 0.263836, 0.050000, 0.050000, 0.263836, 0.050000, -0.050000,
+                      0.263836, -0.050000, -0.050000, 0.263836, -0.050000, 0.050000, 0.263836, 0.150000, 0.050000,
+                      0.363836, 0.150000, 0.050000, 0.363836, 0.150000, -0.050000, 0.263836, 0.150000, -0.050000,
+                      0.263836, 0.250000, 0.050000, 0.363836, 0.250000, 0.050000, 0.363836, 0.250000, -0.050000,
+                      0.263836, 0.250000, -0.050000, 0.163836, 0.150000, 0.050000, 0.163836, 0.150000, -0.050000,
+                      0.163836, 0.250000, 0.050000, 0.163836, 0.250000, -0.050000, 0.063836, 0.150000, 0.050000,
+                      0.063836, 0.150000, -0.050000, 0.063836, 0.250000, 0.050000, 0.063836, 0.250000, -0.050000,
+                      0.163836, 0.350000, 0.050000, 0.163836, 0.350000, -0.050000, 0.063836, 0.350000, -0.050000,
+                      0.063836, 0.350000, 0.050000, 0.163836, 0.450000, 0.050000, 0.163836, 0.450000, -0.050000,
+                      0.063836, 0.450000, -0.050000, 0.063836, 0.450000, 0.050000, 0.363836, 0.350000, 0.050000,
+                      0.363836, 0.350000, -0.050000, 0.363836, 0.450000, -0.050000, 0.363836, 0.450000, 0.050000,
+                      0.063836, 0.050000, -0.050000, 0.063836, -0.050000, -0.050000, 0.063836, -0.050000, 0.050000,
+                      0.063836, 0.050000, 0.050000};
+    unsigned int indexJ5[] = {0, 1, 21, 21, 1, 20, 2, 3, 4, 4, 3, 5, 22, 23, 6, 6, 23, 7, 6, 7, 0, 0, 7, 1, 1, 7, 20,
+                              20, 7, 23, 6, 0, 22, 22, 0, 21, 9, 8, 2, 2, 8, 3, 10, 9, 4, 4, 9, 2, 5, 11, 4, 4, 11, 10,
+                              8, 11, 3, 3, 11, 5, 12, 8, 13, 13, 8, 9, 14, 13, 10, 10, 13, 9, 10, 11, 14, 14, 11, 15,
+                              33, 32, 35, 35, 32, 34, 17, 16, 13, 13, 16, 12, 18, 17, 14, 14, 17, 13, 15, 19, 14, 14,
+                              19, 18, 25, 24, 27, 27, 24, 26, 20, 16, 21, 21, 16, 17, 22, 21, 18, 18, 21, 17, 18, 19,
+                              22, 22, 19, 23, 29, 28, 31, 31, 28, 30, 16, 19, 25, 25, 19, 24, 15, 26, 19, 19, 26, 24,
+                              15, 12, 26, 26, 12, 27, 12, 16, 27, 27, 16, 25, 29, 20, 28, 20, 23, 28, 28, 23, 30, 23,
+                              19, 30, 30, 19, 31, 19, 16, 31, 31, 16, 29, 16, 20, 29, 12, 15, 33, 33, 15, 32, 11, 34,
+                              15, 15, 34, 32, 11, 8, 34, 34, 8, 35, 8, 12, 35, 35, 12, 33, 36, 39, 37, 37, 39, 38, 48,
+                              49, 51, 51, 49, 50, 42, 41, 39, 39, 41, 38, 43, 42, 36, 36, 42, 39, 40, 43, 37, 37, 43,
+                              36, 40, 37, 44, 44, 37, 45, 37, 38, 45, 45, 38, 46, 38, 41, 46, 46, 41, 47, 41, 40, 47,
+                              47, 40, 44, 44, 45, 48, 48, 45, 49, 45, 46, 49, 49, 46, 50, 46, 47, 50, 50, 47, 51, 57,
+                              56, 59, 59, 56, 58, 47, 44, 53, 53, 44, 52, 44, 48, 52, 52, 48, 54, 48, 51, 54, 54, 51,
+                              55, 51, 47, 55, 55, 47, 53, 53, 52, 57, 57, 52, 56, 52, 54, 56, 56, 54, 58, 64, 65, 67,
+                              67, 65, 66, 55, 53, 59, 59, 53, 57, 54, 55, 60, 60, 55, 61, 55, 59, 61, 61, 59, 62, 59,
+                              58, 62, 62, 58, 63, 58, 54, 63, 63, 54, 60, 68, 69, 71, 71, 69, 70, 61, 62, 65, 65, 62,
+                              66, 62, 63, 66, 66, 63, 67, 63, 60, 67, 67, 60, 64, 60, 61, 68, 68, 61, 69, 61, 65, 69,
+                              69, 65, 70, 65, 64, 70, 70, 64, 71, 64, 60, 71, 71, 60, 68, 72, 73, 75, 75, 73, 74, 41,
+                              42, 72, 72, 42, 73, 42, 43, 73, 73, 43, 74, 43, 40, 74, 74, 40, 75, 40, 41, 75, 75, 41,
+                              72};
     float vertN5[] = {0.100000, -0.050000, 0.050000, 0.200000, -0.050000, 0.050000, 0.100000, 0.090032, 0.050000,
                       0.100000, 0.090032, -0.050000, 0.200000, -0.050000, -0.050000, 0.100000, -0.050000, -0.050000,
                       0.100000, 0.450000, 0.050000, 0.200000, 0.450000, 0.050000, 0.200000, 0.450000, -0.050000,
@@ -394,19 +433,6 @@ int main() {
                               27, 49, 49, 27, 48, 27, 44, 48, 48, 44, 50, 44, 45, 50, 50, 45, 51, 24, 49, 45, 45, 49,
                               51};
 
-    float *modelVertices[5] = {
-            vertH6, vertJ5, vertN5, vertO8, vertR1
-    };
-    unsigned int *modelIndices[5] = {
-            indexH6, indexJ5, indexN5, indexO8, indexR1
-    };
-
-    // Models
-//    unsigned int modelEBO[5], modelVAO[5], modelVBO[5];
-//    glGenVertexArrays(5, modelVAO);
-//    glGenBuffers(5, modelVBO);
-//    glGenBuffers(5, modelEBO);
-
     unsigned int modelH6EBO, modelH6VAO, modelH6VBO;
     unsigned int modelJ5EBO, modelJ5VAO, modelJ5VBO;
     unsigned int modelN5EBO, modelN5VAO, modelN5VBO;
@@ -432,19 +458,6 @@ int main() {
     glGenVertexArrays(1, &modelR1VAO);
     glGenBuffers(1, &modelR1VBO);
     glGenBuffers(1, &modelR1EBO);
-
-
-//    for (int i = 0; i < 5; i++) {
-//        glBindVertexArray(modelVAO[i]);
-//        glBindBuffer(GL_ARRAY_BUFFER, modelVBO[i]);
-//        glBufferData(GL_ARRAY_BUFFER, sizeof(modelVertices[i]), modelVertices[i], GL_STATIC_DRAW);
-//
-//        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelEBO[i]);
-//        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(modelIndices[i]), modelIndices[i], GL_STATIC_DRAW);
-//
-//        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
-//        glEnableVertexAttribArray(0);
-//    }
 
     glBindVertexArray(modelH6VAO);
     glBindBuffer(GL_ARRAY_BUFFER, modelH6VBO);
@@ -551,7 +564,6 @@ int main() {
         modelShader.setMat4("translation", translations[0]);
         modelShader.setMat4("rotation", rotations[0]);
         modelShader.setMat4("scaling", scalings[0]);
-//        modelVertices = translationMatrix * modelVertices;
 
         glBindVertexArray(modelH6VAO);
         glDrawElements(type, sizeof(vertH6), GL_UNSIGNED_INT, 0);
@@ -604,35 +616,8 @@ int main() {
     return 0;
 }
 
-std::vector<float> read_csv(const std::string &filename) {
-    using namespace std;
-    vector<string> models;
-    string model;
-    vector<float> result;
-    string line, element, temp;
-
-    // input filestream
-    ifstream myFile(filename);
-
-    // open file
-    if (!myFile.is_open()) throw runtime_error("Error: File Was Not Opened");
-
-    while (getline(myFile, model, ',')) {
-        if (model == "\n") {
-            cout << "new line";
-        }
-        cout << model;
-        result.push_back(std::stof(model));
-    }
-
-    myFile.close();
-    return result;
-}
-
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
-void process_input(GLFWwindow *window) {
-
-}
+void process_input(GLFWwindow *window) {}
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
@@ -662,10 +647,16 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
     }
 }
 
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods){
+void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
+    //Close Window by Pressing Escape
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
     }
+
+    // Switch Rendering Type
+    // Pressing P = Points
+    // Pressing L = Lines
+    // Pressing T = Triangles
     if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
         type = GL_POINTS;
     } else if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) {
@@ -673,6 +664,13 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     } else if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) {
         type = GL_TRIANGLES;
     }
+
+    //Select which Model to Alter
+    // Pressing 0 = Model 1 (H6)
+    // Pressing 1 = Model 2 (K5)
+    // Pressing 2 = Model 3 (N5)
+    // Pressing 3 = Model 4 (O8)
+    // Pressing 4 = Model 5 (R1)
     if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
         selectedModel = 0;
         std::cout << "Model 0 Selected" << std::endl;
@@ -689,61 +687,79 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         selectedModel = 4;
         std::cout << "Model 4 Selected" << std::endl;
     }
+
+    // Press U to Scale Up Selected Model
+    if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS) {
+        scalings[selectedModel] = glm::scale(scalings[selectedModel], glm::vec3(1.0f + ULEN, 1.0f + ULEN, 1.0f + ULEN));
+    }
+
+    // Press J to Scale Down Selected Model
+    if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) {
+        scalings[selectedModel] = glm::scale(scalings[selectedModel], glm::vec3(1.0f - ULEN, 1.0f - ULEN, 1.0f - ULEN));
+    }
+
+    // Press Shift + W to Translate Selected Model in the -Z Direction
+    if ((glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        && ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+            || (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))) {
+        translations[selectedModel] = glm::translate(translations[selectedModel], glm::vec3(0, 0, -ULEN));
+    }
+
+    // Press Shift + A to Translate Selected Model in the -X Direction
+    // Press A to Rotate Selected Model by -5.0 Degrees
+    if ((glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        && ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+            || (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))) {
+        translations[selectedModel] = glm::translate(translations[selectedModel], glm::vec3(-ULEN, 0, 0));
+    } else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+        rotations[selectedModel] = glm::rotate(rotations[selectedModel], glm::radians(-5.0f), glm::vec3(0.0, 1.0, 0.0));
+    }
+
+    // Press Shift + W to Translate Selected Model in the Z Direction
+    if ((glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        && ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+            || (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))) {
+        translations[selectedModel] = glm::translate(translations[selectedModel], glm::vec3(0, 0, ULEN));
+    }
+
+    // Press Shift + D to Translate Selected Model in the X Direction
+    // Press D to Rotate Selected Model by 5.0 Degrees
+    if ((glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        && ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+            || (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))) {
+        translations[selectedModel] = glm::translate(translations[selectedModel], glm::vec3(ULEN, 0, 0));
+    } else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+        rotations[selectedModel] = glm::rotate(rotations[selectedModel], glm::radians(5.0f), glm::vec3(0.0, 1.0, 0.0));
+    }
+
+    // Press Left Arrow Key to Rx
     if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-        //TODO: Rotate around x axis positively
         worldOrientation = glm::rotate(worldOrientation, glm::radians(1.0f), glm::vec3(ULEN, 0.0f, 0.0f));
     }
+
+    // Press Right Arrow Key R-x
     if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-        //TODO: Rotate around x axis negatively
         worldOrientation = glm::rotate(worldOrientation, glm::radians(-1.0f), glm::vec3(ULEN, 0.0f, 0.0f));
     }
+
+    // Press Up Arrow Key Ry
     if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-        //TODO: Rotate around y axis positively
         worldOrientation = glm::rotate(worldOrientation, glm::radians(1.0f), glm::vec3(0.0f, ULEN, 0.0f));
     }
+
+    // Press Up Arrow Key R-y
     if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-        //TODO: Rotate around y axis negatively
         worldOrientation = glm::rotate(worldOrientation, glm::radians(-1.0f), glm::vec3(0.0f, ULEN, 0.0f));
     }
+
+    // Reset World Orientation and Camera by Pressing Home Button
     if (glfwGetKey(window, GLFW_KEY_HOME) == GLFW_PRESS) {
-        for(int i = 0; i < 5; i++){
+        for (int i = 0; i < 5; i++) {
             translations[i] = defaultTranslations[i];
             rotations[i] = defaultRotations[i];
             scalings[i] = defaultScalings[i];
             worldOrientation = glm::mat4(1.0f);
         }
         camera = Camera(glm::vec3(0.0f, 0.1f, 2.0f));
-    }
-    if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS){
-        scalings[selectedModel] = glm::scale(scalings[selectedModel], glm::vec3(1.0f + ULEN, 1.0f + ULEN, 1.0f + ULEN));
-    }
-    if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) {
-        scalings[selectedModel] = glm::scale(scalings[selectedModel], glm::vec3(1.0f - ULEN, 1.0f - ULEN, 1.0f - ULEN));
-    }
-    if ((glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-            && ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-            || (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))) {
-        translations[selectedModel] =  glm::translate(translations[selectedModel], glm::vec3(0, 0 ,-ULEN));
-    }
-    if ((glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-            && ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-            || (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))) {
-        translations[selectedModel] =  glm::translate(translations[selectedModel], glm::vec3(-ULEN, 0 ,0));
-    }
-    if ((glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-            && ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-            || (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))) {
-        translations[selectedModel] =  glm::translate(translations[selectedModel], glm::vec3(0, 0 ,ULEN));
-    }
-    if ((glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-            && ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-            || (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))) {
-        translations[selectedModel] =  glm::translate(translations[selectedModel], glm::vec3(ULEN, 0 ,0));
-    }
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        rotations[selectedModel] = glm::rotate(rotations[selectedModel], glm::radians(5.0f), glm::vec3(0.0, 1.0, 0.0));
-    }
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        rotations[selectedModel] = glm::rotate(rotations[selectedModel], glm::radians(-5.0f), glm::vec3(0.0, 1.0, 0.0));
     }
 }
