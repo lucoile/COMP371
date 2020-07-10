@@ -714,28 +714,36 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         }
         camera = Camera(glm::vec3(0.0f, 0.1f, 2.0f));
     }
-    if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS) {
+    if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS){
         scalings[selectedModel] = glm::scale(scalings[selectedModel], glm::vec3(1.0f + ULEN, 1.0f + ULEN, 1.0f + ULEN));
     }
     if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) {
         scalings[selectedModel] = glm::scale(scalings[selectedModel], glm::vec3(1.0f - ULEN, 1.0f - ULEN, 1.0f - ULEN));
     }
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+    if ((glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+            && ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+            || (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))) {
         translations[selectedModel] =  glm::translate(translations[selectedModel], glm::vec3(0, 0 ,-ULEN));
     }
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+    if ((glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+            && ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+            || (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))) {
         translations[selectedModel] =  glm::translate(translations[selectedModel], glm::vec3(-ULEN, 0 ,0));
     }
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+    if ((glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+            && ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+            || (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))) {
         translations[selectedModel] =  glm::translate(translations[selectedModel], glm::vec3(0, 0 ,ULEN));
     }
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+    if ((glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+            && ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+            || (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))) {
         translations[selectedModel] =  glm::translate(translations[selectedModel], glm::vec3(ULEN, 0 ,0));
     }
-    if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS) {
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
         rotations[selectedModel] = glm::rotate(rotations[selectedModel], glm::radians(5.0f), glm::vec3(0.0, 1.0, 0.0));
     }
-    if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) {
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
         rotations[selectedModel] = glm::rotate(rotations[selectedModel], glm::radians(-5.0f), glm::vec3(0.0, 1.0, 0.0));
     }
 }
