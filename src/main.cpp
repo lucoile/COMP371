@@ -8,12 +8,12 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "shader_m.h"
-#include "camera.h"
-#include "texture.h"
-#include "mesh.h"
-#include "grid.h"
-#include "line.h"
+#include "Utilities/shader_m.h"
+#include "Utilities/camera.h"
+#include "Utilities/texture.h"
+#include "Mesh/mesh.h"
+#include "Grid/grid.h"
+#include "Line/line.h"
 
 #include <iostream>
 #include <istream>

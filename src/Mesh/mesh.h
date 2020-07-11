@@ -6,7 +6,7 @@
 #define COMP371_MESH_H
 
 #include <vector>
-#include "shader_m.h"
+#include "../Utilities/shader_m.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>

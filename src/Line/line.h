@@ -1,23 +1,22 @@
 //
-// Created by Daniel Batista-Ferreira on 7/11/20.
+// Created by danie on 2020-07-11.
 //
 
-#ifndef COMP371_GRID_H
-#define COMP371_GRID_H
+#ifndef COMP371_LINE_H
+#define COMP371_LINE_H
 
 #include <vector>
-#include "shader_m.h"
+#include "../Utilities/shader_m.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-class Grid {
+class Line {
 public:
     std::vector<float> vertices;
     std::vector<unsigned int> indices;
-    glm::vec3 gridPositions[100][100];
 
-    Grid(std::vector<float> vertices, std::vector<unsigned int> indices);
+    Line(std::vector<float> vertices, std::vector<unsigned int> indices);
 
     void draw(Shader &shader);
 
@@ -26,8 +25,7 @@ public:
 private:
     unsigned int VBO, VAO, EBO;
 
-    void setupGrid();
+    void setupLine();
 };
 
-
-#endif //COMP371_GRID_H
+#endif //COMP371_LINE_H
