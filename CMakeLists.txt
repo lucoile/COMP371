@@ -6,6 +6,7 @@ project (COMP371)
 add_executable(main
         src/main.cpp
         src/texture.cpp
+        src/mesh.cpp
         src/camera.cpp
         src/shader_m.cpp
         )
