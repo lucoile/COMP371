@@ -316,6 +316,8 @@ int main() {
 
         for (int i = 0; i < 5; i++) {
             modelShader.setMat4("translation", translations[i]);
+            modelShader.setMat4("rotation", rotations[i]);
+            modelShader.setMat4("scaling", scalings[i]);
             (*modelMeshes[i]).draw(modelShader);
         }
 
