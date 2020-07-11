@@ -15,8 +15,6 @@
 #include "mesh.h"
 
 #include <iostream>
-#include <fstream>
-#include <sstream>
 #include <istream>
 #include <string>
 #include <vector>
@@ -327,9 +325,15 @@ int main() {
     }
 
     // De-allocate all resources once they've outlived their purpose:
+    glDeleteBuffers(1, &lineVAO);
+    glDeleteBuffers(1, &lineVBO);
     glDeleteBuffers(1, &lineEBO);
     glDeleteBuffers(1, &squareEBO);
     glDeleteBuffers(1, &squareVAO);
+    glDeleteBuffers(1, &squareVAO);
+    for (int i = 0; i < 5; i++) {
+        modelMeshes[i].deleteBuffers();
+    }
 
     // Terminate, clearing all previously allocated GLFW resources.
     glfwTerminate();

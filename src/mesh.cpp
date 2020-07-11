@@ -17,6 +17,12 @@ void Mesh::draw(Shader &shader) {
     glBindVertexArray(0);
 }
 
+void Mesh::deleteBuffers() {
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &VAO);
+    glDeleteBuffers(1, &EBO);
+}
+
 void Mesh::setupMesh() {
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
@@ -37,3 +43,5 @@ void Mesh::setupMesh() {
 
     glBindVertexArray(0);
 }
+
+
