@@ -4,17 +4,47 @@
 
 #include "mesh.h"
 
-Mesh::Mesh(std::vector<float> vertices, std::vector<unsigned int> indices) {
+Mesh::Mesh() {}
+
+Mesh::Mesh(std::vector<float> vertices, std::vector<unsigned int> indices, glm::mat4 translation, glm::mat4 rotation, glm::mat4 scaling) {
     this->vertices = vertices;
     this->indices = indices;
+    this->translation = translation;
+    this->rotation = rotation;
+    this->scaling = scaling;
+    this->defaultTranslation = translation;
+    this->defaultRotation = rotation;
+    this->defaultScaling = scaling;
 
     setupMesh();
 }
 
-void Mesh::draw(Shader &shader) {
+void Mesh::scale(float x, float y, float z) {
+    scaling = glm::scale(scaling, glm::vec3(1.0f + x, 1.0f + y, 1.0f + z));
+}
+
+void Mesh::translate(float x, float y, float z) {
+    translation = glm::translate(translation, glm::vec3(x, y, z));
+}
+
+void Mesh::rotate(float angle, glm::vec3 vector) {
+    rotation = glm::rotate(rotation, glm::radians(angle), vector);
+}
+
+void Mesh::draw(Shader &shader, GLenum type) {
+    shader.setMat4("translation", translation);
+    shader.setMat4("rotation", rotation);
+    shader.setMat4("scaling", scaling);
+
     glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+    glDrawElements(type, indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
+}
+
+void Mesh::reset() {
+    rotation = defaultRotation;
+    translation = defaultTranslation;
+    scaling = defaultScaling;
 }
 
 void Mesh::deleteBuffers() {
@@ -43,5 +73,9 @@ void Mesh::setupMesh() {
 
     glBindVertexArray(0);
 }
+
+
+
+
 
 
