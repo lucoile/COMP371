@@ -12,6 +12,8 @@
 #include "camera.h"
 #include "texture.h"
 #include "mesh.h"
+#include "grid.h"
+#include "line.h"
 
 #include <iostream>
 #include <istream>
@@ -92,84 +94,31 @@ int main() {
     Shader lineShader("../res/shaders/line.vert", "../res/shaders/line.frag");
     Shader modelShader("../res/shaders/model.vert", "../res/shaders/model.frag");
 
-    float squareVertices[] = {
-//          Vertices            Colors
-            0.0f, 0.0f, 0.0f, 0.0f, 0.407f, 0.478f,  // Point 0
-            ULEN, 0.0f, 0.0f, 0.0f, 0.407f, 0.478f,  // Point 1
-            0.0f, 0.0f, ULEN, 0.0f, 0.407f, 0.478f,  // Point 2
-            ULEN, 0.0f, ULEN, 0.0f, 0.407f, 0.478f   // Point 3
-    };
+    std::vector<float> vertGrid = {0.0f, 0.0f, 0.0f, 0.0f, 0.407f, 0.478f,
+                                  ULEN, 0.0f, 0.0f, 0.0f, 0.407f, 0.478f,
+                                  0.0f, 0.0f, ULEN, 0.0f, 0.407f, 0.478f,
+                                  ULEN, 0.0f, ULEN, 0.0f, 0.407f, 0.478f};
+    std::vector<unsigned int> indexGrid = { 0, 1,
+                                          0, 2,
+                                          2, 3,
+                                          1, 3};
+    Grid grid(vertGrid, indexGrid);
 
-    unsigned int squareIndices[] = {
-            0, 1,
-            0, 2,
-            2, 3,
-            1, 3,
-    };
-
-    // Generate Grid Positions from Center
-    glm::vec3 gridPositions[100][100];
-
-    for (int i = -50; i < 50; i++) {
-        for (int j = -50; j < 50; j++) {
-            gridPositions[i + 50][j + 50] = glm::vec3((float) i / (1 / ULEN), 0.0f, (float) j / (1 / ULEN));
-        }
-    }
-
-    // Square
-    unsigned int squareEBO, squareVAO, squareVBO;
-    glGenVertexArrays(1, &squareVAO);
-    glGenBuffers(1, &squareVBO);
-    glGenBuffers(1, &squareEBO);
-
-    glBindVertexArray(squareVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, squareVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(squareVertices), squareVertices, GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, squareEBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(squareIndices), squareIndices, GL_STATIC_DRAW);
-
-    // Position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *) 0);
-    glEnableVertexAttribArray(0);
-    // Color attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *) (3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-
-    float linesVertices[] = {
-//          Vertices                  Colors
-            0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,       // red x-axis line
-            0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,       // green y-axis line
-            0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,       // blue z-axis line
+    std::vector<float> vertLines = {
+            0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+            0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+            0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
             ULEN * 5, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
             0.0f, ULEN * 5, 0.0f, 0.0f, 1.0f, 0.0f,
             0.0f, 0.0f, ULEN * 5, 0.0f, 0.0f, 1.0f
     };
-    unsigned int linesIndices[] = {
+    std::vector<unsigned int> indexLines = {
             0, 3,   // red x-axis line
             1, 4,   // green y-axis line
             2, 5    // blue z-axis line
     };
 
-    // Lines
-    unsigned int lineEBO, lineVAO, lineVBO;
-    glGenVertexArrays(1, &lineVAO);
-    glGenBuffers(1, &lineVBO);
-    glGenBuffers(1, &lineEBO);
-
-    glBindVertexArray(lineVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, lineVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(linesVertices), linesVertices, GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, lineEBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(linesIndices), linesIndices, GL_STATIC_DRAW);
-
-    // Position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *) 0);
-    glEnableVertexAttribArray(0);
-    // Color attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *) (3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
+    Line line(vertLines, indexLines);
 
     // Alphanumberic model data
     std::vector<float> vertH6 = {0.074075, -0.050000, 0.050000, 0.174075, -0.050000, 0.050000, 0.074075, 0.050000, 0.050000, 0.174075, 0.050000, 0.050000, 0.074075, 0.050000, -0.050000, 0.174075, 0.050000, -0.050000, 0.074075, -0.050000, -0.050000, 0.174075, -0.050000, -0.050000, 0.274075, -0.050000, -0.050000, 0.274075, -0.050000, 0.050000, 0.274075, 0.050000, -0.050000, 0.274075, 0.050000, 0.050000, 0.374075, -0.050000, -0.050000, 0.374075, -0.050000, 0.050000, 0.374075, 0.050000, -0.050000, 0.374075, 0.050000, 0.050000, 0.074075, 0.150000, 0.050000, 0.174075, 0.150000, 0.050000, 0.174075, 0.150000, -0.050000, 0.074075, 0.150000, -0.050000, 0.074075, 0.250000, 0.050000, 0.174075, 0.250000, 0.050000, 0.174075, 0.250000, -0.050000, 0.074075, 0.250000, -0.050000, 0.074075, 0.350000, 0.050000, 0.174075, 0.350000, 0.050000, 0.174075, 0.350000, -0.050000, 0.074075, 0.350000, -0.050000, 0.074075, 0.450000, 0.050000, 0.174075, 0.450000, 0.050000, 0.174075, 0.450000, -0.050000, 0.074075, 0.450000, -0.050000, 0.274075, 0.350000, 0.050000, 0.274075, 0.350000, -0.050000, 0.274075, 0.450000, -0.050000, 0.274075, 0.450000, 0.050000, 0.374075, 0.350000, 0.050000, 0.374075, 0.350000, -0.050000, 0.374075, 0.450000, -0.050000, 0.374075, 0.450000, 0.050000, 0.274075, 0.350000, 0.050000, 0.274075, 0.350000, -0.050000, 0.374075, 0.350000, -0.050000, 0.374075, 0.350000, 0.050000, 0.274075, 0.150000, 0.050000, 0.274075, 0.150000, -0.050000, 0.274075, 0.250000, -0.050000, 0.274075, 0.250000, 0.050000, 0.374075, 0.150000, 0.050000, 0.374075, 0.150000, -0.050000, 0.374075, 0.250000, -0.050000, 0.374075, 0.250000, 0.050000, -0.495108, -0.050000, 0.050000, -0.395108, -0.050000, 0.050000, -0.495108, 0.250000, 0.050000, -0.395108, 0.150000, 0.050000, -0.495108, 0.250000, -0.050000, -0.395108, 0.150000, -0.050000, -0.495108, -0.050000, -0.050000, -0.395108, -0.050000, -0.050000, -0.395108, 0.250000, 0.050000, -0.395108, 0.250000, -0.050000, -0.495108, 0.450000, 0.050000, -0.395108, 0.450000, 0.050000, -0.395108, 0.450000, -0.050000, -0.495108, 0.450000, -0.050000, -0.095108, 0.150000, 0.050000, -0.095108, 0.150000, -0.050000, -0.195108, 0.250000, 0.050000, -0.195108, 0.250000, -0.050000, -0.195108, 0.150000, -0.050000, -0.195108, 0.150000, 0.050000, -0.195108, 0.450000, 0.050000, -0.195108, 0.450000, -0.050000, -0.095108, 0.450000, 0.050000, -0.095108, 0.450000, -0.050000, -0.195108, -0.050000, -0.050000, -0.195108, -0.050000, 0.050000, -0.095108, -0.050000, -0.050000, -0.095108, -0.050000, 0.050000};
@@ -226,9 +175,7 @@ int main() {
         lineShader.setMat4("view", view);
 
         // Draw lines
-        glBindVertexArray(lineVAO);
-        glDrawElements(GL_LINES, 6, GL_UNSIGNED_INT, 0);
-        glBindVertexArray(0);
+        line.draw(lineShader);
 
         // Render grid
         // Activate shader
@@ -237,17 +184,7 @@ int main() {
         gridShader.setMat4("view", view);
         gridShader.setMat4("world", worldOrientation);
 
-        glBindVertexArray(squareVAO);
-        for (auto &gridPosition : gridPositions) {
-            for (auto &j : gridPosition) {
-                glm::mat4 model = glm::mat4(1.0f); //Use Identity Matrix to bring back to original
-                model = glm::translate(model, j);
-                gridShader.setMat4("model", model);
-
-                glDrawElements(GL_LINES, 8, GL_UNSIGNED_INT, nullptr);
-            }
-        }
-        glBindVertexArray(0);
+        grid.draw(gridShader);
 
         // Render models
         modelShader.use();
@@ -265,12 +202,8 @@ int main() {
     }
 
     // De-allocate all resources once they've outlived their purpose:
-    glDeleteBuffers(1, &lineVAO);
-    glDeleteBuffers(1, &lineVBO);
-    glDeleteBuffers(1, &lineEBO);
-    glDeleteBuffers(1, &squareEBO);
-    glDeleteBuffers(1, &squareVAO);
-    glDeleteBuffers(1, &squareVAO);
+    line.deleteBuffers();
+    grid.deleteBuffers();
     for (int i = 0; i < 5; i++) {
         modelMeshes[i].deleteBuffers();
     }
