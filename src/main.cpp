@@ -55,7 +55,7 @@ Mesh modelMeshes[5];
 glm::mat4 worldOrientation = glm::mat4(1.0f);
 
 int main() {
-    // glfw: initialize and configure
+    // GLFW: Initialize and configure
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -196,7 +196,7 @@ int main() {
             modelMeshes[i].draw(modelShader, type);
         }
 
-        // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
+        // GLFW: Swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
@@ -213,15 +213,15 @@ int main() {
     return 0;
 }
 
-// process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
+// Process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 void process_input(GLFWwindow *window) {}
 
-// glfw: whenever the window size changed (by OS or user resize) this callback function executes
+// GLFW: Whenever the window size changed (by OS or user resize), this callback function executes
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
-// glfw: whenever the mouse moves, this callback is called
+// GLFW: Whenever the mouse moves, this callback is called
 void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
     if (firstMouse) {
         lastX = float(xpos);
@@ -230,7 +230,7 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
     }
 
     auto xoffset = float(xpos - lastX);
-    auto yoffset = float(lastY - ypos); // reversed since y-coordinates go from bottom to top
+    auto yoffset = float(lastY - ypos); // Reversed since y-coordinates go from bottom to top
 
     lastX = float(xpos);
     lastY = float(ypos);
@@ -245,12 +245,13 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
 }
 
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
-    //Close Window by Pressing Escape
+
+    //Close window by pressing Escape
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
     }
 
-    // Switch Rendering Type
+    // Switch rendering type
     // Pressing P = Points
     // Pressing L = Lines
     // Pressing T = Triangles
@@ -262,7 +263,7 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
         type = GL_TRIANGLES;
     }
 
-    //Select which Model to Alter
+    //Select which model to alter
     // Pressing 0 = Model 1 (H6)
     // Pressing 1 = Model 2 (K5)
     // Pressing 2 = Model 3 (N5)
@@ -285,25 +286,25 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
         std::cout << "Model 4 Selected" << std::endl;
     }
 
-    // Press U to Scale Up Selected Model
+    // Press U to scale up selected model
     if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS) {
         modelMeshes[selectedModel].scale(ULEN, ULEN, ULEN);
     }
 
-    // Press J to Scale Down Selected Model
+    // Press J to scale down selected model
     if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) {
         modelMeshes[selectedModel].scale(-ULEN, -ULEN, -ULEN);
     }
 
-    // Press Shift + W to Translate Selected Model in the -Z Direction
+    // Press Shift + W to translate selected model in the -Z direction
     if ((glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         && ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
             || (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))) {
         modelMeshes[selectedModel].translate(0, 0, -ULEN);
     }
 
-    // Press Shift + A to Translate Selected Model in the -X Direction
-    // Press A to Rotate Selected Model by -5.0 Degrees
+    // Press Shift + A to translate selected model in the -X direction
+    // Press A to rotate selected model by -5.0 degrees
     if ((glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
         && ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
             || (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))) {
@@ -312,15 +313,15 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
         modelMeshes[selectedModel].rotate(-5.0f, glm::vec3(0.0, 1.0, 0.0));
     }
 
-    // Press Shift + W to Translate Selected Model in the Z Direction
+    // Press Shift + W to translate selected model in the Z direction
     if ((glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
         && ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
             || (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))) {
         modelMeshes[selectedModel].translate(0, 0, ULEN);
     }
 
-    // Press Shift + D to Translate Selected Model in the X Direction
-    // Press D to Rotate Selected Model by 5.0 Degrees
+    // Press Shift + D to translate selected model in the X direction
+    // Press D to rotate selected model by 5.0 degrees
     if ((glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         && ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
             || (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))) {
@@ -334,22 +335,22 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
         worldOrientation = glm::rotate(worldOrientation, glm::radians(1.0f), glm::vec3(ULEN, 0.0f, 0.0f));
     }
 
-    // Press Right Arrow Key R-x
+    // Press Right Arrow Key to R-x
     if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
         worldOrientation = glm::rotate(worldOrientation, glm::radians(-1.0f), glm::vec3(ULEN, 0.0f, 0.0f));
     }
 
-    // Press Up Arrow Key Ry
+    // Press Up Arrow Key to Ry
     if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
         worldOrientation = glm::rotate(worldOrientation, glm::radians(1.0f), glm::vec3(0.0f, ULEN, 0.0f));
     }
 
-    // Press Up Arrow Key R-y
+    // Press Up Arrow Key to R-y
     if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
         worldOrientation = glm::rotate(worldOrientation, glm::radians(-1.0f), glm::vec3(0.0f, ULEN, 0.0f));
     }
 
-    // Reset World Orientation and Camera by Pressing Home Button
+    // Reset world orientation and camera by pressing Home button
     if (glfwGetKey(window, GLFW_KEY_HOME) == GLFW_PRESS) {
         for (int i = 0; i < 5; i++) {
             worldOrientation = glm::mat4(1.0f);
