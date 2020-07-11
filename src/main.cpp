@@ -28,7 +28,9 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 
 void process_input(GLFWwindow *window);
 
-std::vector<float> read_csv(std::string filename);
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+
+std::vector<float> read_csv(const std::string &filename);
 
 // Settings
 const unsigned int SCR_WIDTH = 1024;
@@ -36,7 +38,7 @@ const unsigned int SCR_HEIGHT = 768;
 const float ULEN = 0.1f; // Unit Length
 
 // Camera
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera(glm::vec3(0.0f, 0.1f, 2.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -47,6 +49,61 @@ float lastFrame = 0.0f;
 
 // Render Type
 GLenum type = GL_TRIANGLES;
+unsigned int selectedModel = 1;
+
+// Translation matrices for models
+glm::mat4 defaultTranslations[] = {
+        glm::translate(glm::mat4(1.0f), glm::vec3(40 * ULEN, ULEN, 40 * ULEN)),
+        glm::translate(glm::mat4(1.0f), glm::vec3(-40 * ULEN, ULEN, 40 * ULEN)),
+        glm::translate(glm::mat4(1.0f), glm::vec3(40 * ULEN, ULEN, -40 * ULEN)),
+        glm::translate(glm::mat4(1.0f), glm::vec3(-40 * ULEN, ULEN, -40 * ULEN)),
+        glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, ULEN, 0.0f))
+};
+
+glm::mat4 translations[] = {
+        glm::translate(glm::mat4(1.0f), glm::vec3(40 * ULEN, ULEN, 40 * ULEN)),
+        glm::translate(glm::mat4(1.0f), glm::vec3(-40 * ULEN, ULEN, 40 * ULEN)),
+        glm::translate(glm::mat4(1.0f), glm::vec3(40 * ULEN, ULEN, -40 * ULEN)),
+        glm::translate(glm::mat4(1.0f), glm::vec3(-40 * ULEN, ULEN, -40 * ULEN)),
+        glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, ULEN, 0.0f))
+};
+
+glm::mat4 defaultRotations[] = {
+        glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0, 1.0, 0.0)),
+        glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0, 1.0, 0.0)),
+        glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0, 1.0, 0.0)),
+        glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0, 1.0, 0.0)),
+        glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0, 1.0, 0.0))
+};
+
+glm::mat4 rotations[] = {
+        glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0, 1.0, 0.0)),
+        glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0, 1.0, 0.0)),
+        glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0, 1.0, 0.0)),
+        glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0, 1.0, 0.0)),
+        glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0, 1.0, 0.0))
+};
+
+glm::mat4 defaultScalings[] = {
+        glm::scale(glm::mat4(1.0f), glm::vec3(1.0, 1.0, 1.0)),
+        glm::scale(glm::mat4(1.0f), glm::vec3(1.0, 1.0, 1.0)),
+        glm::scale(glm::mat4(1.0f), glm::vec3(1.0, 1.0, 1.0)),
+        glm::scale(glm::mat4(1.0f), glm::vec3(1.0, 1.0, 1.0)),
+        glm::scale(glm::mat4(1.0f), glm::vec3(1.0, 1.0, 1.0))
+};
+
+glm::mat4 scalings[] = {
+        glm::scale(glm::mat4(1.0f), glm::vec3(1.0, 1.0, 1.0)),
+        glm::scale(glm::mat4(1.0f), glm::vec3(1.0, 1.0, 1.0)),
+        glm::scale(glm::mat4(1.0f), glm::vec3(1.0, 1.0, 1.0)),
+        glm::scale(glm::mat4(1.0f), glm::vec3(1.0, 1.0, 1.0)),
+        glm::scale(glm::mat4(1.0f), glm::vec3(1.0, 1.0, 1.0))
+};
+
+glm::mat4 defaultView;
+
+glm::mat4 worldOrientation = glm::mat4(1.0f);
+
 
 int main() {
     // glfw: initialize and configure
@@ -60,8 +117,8 @@ int main() {
 #endif
 
     // GLFW Window Creation
-    GLFWwindow *window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "COMP371 Project", NULL, NULL);
-    if (window == NULL) {
+    GLFWwindow *window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "COMP371 Project", nullptr, nullptr);
+    if (window == nullptr) {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
         return -1;
@@ -69,6 +126,7 @@ int main() {
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetKeyCallback(window, key_callback);
 
     // Tell GLFW to capture our mouse
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -89,10 +147,10 @@ int main() {
 
     float squareVertices[] = {
 //          Vertices            Colors
-            0.0f, 0.0f, 0.0f,   0.0f, 0.407f, 0.478f,  // Point 0
-            ULEN, 0.0f, 0.0f,   0.0f, 0.407f, 0.478f,  // Point 1
-            0.0f, 0.0f, ULEN,   0.0f, 0.407f, 0.478f,  // Point 2
-            ULEN, 0.0f, ULEN,   0.0f, 0.407f, 0.478f   // Point 3
+            0.0f, 0.0f, 0.0f, 0.0f, 0.407f, 0.478f,  // Point 0
+            ULEN, 0.0f, 0.0f, 0.0f, 0.407f, 0.478f,  // Point 1
+            0.0f, 0.0f, ULEN, 0.0f, 0.407f, 0.478f,  // Point 2
+            ULEN, 0.0f, ULEN, 0.0f, 0.407f, 0.478f   // Point 3
     };
 
     unsigned int squareIndices[] = {
@@ -106,8 +164,8 @@ int main() {
     glm::vec3 gridPositions[100][100];
 
     for (int i = -50; i < 50; i++) {
-        for ( int j = -50; j < 50; j++) {
-            gridPositions[i+50][j+50] = glm::vec3((float) i / (1/ULEN), 0.0f, (float) j / (1/ULEN));
+        for (int j = -50; j < 50; j++) {
+            gridPositions[i + 50][j + 50] = glm::vec3((float) i / (1 / ULEN), 0.0f, (float) j / (1 / ULEN));
         }
     }
 
@@ -125,20 +183,20 @@ int main() {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(squareIndices), squareIndices, GL_STATIC_DRAW);
 
     // Position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) 0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *) 0);
     glEnableVertexAttribArray(0);
     // Color attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) (3 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *) (3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
     float linesVertices[] = {
 //          Vertices                  Colors
-            0.0f,   0.0f,   0.0f,     1.0f, 0.0f, 0.0f,       // red x-axis line
-            0.0f,   0.0f,   0.0f,     0.0f, 1.0f, 0.0f,       // green y-axis line
-            0.0f,   0.0f,   0.0f,     0.0f, 0.0f, 1.0f,       // blue z-axis line
-            ULEN*5, 0.0f,   0.0f,     1.0f, 0.0f, 0.0f,
-            0.0f,   ULEN*5, 0.0f,     0.0f, 1.0f, 0.0f,
-            0.0f,   0.0f,   ULEN*5,   0.0f, 0.0f, 1.0f
+            0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,       // red x-axis line
+            0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,       // green y-axis line
+            0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,       // blue z-axis line
+            ULEN * 5, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+            0.0f, ULEN * 5, 0.0f, 0.0f, 1.0f, 0.0f,
+            0.0f, 0.0f, ULEN * 5, 0.0f, 0.0f, 1.0f
     };
     unsigned int linesIndices[] = {
             0, 3,   // red x-axis line
@@ -160,10 +218,10 @@ int main() {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(linesIndices), linesIndices, GL_STATIC_DRAW);
 
     // Position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) 0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *) 0);
     glEnableVertexAttribArray(0);
     // Color attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) (3 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *) (3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
 //    std::vector<float> modelVAO1 = read_csv("../res/models/alphanumeric_vertices.csv");
@@ -194,25 +252,15 @@ int main() {
             &meshH6, &meshJ5, &meshN5, &meshO8, &meshR1
     };
 
-    // Translation matrices for models
-    glm::mat4 translations[] = {
-            glm::translate(glm::mat4(1.0f), glm::vec3(40*ULEN, ULEN, 45*ULEN)),
-            glm::translate(glm::mat4(1.0f), glm::vec3(-40*ULEN, ULEN, 45*ULEN)),
-            glm::translate(glm::mat4(1.0f), glm::vec3(40*ULEN, ULEN, -45*ULEN)),
-            glm::translate(glm::mat4(1.0f), glm::vec3(-40*ULEN, ULEN, -45*ULEN)),
-            glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, ULEN, 0.0f))
-    };
-
     // Load and Create a texture
     Texture texture1("res/textures/dirt.jpg");
 
     // Tell opengl for each sampler to which texture unit it belongs to (only has to be done once)
     gridShader.use();
-
     // Render Loop
     while (!glfwWindowShouldClose(window)) {
         // Per Frame Time Logic
-        float currentFrame = glfwGetTime();
+        auto currentFrame = float(glfwGetTime());
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
@@ -246,12 +294,13 @@ int main() {
         gridShader.use();
         gridShader.setMat4("projection", projection);
         gridShader.setMat4("view", view);
+        gridShader.setMat4("world", worldOrientation);
 
         glBindVertexArray(squareVAO);
-        for (unsigned int i = 0; i < 100; i++) {
-            for (unsigned int j = 0; j < 100; j++) {
+        for (auto &gridPosition : gridPositions) {
+            for (auto &j : gridPosition) {
                 glm::mat4 model = glm::mat4(1.0f); //Use Identity Matrix to bring back to original
-                model = glm::translate(model, gridPositions[i][j]);
+                model = glm::translate(model, j);
                 gridShader.setMat4("model", model);
 
                 glDrawElements(GL_LINES, 8, GL_UNSIGNED_INT, nullptr);
@@ -263,6 +312,7 @@ int main() {
         modelShader.use();
         modelShader.setMat4("projection", projection);
         modelShader.setMat4("view", view);
+        modelShader.setMat4("world", worldOrientation);
 
         for (int i = 0; i < 5; i++) {
             modelShader.setMat4("translation", translations[i]);
@@ -284,9 +334,9 @@ int main() {
     return 0;
 }
 
-std::vector<float> read_csv(std::string filename) {
+std::vector<float> read_csv(const std::string &filename) {
     using namespace std;
-    vector<string>  models;
+    vector<string> models;
     string model;
     vector<float> result;
     string line, element, temp;
@@ -295,10 +345,10 @@ std::vector<float> read_csv(std::string filename) {
     ifstream myFile(filename);
 
     // open file
-    if(!myFile.is_open()) throw runtime_error("Error: File Was Not Opened");
+    if (!myFile.is_open()) throw runtime_error("Error: File Was Not Opened");
 
-    while(getline(myFile, model, ',')){
-        if (model.compare("\n") == 0){
+    while (getline(myFile, model, ',')) {
+        if (model == "\n") {
             cout << "new line";
         }
         cout << model;
@@ -311,15 +361,7 @@ std::vector<float> read_csv(std::string filename) {
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 void process_input(GLFWwindow *window) {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-        glfwSetWindowShouldClose(window, true);
-    } else if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
-        type = GL_POINTS;
-    } else if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) {
-        type = GL_LINES;
-    } else if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) {
-        type = GL_TRIANGLES;
-    }
+
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
@@ -330,22 +372,108 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 // glfw: whenever the mouse moves, this callback is called
 void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
     if (firstMouse) {
-        lastX = xpos;
-        lastY = ypos;
+        lastX = float(xpos);
+        lastY = float(ypos);
         firstMouse = false;
     }
 
-    float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+    auto xoffset = float(xpos - lastX);
+    auto yoffset = float(lastY - ypos); // reversed since y-coordinates go from bottom to top
 
-    lastX = xpos;
-    lastY = ypos;
+    lastX = float(xpos);
+    lastY = float(ypos);
 
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
-        camera.process_mouse_movement(xoffset, yoffset, PAN);
+        camera.process_mouse_movement(xoffset, 0, PAN);
     } else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
         camera.process_mouse_movement(0, yoffset, ZOOM);
     } else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS) {
-        camera.process_mouse_movement(xoffset, yoffset, TILT);
+        camera.process_mouse_movement(0, yoffset, TILT);
+    }
+}
+
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods){
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+        glfwSetWindowShouldClose(window, true);
+    }
+    if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
+        type = GL_POINTS;
+    } else if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) {
+        type = GL_LINES;
+    } else if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) {
+        type = GL_TRIANGLES;
+    }
+    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
+        selectedModel = 0;
+        std::cout << "Model 0 Selected" << std::endl;
+    } else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) {
+        selectedModel = 1;
+        std::cout << "Model 1 Selected" << std::endl;
+    } else if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) {
+        selectedModel = 2;
+        std::cout << "Model 2 Selected" << std::endl;
+    } else if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS) {
+        selectedModel = 3;
+        std::cout << "Model 3 Selected" << std::endl;
+    } else if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS) {
+        selectedModel = 4;
+        std::cout << "Model 4 Selected" << std::endl;
+    }
+    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+        //TODO: Rotate around x axis positively
+        worldOrientation = glm::rotate(worldOrientation, glm::radians(1.0f), glm::vec3(ULEN, 0.0f, 0.0f));
+    }
+    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+        //TODO: Rotate around x axis negatively
+        worldOrientation = glm::rotate(worldOrientation, glm::radians(-1.0f), glm::vec3(ULEN, 0.0f, 0.0f));
+    }
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+        //TODO: Rotate around y axis positively
+        worldOrientation = glm::rotate(worldOrientation, glm::radians(1.0f), glm::vec3(0.0f, ULEN, 0.0f));
+    }
+    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+        //TODO: Rotate around y axis negatively
+        worldOrientation = glm::rotate(worldOrientation, glm::radians(-1.0f), glm::vec3(0.0f, ULEN, 0.0f));
+    }
+    if (glfwGetKey(window, GLFW_KEY_HOME) == GLFW_PRESS) {
+        for(int i = 0; i < 5; i++){
+            translations[i] = defaultTranslations[i];
+            rotations[i] = defaultRotations[i];
+            scalings[i] = defaultScalings[i];
+            worldOrientation = glm::mat4(1.0f);
+        }
+        camera = Camera(glm::vec3(0.0f, 0.1f, 2.0f));
+    }
+    if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS){
+        scalings[selectedModel] = glm::scale(scalings[selectedModel], glm::vec3(1.0f + ULEN, 1.0f + ULEN, 1.0f + ULEN));
+    }
+    if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) {
+        scalings[selectedModel] = glm::scale(scalings[selectedModel], glm::vec3(1.0f - ULEN, 1.0f - ULEN, 1.0f - ULEN));
+    }
+    if ((glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+            && ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+            || (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))) {
+        translations[selectedModel] =  glm::translate(translations[selectedModel], glm::vec3(0, 0 ,-ULEN));
+    }
+    if ((glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+            && ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+            || (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))) {
+        translations[selectedModel] =  glm::translate(translations[selectedModel], glm::vec3(-ULEN, 0 ,0));
+    }
+    if ((glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+            && ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+            || (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))) {
+        translations[selectedModel] =  glm::translate(translations[selectedModel], glm::vec3(0, 0 ,ULEN));
+    }
+    if ((glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+            && ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+            || (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))) {
+        translations[selectedModel] =  glm::translate(translations[selectedModel], glm::vec3(ULEN, 0 ,0));
+    }
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+        rotations[selectedModel] = glm::rotate(rotations[selectedModel], glm::radians(5.0f), glm::vec3(0.0, 1.0, 0.0));
+    }
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+        rotations[selectedModel] = glm::rotate(rotations[selectedModel], glm::radians(-5.0f), glm::vec3(0.0, 1.0, 0.0));
     }
 }
