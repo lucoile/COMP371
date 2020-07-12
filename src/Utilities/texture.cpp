@@ -17,7 +17,7 @@
 Texture::Texture(const std::string& fileName)
 {
     int width, height, numComponents;
-    unsigned char* data = stbi_load(FileSystem::getPath("res/textures/dirt.jpg").c_str(), &width, &height, &numComponents, 4);
+    unsigned char* data = stbi_load(FileSystem::getPath(fileName).c_str(), &width, &height, &numComponents, 4);
 
     if(data == NULL)
         std::cerr << "Unable to load texture: " << fileName << std::endl;

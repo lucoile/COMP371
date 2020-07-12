@@ -5,8 +5,12 @@ project (COMP371)
 # The main executable
 add_executable(main
         src/main.cpp
-        src/texture.cpp
-        )
+        src/Utilities/texture.cpp
+        src/Mesh/mesh.cpp
+        src/Utilities/camera.cpp
+        src/Utilities/shader_m.cpp
+        src/Grid/grid.cpp
+        src/Line/line.cpp)
 set_property(TARGET main PROPERTY CXX_STANDARD 11)
 target_compile_options(main PRIVATE -Wall)
 
