@@ -313,7 +313,7 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
         modelMeshes[selectedModel].rotate(-5.0f, glm::vec3(0.0, 1.0, 0.0));
     }
 
-    // Press Shift + W to translate selected model in the Z direction
+    // Press Shift + S to translate selected model in the Z direction
     if ((glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
         && ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
             || (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))) {
