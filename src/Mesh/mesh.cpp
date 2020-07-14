@@ -3,6 +3,10 @@
 //
 
 #include "mesh.h"
+#include <cstdlib>
+#include <ctime>
+
+const float ULEN = 0.1f; // Unit Length
 
 Mesh::Mesh() {}
 
@@ -75,7 +79,14 @@ void Mesh::setupMesh() {
 }
 
 
+void Mesh::randomReposition() {
+    //Bring Model to Middle
+    translation = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, ULEN, 0.0f));
 
+    //Random Number Between -50 and 50 Normalized
+    float randomX = (rand() % 101 + (-50))/(1/ULEN);
+    float randomZ = (rand() % 101 + (-50))/(1/ULEN);
 
-
-
+    //Translate to the new random position on the grid.
+    translation = glm::translate(translation, glm::vec3(randomX, 0, randomZ));
+}

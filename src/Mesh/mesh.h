@@ -36,6 +36,8 @@ public:
 
     void reset();
 
+    void randomReposition();
+
     void deleteBuffers();
 
 private:

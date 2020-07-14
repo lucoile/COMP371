@@ -288,6 +288,11 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
         std::cout << "Model 4 Selected" << std::endl;
     }
 
+    // Press Spacebar to reposition selected model to a random spot on the grid
+    if(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+        modelMeshes[selectedModel].randomReposition();
+    }
+
     // Press U to scale up selected model
     if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS) {
         modelMeshes[selectedModel].scale(ULEN, ULEN, ULEN);
