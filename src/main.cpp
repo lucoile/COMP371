@@ -28,8 +28,8 @@ void process_input(GLFWwindow *window);
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
 
 // Settings
-const unsigned int SCR_WIDTH = 1024;
-const unsigned int SCR_HEIGHT = 768;
+unsigned int SCR_WIDTH = 1024;
+unsigned int SCR_HEIGHT = 768;
 const float ULEN = 0.1f; // Unit Length
 
 // Camera
@@ -78,7 +78,7 @@ int main() {
     glfwSetKeyCallback(window, key_callback);
 
     // Tell GLFW to capture our mouse
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(window, GLFW_CURSOR, false);
 
     // Load all OpenGL function pointers
     if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
@@ -219,6 +219,8 @@ void process_input(GLFWwindow *window) {}
 // GLFW: Whenever the window size changed (by OS or user resize), this callback function executes
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);
+    SCR_WIDTH = width;
+    SCR_HEIGHT = height;
 }
 
 // GLFW: Whenever the mouse moves, this callback is called
