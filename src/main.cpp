@@ -8,12 +8,17 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 #include "Utilities/shader_m.h"
 #include "Utilities/camera.h"
 #include "Utilities/texture.h"
 #include "Mesh/mesh.h"
 #include "Grid/grid.h"
 #include "Line/line.h"
+
 
 #include <iostream>
 #include <istream>

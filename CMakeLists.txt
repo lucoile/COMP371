@@ -30,3 +30,7 @@ target_link_libraries(main PRIVATE glfw)
 ## glm
 add_subdirectory(lib/glm EXCLUDE_FROM_ALL)
 target_link_libraries(main PRIVATE glm)
+
+## assimp
+add_subdirectory(lib/assimp-5.0.1 EXCLUDE_FROM_ALL)
+target_link_libraries(main PRIVATE assimp)
