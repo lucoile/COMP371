@@ -16,7 +16,6 @@
 #include "Utilities/camera.h"
 #include "Utilities/model.h"
 
-#include "Mesh/mesh.h"
 #include "Grid/grid.h"
 #include "Line/line.h"
 
