@@ -5,7 +5,7 @@
 #include "model.h"
 #include "stb_image.h"
 
-Model::Model(char *path)
+Model::Model(std::string const path)
 {
     loadModel(path);
 }
@@ -24,7 +24,7 @@ void Model::loadModel(std::string path)
     // check for errors
     if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // if is Not Zero
     {
-        cout << "ERROR::ASSIMP:: " << importer.GetErrorString() << endl;
+        std::cout << "ERROR::ASSIMP:: " << importer.GetErrorString() << std::endl;
         return;
     }
     // retrieve the directory path of the filepath
@@ -105,10 +105,10 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
         {
             aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
             std::vector<Texture> diffuseMaps = loadMaterialTextures(material,
-                                                               aiTextureType_DIFFUSE, "texture_diffuse");
+                                                                    aiTextureType_DIFFUSE, "texture_diffuse");
             textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
             std::vector<Texture> specularMaps = loadMaterialTextures(material,
-                                                                aiTextureType_SPECULAR, "texture_specular");
+                                                                     aiTextureType_SPECULAR, "texture_specular");
             textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
         }
     }
@@ -147,7 +147,7 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType 
     return textures;
 }
 
-unsigned int Model::TextureFromFile(const char *path, const std::string &directory, bool gamma)
+unsigned int Model::TextureFromFile(const char *path, const std::string &directory)
 {
     std::string filename = std::string(path);
     filename = directory + '/' + filename;
