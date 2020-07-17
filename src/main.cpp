@@ -56,8 +56,8 @@ unsigned int selectedModel = 0;
 struct Alphanum {
     std::vector<glm::mat4> letterTrans;
     std::vector<glm::mat4> numTrans;
-    glm::vec3 letterAdjust;
-    glm::vec3 numAdjust;
+    glm::mat4 letterAdjust;
+    glm::mat4 numAdjust;
     glm::mat4 rotation;
     glm::mat4 scale;
     glm::mat4 translation;
@@ -148,28 +148,222 @@ int main() {
 
     // R1
     models[0].letterTrans.push_back(
-            glm::scale(id, glm::vec3(1.0f, 4.0f, 1.0f))
+            glm::scale(id, glm::vec3(1.0f, 5.0f, 1.0f))
             );
     models[0].letterTrans.push_back(
-            glm::translate(id, glm::vec3(1.0*ULEN, 3.0f*ULEN, 0.0f))
+            glm::translate(id, glm::vec3(1.0*ULEN, 4.0f*ULEN, 0.0f))
             );
     models[0].letterTrans.push_back(
-            glm::translate(id, glm::vec3(2.0*ULEN, 2.0*ULEN, 0.0f))
-    );
+            glm::translate(id, glm::vec3(2.0*ULEN, 2.0*ULEN, 0.0f)) *
+            glm::scale(id, glm::vec3(1.0f, 3.0f, 1.0f))
+            );
     models[0].letterTrans.push_back(
-            glm::translate(id, glm::vec3(2.0*ULEN, 0.0f, 0.0f))
-    );
+            glm::translate(id, glm::vec3(1.0*ULEN, 2.0*ULEN, 0.0f))
+            );
+    glm::mat4 shearR = {
+            1.0f, 0.0f, 0.0f, 0.0f,
+            -1.0, 1.0f, 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f, 0.0f,
+            0.0f, 0.0f, 0.0f, 1.0f
+    };
     models[0].letterTrans.push_back(
-            glm::translate(id, glm::vec3(1.0*ULEN, 1.0*ULEN, 0.0f))
+            glm::translate(id, glm::vec3(2.0*ULEN, 0.0f, 0.0f)) *
+            glm::scale(id, glm::vec3(1.0f, 2.0f, 1.0f)) * shearR
     );
-    models[0].numTrans.push_back(glm::scale(id, glm::vec3(1.0f, 4.0f, 1.0f)));
 
-    models[0].letterAdjust = glm::vec3(-3*ULEN, 0.0f, 0.0f);
-    models[0].numAdjust = glm::vec3(ULEN, 0.0f, 0.0f);
+    models[0].numTrans.push_back(glm::scale(id, glm::vec3(1.0f, 5.0f, 1.0f)));
+
+    models[0].letterAdjust = glm::translate(id, glm::vec3(-3*ULEN, 0.0f, 0.0f));
+    models[0].numAdjust = glm::translate(id, glm::vec3(ULEN, 0.0f, 0.0f));
 
     models[0].scale = id;
     models[0].translation = id;
     models[0].rotation = id;
+
+    // H6
+    models[1].letterTrans.push_back(
+            glm::translate(id, glm::vec3(-1.0*ULEN, 0.0f, 0.0f)) *
+            glm::scale(id, glm::vec3(1.0f, 5.0f, 1.0f))
+            );
+    models[1].letterTrans.push_back(
+            glm::translate(id, glm::vec3(0.0f, 2*ULEN, 0.0f))
+            );
+    models[1].letterTrans.push_back(
+            glm::translate(id, glm::vec3(1.0*ULEN, 0.0f, 0.0f)) *
+            glm::scale(id, glm::vec3(1.0f, 5.0f, 1.0f))
+    );
+
+    models[1].numTrans.push_back(
+            glm::translate(id, glm::vec3(-1.0*ULEN, 0.0f, 0.0f)) *
+            glm::scale(id, glm::vec3(1.0f, 5.0f, 1.0f))
+    );
+    models[1].numTrans.push_back(
+            glm::translate(id, glm::vec3(0.0f, 2.0*ULEN, 0.0f))
+    );
+    models[1].numTrans.push_back(
+            glm::translate(id, glm::vec3(0.0f, 4.0*ULEN, 0.0f))
+    );
+    models[1].numTrans.push_back(
+            id
+    );
+    models[1].numTrans.push_back(
+            glm::translate(id, glm::vec3(1.0*ULEN, 0.0f, 0.0f)) *
+            glm::scale(id, glm::vec3(1.0f, 3.0f, 1.0f))
+    );
+
+    models[1].letterAdjust = glm::translate(id, glm::vec3(-2.0*ULEN, 0.0f, 0.0f));
+    models[1].numAdjust = glm::translate(id, glm::vec3(2.0*ULEN, 0.0f, 0.0f));
+
+    models[1].scale = id;
+    models[1].translation = glm::translate(id, glm::vec3(40 * ULEN, 0.0f, 40 * ULEN));
+    models[1].rotation = id;
+
+    // N5
+    models[2].letterTrans.push_back(
+            glm::translate(id, glm::vec3(-1.5*ULEN, 0.0f, 0.0f)) *
+            glm::scale(id, glm::vec3(1.0f, 5.0f, 1.0f))
+            );
+    models[2].letterTrans.push_back(
+            glm::translate(id, glm::vec3(1.5*ULEN, 0.0f, 0.0f)) *
+            glm::scale(id, glm::vec3(1.0f, 5.0f, 1.0f))
+    );
+    glm::mat4 shearN = {
+        1.0f, 0.0f, 0.0f, 0.0f,
+        -3.0, 1.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, 0.0f, 1.0f
+    };
+    models[2].letterTrans.push_back(
+            glm::translate(id, glm::vec3(1.5*ULEN, 0.0f, 0.0f)) *
+            glm::scale(id, glm::vec3(1.0f, 5.0f, 1.0f)) * shearN
+    );
+
+    models[2].numTrans.push_back(
+            glm::translate(id, glm::vec3(-1.0*ULEN, 0.0f, 0.0f))
+            );
+    models[2].numTrans.push_back(
+            glm::translate(id, glm::vec3(-1.0*ULEN, 2.0*ULEN, 0.0f)) *
+            glm::scale(id, glm::vec3(1.0f, 3.0f, 1.0f))
+    );
+    models[2].numTrans.push_back(
+            glm::translate(id, glm::vec3(0.0f, 2.0*ULEN, 0.0f))
+    );
+    models[2].numTrans.push_back(
+            glm::translate(id, glm::vec3(0.5*ULEN, 4.0*ULEN, 0.0f)) *
+            glm::scale(id, glm::vec3(2.0f, 1.0f, 1.0f))
+    );
+    models[2].numTrans.push_back(
+            id
+    );
+    models[2].numTrans.push_back(
+            glm::translate(id, glm::vec3(1.0*ULEN, 0.0f, 0.0f)) *
+            glm::scale(id, glm::vec3(1.0f, 3.0f, 1.0f))
+    );
+
+    models[2].letterAdjust = glm::translate(id, glm::vec3(-2.5*ULEN, 0.0f, 0.0f));
+    models[2].numAdjust = glm::translate(id, glm::vec3(2.0*ULEN, 0.0f, 0.0f));
+
+    models[2].scale = id;
+    models[2].translation = glm::translate(id, glm::vec3(-40 * ULEN, 0.0f, 40 * ULEN));
+    models[2].rotation = id;
+
+    // 08
+    models[3].letterTrans.push_back(
+            glm::translate(id, glm::vec3(-1*ULEN, 0.0f, 0.0f)) *
+            glm::scale(id, glm::vec3(1.0f, 5.0f, 1.0f))
+            );
+    models[3].letterTrans.push_back(
+            glm::translate(id, glm::vec3(1*ULEN, 0.0f, 0.0f)) *
+            glm::scale(id, glm::vec3(1.0f, 5.0f, 1.0f))
+            );
+    models[3].letterTrans.push_back(
+            id
+    );
+    models[3].letterTrans.push_back(
+            glm::translate(id, glm::vec3(0.0f, 4.0*ULEN, 0.0f))
+    );
+
+    models[3].numTrans.push_back(
+            glm::translate(id, glm::vec3(-1*ULEN, 0.0f, 0.0f)) *
+            glm::scale(id, glm::vec3(1.0f, 5.0f, 1.0f))
+    );
+    models[3].numTrans.push_back(
+            glm::translate(id, glm::vec3(1*ULEN, 0.0f, 0.0f)) *
+            glm::scale(id, glm::vec3(1.0f, 5.0f, 1.0f))
+    );
+    models[3].numTrans.push_back(
+            id
+    );
+    models[3].numTrans.push_back(
+            glm::translate(id, glm::vec3(0.0f, 4.0*ULEN, 0.0f))
+    );
+    models[3].numTrans.push_back(
+            glm::translate(id, glm::vec3(0.0f, 2.0*ULEN, 0.0f))
+    );
+
+    models[3].letterAdjust = glm::translate(id, glm::vec3(-2.0*ULEN, 0.0f, 0.0f));
+    models[3].numAdjust = glm::translate(id, glm::vec3(2.0*ULEN, 0.0f, 0.0f));
+
+    models[3].scale = id;
+    models[3].translation = glm::translate(id, glm::vec3(-40 * ULEN, 0.0f, -40 * ULEN));
+    models[3].rotation = id;
+
+    // K5
+    models[4].letterTrans.push_back(
+            glm::translate(id, glm::vec3(-1.0*ULEN, 0.0f, 0.0f)) *
+            glm::scale(id, glm::vec3(1.0f, 5.0f, 1.0f))
+            );
+    glm::mat4 shearKTop = {
+            1.0f, 0.0f, 0.0f, 0.0f,
+            2.0, 1.0f, 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f, 0.0f,
+            0.0f, 0.0f, 0.0f, 1.0f
+    };
+    models[4].letterTrans.push_back(
+            glm::translate(id, glm::vec3(-1.0*ULEN, 3.0*ULEN, 0.0f)) *
+            glm::scale(id, glm::vec3(1.0f, 2.0f, 1.0f)) * shearKTop
+    );
+    glm::mat4 shearKBottom = {
+            1.0f, 0.0f, 0.0f, 0.0f,
+            -2.0, 1.0f, 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f, 0.0f,
+            0.0f, 0.0f, 0.0f, 1.0f
+    };
+    models[4].letterTrans.push_back(
+            glm::translate(id, glm::vec3(1.0*ULEN, 0.0f, 0.0f)) *
+            glm::scale(id, glm::vec3(1.0f, 3.0f, 1.0f)) * shearKBottom
+    );
+
+    models[4].numTrans.push_back(
+            glm::translate(id, glm::vec3(-1.0*ULEN, 0.0f, 0.0f))
+    );
+    models[4].numTrans.push_back(
+            glm::translate(id, glm::vec3(-1.0*ULEN, 2.0*ULEN, 0.0f)) *
+            glm::scale(id, glm::vec3(1.0f, 3.0f, 1.0f))
+    );
+    models[4].numTrans.push_back(
+            glm::translate(id, glm::vec3(0.0f, 2.0*ULEN, 0.0f))
+    );
+    models[4].numTrans.push_back(
+            glm::translate(id, glm::vec3(0.5*ULEN, 4.0*ULEN, 0.0f)) *
+            glm::scale(id, glm::vec3(2.0f, 1.0f, 1.0f))
+    );
+    models[4].numTrans.push_back(
+            id
+    );
+    models[4].numTrans.push_back(
+            glm::translate(id, glm::vec3(1.0*ULEN, 0.0f, 0.0f)) *
+            glm::scale(id, glm::vec3(1.0f, 3.0f, 1.0f))
+    );
+
+    models[4].letterAdjust = glm::translate(id, glm::vec3(-2.0*ULEN, 0.0f, 0.0f));
+    models[4].numAdjust = glm::translate(id, glm::vec3(2.0*ULEN, 0.0f, 0.0f));
+
+    models[4].scale = id;
+    models[4].translation = glm::translate(id, glm::vec3(40 * ULEN, 0.0f, -40 * ULEN));
+    models[4].rotation = id;
+
+
 
     // Render Loop
     while (!glfwWindowShouldClose(window)) {
@@ -213,13 +407,13 @@ int main() {
         // Render models
         cubeShader.use();
 
-        for (unsigned int j = 0; j < 1; j++)
+        for (unsigned int j = 0; j < 5; j++)
         {
             for (unsigned int i = 0; i < models[j].letterTrans.size(); i++)
             {
-                glm::mat4 letterTrans = glm::translate(models[j].letterTrans[i], models[j].letterAdjust);
                 glm::mat4 transformations = projection * view * worldOrientation *
-                                            models[j].translation * models[j].rotation * models[j].scale * letterTrans;
+                                            models[j].translation * models[j].rotation * models[j].scale *
+                                            models[j].letterAdjust * models[j].letterTrans[i];
                 cubeShader.setMat4("transformations", transformations);
 
                 cube.Draw(cubeShader);
@@ -227,9 +421,9 @@ int main() {
 
             for (unsigned int i = 0; i < models[j].numTrans.size(); i++)
             {
-                glm::mat4 letterTrans = glm::translate(models[j].numTrans[i], models[j].numAdjust);
                 glm::mat4 transformations = projection * view * worldOrientation *
-                                            models[j].translation * models[j].rotation * models[j].scale * letterTrans;
+                                            models[j].translation * models[j].rotation * models[j].scale *
+                                            models[j].numAdjust * models[j].numTrans[i];
                 cubeShader.setMat4("transformations", transformations);
 
                 cube.Draw(cubeShader);
@@ -303,11 +497,11 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
     }
 
     //Select which model to alter
-    // Pressing 0 = Model 1 (H6)
-    // Pressing 1 = Model 2 (K5)
+    // Pressing 0 = Model 1 (R1)
+    // Pressing 1 = Model 2 (H6)
     // Pressing 2 = Model 3 (N5)
     // Pressing 3 = Model 4 (O8)
-    // Pressing 4 = Model 5 (R1)
+    // Pressing 4 = Model 5 (K5)
     if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
         selectedModel = 0;
         std::cout << "Model 0 Selected" << std::endl;
