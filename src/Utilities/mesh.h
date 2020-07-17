@@ -35,7 +35,7 @@ public:
     Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
 
     // Render the mesh
-    void Draw(Shader &shader);
+    void Draw(Shader &shader, GLenum type);
 private:
     // render data
     unsigned int VAO, VBO, EBO;

@@ -22,7 +22,7 @@ public:
     Model(std::string const path);
 
     // draws the model
-    void Draw(Shader &shader);
+    void Draw(Shader &shader, GLenum type);
 private:
     // model data
     std::vector<Mesh> meshes;

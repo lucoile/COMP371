@@ -416,7 +416,7 @@ int main() {
                                             models[j].letterAdjust * models[j].letterTrans[i];
                 cubeShader.setMat4("transformations", transformations);
 
-                cube.Draw(cubeShader);
+                cube.Draw(cubeShader, type);
             }
 
             for (unsigned int i = 0; i < models[j].numTrans.size(); i++)
@@ -426,7 +426,7 @@ int main() {
                                             models[j].numAdjust * models[j].numTrans[i];
                 cubeShader.setMat4("transformations", transformations);
 
-                cube.Draw(cubeShader);
+                cube.Draw(cubeShader, type);
             }
         }
 
