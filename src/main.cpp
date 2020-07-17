@@ -111,7 +111,6 @@ int main() {
     // Build and Compile our Shader Program
     Shader gridShader("../res/shaders/grid.vert", "../res/shaders/grid.frag");
     Shader lineShader("../res/shaders/line.vert", "../res/shaders/line.frag");
-    Shader modelShader("../res/shaders/model.vert", "../res/shaders/model.frag");
     Shader cubeShader("../res/shaders/cube.vert", "../res/shaders/cube.frag");
 
 
