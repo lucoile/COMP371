@@ -406,24 +406,39 @@ int main() {
         // Render models
         cubeShader.use();
 
+        // light properties
+        cubeShader.setVec3("light.position", 0.0f, 30.0*ULEN, 0.0f);
+        cubeShader.setVec3("light.ambient",  0.2f, 0.2f, 0.2f);
+        cubeShader.setVec3("light.diffuse",  0.5f, 0.5f, 0.5f);
+        cubeShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+
+        // material properties
+        cubeShader.setVec3("material.ambient", 0.5f, 0.5f, 0.5f);
+        cubeShader.setVec3("material.diffuse", 0.5f, 0.5f, 0.5f);
+        cubeShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
+        cubeShader.setFloat("material.shininess", 32.0f);
+
+        // render each alphanumeric pair by looping through the array of models
         for (unsigned int j = 0; j < 5; j++)
         {
+            // draw the letter
             for (unsigned int i = 0; i < models[j].letterTrans.size(); i++)
             {
-                glm::mat4 transformations = projection * view * worldOrientation *
-                                            models[j].translation * models[j].rotation * models[j].scale *
-                                            models[j].letterAdjust * models[j].letterTrans[i];
+                glm::mat4 model = worldOrientation * models[j].translation * models[j].rotation * models[j].scale * models[j].letterAdjust;
+                glm::mat4 transformations = projection * view * model *  models[j].letterTrans[i];
                 cubeShader.setMat4("transformations", transformations);
+                cubeShader.setMat4("model", model);
 
                 cube.Draw(cubeShader, type);
             }
 
+            // draw the number
             for (unsigned int i = 0; i < models[j].numTrans.size(); i++)
             {
-                glm::mat4 transformations = projection * view * worldOrientation *
-                                            models[j].translation * models[j].rotation * models[j].scale *
-                                            models[j].numAdjust * models[j].numTrans[i];
+                glm::mat4 model = worldOrientation * models[j].translation * models[j].rotation * models[j].scale * models[j].numAdjust;
+                glm::mat4 transformations = projection * view * model * models[j].numTrans[i];
                 cubeShader.setMat4("transformations", transformations);
+                cubeShader.setMat4("model", model);
 
                 cube.Draw(cubeShader, type);
             }
