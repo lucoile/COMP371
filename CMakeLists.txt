@@ -6,9 +6,10 @@ project (COMP371)
 add_executable(main
         src/main.cpp
         src/Utilities/texture.cpp
-        src/Mesh/mesh.cpp
         src/Utilities/camera.cpp
         src/Utilities/shader_m.cpp
+        src/Utilities/model.cpp
+        src/Utilities/mesh.cpp
         src/Grid/grid.cpp
         src/Line/line.cpp)
 set_property(TARGET main PROPERTY CXX_STANDARD 11)
@@ -30,3 +31,7 @@ target_link_libraries(main PRIVATE glfw)
 ## glm
 add_subdirectory(lib/glm EXCLUDE_FROM_ALL)
 target_link_libraries(main PRIVATE glm)
+
+## assimp
+add_subdirectory(lib/assimp-5.0.1 EXCLUDE_FROM_ALL)
+target_link_libraries(main PRIVATE assimp)
