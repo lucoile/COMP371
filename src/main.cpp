@@ -363,6 +363,8 @@ int main() {
     models[4].translation = glm::translate(id, glm::vec3(40 * ULEN, 0.0f, -40 * ULEN));
     models[4].rotation = id;
 
+    // Textures
+	Texture texture("res/textures/box.jpg");
 
 
     // Render Loop
@@ -405,10 +407,9 @@ int main() {
         grid.draw(gridShader);
 
         // light properties
-        Texture texture("res/textures/box.jpg");
-        texture.bind();
-
         cubeShader.use();
+        cubeShader.setInt("material.diffuse", 0);
+
         cubeShader.setVec3("light.position", 0.0f, 30.0*ULEN, 0.0f);
         cubeShader.setVec3("light.ambient",  0.2f, 0.2f, 0.2f);
         cubeShader.setVec3("light.diffuse",  0.5f, 0.5f, 0.5f);
@@ -416,7 +417,7 @@ int main() {
 
         // material properties
         cubeShader.setVec3("material.ambient", 0.5f, 0.5f, 0.5f);
-        cubeShader.setVec3("material.diffuse", 0.5f, 0.5f, 0.5f);
+//        cubeShader.setVec3("material.diffuse", 0.5f, 0.5f, 0.5f);
         cubeShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
         cubeShader.setFloat("material.shininess", 32.0f);
 
