@@ -15,6 +15,7 @@
 #include "Utilities/shader_m.h"
 #include "Utilities/camera.h"
 #include "Utilities/model.h"
+#include "Utilities/texture.h"
 
 #include "Grid/grid.h"
 #include "Line/line.h"
@@ -114,10 +115,10 @@ int main() {
     Shader cubeShader("../res/shaders/cube.vert", "../res/shaders/cube.frag");
 
 
-    std::vector<float> vertGrid = {0.0f, 0.0f, 0.0f, 0.0f, 0.407f, 0.478f,
-                                  ULEN, 0.0f, 0.0f, 0.0f, 0.407f, 0.478f,
-                                  0.0f, 0.0f, ULEN, 0.0f, 0.407f, 0.478f,
-                                  ULEN, 0.0f, ULEN, 0.0f, 0.407f, 0.478f};
+    std::vector<float> vertGrid = {0.0f, 0.0f, 0.0f, 0.0f, 0.407f, 0.478f, 0.0f, 0.0f,
+                                  ULEN, 0.0f, 0.0f, 0.0f, 0.407f, 0.478f, ULEN, 0.0f,
+                                  0.0f, 0.0f, ULEN, 0.0f, 0.407f, 0.478f, 0.0f, ULEN,
+                                  ULEN, 0.0f, ULEN, 0.0f, 0.407f, 0.478f, ULEN, ULEN};
     std::vector<unsigned int> indexGrid = { 0, 1,
                                           0, 2,
                                           2, 3,
@@ -403,10 +404,11 @@ int main() {
 
         grid.draw(gridShader);
 
-        // Render models
-        cubeShader.use();
-
         // light properties
+        Texture texture("res/textures/box.jpg");
+        texture.bind();
+
+        cubeShader.use();
         cubeShader.setVec3("light.position", 0.0f, 30.0*ULEN, 0.0f);
         cubeShader.setVec3("light.ambient",  0.2f, 0.2f, 0.2f);
         cubeShader.setVec3("light.diffuse",  0.5f, 0.5f, 0.5f);

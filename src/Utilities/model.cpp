@@ -55,7 +55,7 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
 {
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
-    std::vector<Texture> textures;
+    std::vector<LightingTexture> textures;
 
     for(unsigned int i = 0; i < mesh->mNumVertices; i++)
     {
@@ -104,10 +104,10 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
         if(mesh->mMaterialIndex >= 0)
         {
             aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
-            std::vector<Texture> diffuseMaps = loadMaterialTextures(material,
+            std::vector<LightingTexture> diffuseMaps = loadMaterialTextures(material,
                                                                     aiTextureType_DIFFUSE, "texture_diffuse");
             textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-            std::vector<Texture> specularMaps = loadMaterialTextures(material,
+            std::vector<LightingTexture> specularMaps = loadMaterialTextures(material,
                                                                      aiTextureType_SPECULAR, "texture_specular");
             textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
         }
@@ -116,9 +116,9 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
     return Mesh(vertices, indices, textures);
 }
 
-std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName)
+std::vector<LightingTexture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName)
 {
-    std::vector<Texture> textures;
+    std::vector<LightingTexture> textures;
     for(unsigned int i = 0; i < mat->GetTextureCount(type); i++)
     {
         aiString str;
@@ -136,7 +136,7 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType 
         }
         if(!skip)
         {   // if texture hasn't been loaded already, load it
-            Texture texture;
+            LightingTexture texture;
             texture.id = TextureFromFile(str.C_Str(), directory);
             texture.type = typeName;
             texture.path = str.C_Str();
@@ -186,4 +186,3 @@ unsigned int Model::TextureFromFile(const char *path, const std::string &directo
 
     return textureID;
 }
-
