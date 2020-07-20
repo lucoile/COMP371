@@ -361,8 +361,8 @@ int main() {
     models[4].rotation = id;
 
     // Textures
-	Texture texture("res/textures/box.jpg");
-	Texture texture1("res/textures/ground.jpg");
+	Texture boxTexture("res/textures/box.jpg");
+	Texture groundTexture("res/textures/ground.jpg");
 
 	// Render Loop
     while (!glfwWindowShouldClose(window)) {
@@ -401,15 +401,18 @@ int main() {
         gridShader.setMat4("view", view);
         gridShader.setMat4("world", worldOrientation);
 
-		glActiveTexture(GL_TEXTURE1);
+		glActiveTexture(GL_TEXTURE0);
 		glEnable(GL_TEXTURE_2D);
-		texture1.bind();
+		groundTexture.bind();
 
         grid.draw(gridShader);
 
         // light properties
         cubeShader.use();
-        cubeShader.setInt("material.diffuse", 0);
+        glActiveTexture(GL_TEXTURE1);
+        glEnable(GL_TEXTURE_2D);
+        boxTexture.bind();
+        cubeShader.setInt("material.diffuse", 1);
 
         cubeShader.setVec3("light.position", 0.0f, 30.0*ULEN, 0.0f);
         cubeShader.setVec3("light.ambient",  0.2f, 0.2f, 0.2f);
