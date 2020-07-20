@@ -27,7 +27,8 @@ void Grid::draw(Shader &shader) {
             model = glm::translate(model, j);
             shader.setMat4("model", model);
 
-            glDrawElements(GL_LINES, 8, GL_UNSIGNED_INT, nullptr);
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+//            glDrawArrays(GL_LINES, 0, 16);
         }
     }
     glBindVertexArray(0);

@@ -116,13 +116,10 @@ int main() {
 
 
     std::vector<float> vertGrid = {0.0f, 0.0f, 0.0f, 0.0f, 0.407f, 0.478f, 0.0f, 0.0f,
-                                  ULEN, 0.0f, 0.0f, 0.0f, 0.407f, 0.478f, ULEN, 0.0f,
-                                  0.0f, 0.0f, ULEN, 0.0f, 0.407f, 0.478f, 0.0f, ULEN,
-                                  ULEN, 0.0f, ULEN, 0.0f, 0.407f, 0.478f, ULEN, ULEN};
-    std::vector<unsigned int> indexGrid = { 0, 1,
-                                          0, 2,
-                                          2, 3,
-                                          1, 3};
+                                  ULEN, 0.0f, 0.0f, 0.0f, 0.407f, 0.478f, 1.0f, 0.0f,
+                                  0.0f, 0.0f, ULEN, 0.0f, 0.407f, 0.478f, 0.0f, 1.0f,
+                                  ULEN, 0.0f, ULEN, 0.0f, 0.407f, 0.478f, 1.0f, 1.0f};
+    std::vector<unsigned int> indexGrid = {0, 2, 3, 3, 1, 0};
     Grid grid(vertGrid, indexGrid);
 
     std::vector<float> vertLines = {
@@ -364,10 +361,10 @@ int main() {
     models[4].rotation = id;
 
     // Textures
-    Texture texture1("res/textures/ground.jpg");
 	Texture texture("res/textures/box.jpg");
+	Texture texture1("res/textures/ground.jpg");
 
-    // Render Loop
+	// Render Loop
     while (!glfwWindowShouldClose(window)) {
         // Per Frame Time Logic
         auto currentFrame = float(glfwGetTime());
@@ -400,10 +397,13 @@ int main() {
         // Render grid
         // Activate shader
         gridShader.use();
-        gridShader.setInt("texture1", 0);
         gridShader.setMat4("projection", projection);
         gridShader.setMat4("view", view);
         gridShader.setMat4("world", worldOrientation);
+
+		glActiveTexture(GL_TEXTURE1);
+		glEnable(GL_TEXTURE_2D);
+		texture1.bind();
 
         grid.draw(gridShader);
 
