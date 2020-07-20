@@ -364,8 +364,8 @@ int main() {
     models[4].rotation = id;
 
     // Textures
+    Texture texture1("res/textures/ground.jpg");
 	Texture texture("res/textures/box.jpg");
-
 
     // Render Loop
     while (!glfwWindowShouldClose(window)) {
@@ -400,6 +400,7 @@ int main() {
         // Render grid
         // Activate shader
         gridShader.use();
+        gridShader.setInt("texture1", 0);
         gridShader.setMat4("projection", projection);
         gridShader.setMat4("view", view);
         gridShader.setMat4("world", worldOrientation);
