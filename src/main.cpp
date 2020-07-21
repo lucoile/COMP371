@@ -32,6 +32,8 @@ void process_input(GLFWwindow *window);
 
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
 
+void resetTextures(const Shader &shader);
+
 // Settings
 unsigned int SCR_WIDTH = 1024;
 unsigned int SCR_HEIGHT = 768;
@@ -52,6 +54,9 @@ GLenum type = GL_TRIANGLES;
 
 // Selected Model
 unsigned int selectedModel = 0;
+
+// Texture Toggle
+unsigned int textureOn = 0;
 
 // Alphanumeric class
 struct Alphanum {
@@ -119,7 +124,9 @@ int main() {
                                   ULEN, 0.0f, 0.0f, 0.0f, 0.407f, 0.478f, 1.0f, 0.0f,
                                   0.0f, 0.0f, ULEN, 0.0f, 0.407f, 0.478f, 0.0f, 1.0f,
                                   ULEN, 0.0f, ULEN, 0.0f, 0.407f, 0.478f, 1.0f, 1.0f};
-    std::vector<unsigned int> indexGrid = {0, 2, 3, 3, 1, 0};
+
+    std::vector<unsigned int> indexGrid = {0, 2, 3, 3, 1, 0};// {0, 1, 0, 2, 2, 3, 1, 3};
+
     Grid grid(vertGrid, indexGrid);
 
     std::vector<float> vertLines = {
@@ -422,22 +429,29 @@ int main() {
         shinyTexture.bind();
 
         // material properties
-        cubeShader.setVec3("material.ambient", 0.5f, 0.5f, 0.5f);
-        cubeShader.setVec3("material.specular", 0.2f, 0.2f, 0.2f);
-        cubeShader.setFloat("material.shininess", 32.0f);
+        if(textureOn == 1){
+            cubeShader.setVec3("material.ambient", 0.5f, 0.5f, 0.5f);
+            cubeShader.setVec3("material.specular", 0.2f, 0.2f, 0.2f);
+            cubeShader.setFloat("material.shininess", 32.0f);
 
-        // light properties
-        cubeShader.setVec3("light.ambient",  0.2f, 0.2f, 0.2f);
-        cubeShader.setVec3("light.diffuse",  1.0f, 1.0f, 1.0f);
-        cubeShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+            // light properties
+            cubeShader.setVec3("light.ambient",  0.2f, 0.2f, 0.2f);
+            cubeShader.setVec3("light.diffuse",  1.0f, 1.0f, 1.0f);
+            cubeShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+            cubeShader.setVec3("light.position", 0.0f, 30.0*ULEN, 0.0f);
+        } else{
+            resetTextures(cubeShader);
+        }
 
         // render each alphanumeric pair by looping through the array of models
         for (unsigned int j = 0; j < 5; j++)
         {
             // add box texture
-            cubeShader.setInt("material.diffuse", 1);
-            // removes shine from light
-            cubeShader.setVec3("light.position", 0.0f, 30.0*ULEN, 0.0f);
+            if(textureOn == 1){
+                cubeShader.setInt("material.diffuse", 1);
+            }else{
+                resetTextures(cubeShader);
+            }
 
             // draw the letter
             for (unsigned int i = 0; i < models[j].letterTrans.size(); i++)
@@ -451,10 +465,13 @@ int main() {
             }
 
             // add shiny texture
-            cubeShader.setInt("material.diffuse", 2);
-			cubeShader.setVec3("material.ambient", 0.5f, 0.5f, 0.5f);
-			cubeShader.setVec3("material.specular", 1.0f, 1.0f, 1.0f);
-			cubeShader.setFloat("material.shininess", 64.0f);
+            if(textureOn == 1){
+                cubeShader.setInt("material.diffuse", 2);
+                cubeShader.setVec3("material.specular", 1.0f, 1.0f, 1.0f);
+                cubeShader.setFloat("material.shininess", 64.0f);
+            }else{
+                resetTextures(cubeShader);
+            }
 
             // draw the number
             for (unsigned int i = 0; i < models[j].numTrans.size(); i++)
@@ -480,6 +497,17 @@ int main() {
     // Terminate, clearing all previously allocated GLFW resources.
     glfwTerminate();
     return 0;
+}
+
+void resetTextures(const Shader &shader) {
+    shader.setVec3("material.ambient", 0.0f, 0.0f, 0.0f);
+    shader.setVec3("material.specular", 0.0f, 0.0f, 0.0f);
+    shader.setFloat("material.shininess", 0.0f);
+
+    // light properties
+    shader.setVec3("light.ambient", 0.0f, 0.0f, 0.0f);
+    shader.setVec3("light.diffuse", 0.0f, 0.0f, 0.0f);
+    shader.setVec3("light.specular", 0.0f, 0.0f, 0.0f);
 }
 
 // Process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
@@ -648,5 +676,10 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
     if (glfwGetKey(window, GLFW_KEY_HOME) == GLFW_PRESS) {
         worldOrientation = glm::mat4(1.0f);
         camera = Camera(glm::vec3(0.0f, 0.1f, 2.0f));
+    }
+
+    // Press X to toggle textures
+    if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS){
+        textureOn = 1-textureOn;
     }
 }
