@@ -363,6 +363,7 @@ int main() {
     // Textures
 	Texture boxTexture("res/textures/box.jpg");
 	Texture groundTexture("res/textures/ground.jpg");
+	Texture shinyTexture("res/textures/yellow.png");
 
 	// Render Loop
     while (!glfwWindowShouldClose(window)) {
@@ -401,33 +402,43 @@ int main() {
         gridShader.setMat4("view", view);
         gridShader.setMat4("world", worldOrientation);
 
+        // bind grounud texture
 		glActiveTexture(GL_TEXTURE0);
 		glEnable(GL_TEXTURE_2D);
 		groundTexture.bind();
 
         grid.draw(gridShader);
 
-        // light properties
         cubeShader.use();
+
+        // bind box texture
         glActiveTexture(GL_TEXTURE1);
         glEnable(GL_TEXTURE_2D);
         boxTexture.bind();
-        cubeShader.setInt("material.diffuse", 1);
 
-        cubeShader.setVec3("light.position", 0.0f, 30.0*ULEN, 0.0f);
+        // bind shiny texture
+        glActiveTexture(GL_TEXTURE2);
+        glEnable(GL_TEXTURE_2D);
+        shinyTexture.bind();
+
+        // material properties
+        cubeShader.setVec3("material.ambient", 0.5f, 0.5f, 0.5f);
+        cubeShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
+        cubeShader.setFloat("material.shininess", 32.0f);
+
+        // light properties
         cubeShader.setVec3("light.ambient",  0.2f, 0.2f, 0.2f);
         cubeShader.setVec3("light.diffuse",  0.5f, 0.5f, 0.5f);
         cubeShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 
-        // material properties
-        cubeShader.setVec3("material.ambient", 0.5f, 0.5f, 0.5f);
-//        cubeShader.setVec3("material.diffuse", 0.5f, 0.5f, 0.5f);
-        cubeShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
-        cubeShader.setFloat("material.shininess", 32.0f);
-
         // render each alphanumeric pair by looping through the array of models
         for (unsigned int j = 0; j < 5; j++)
         {
+            // add box texture
+            cubeShader.setInt("material.diffuse", 1);
+            // removes shine from light
+            cubeShader.setVec3("light.position", 0.0f, 30.0*ULEN, 0.0f);
+
             // draw the letter
             for (unsigned int i = 0; i < models[j].letterTrans.size(); i++)
             {
@@ -438,6 +449,10 @@ int main() {
 
                 cube.Draw(cubeShader, type);
             }
+
+            // add shiny texture
+            cubeShader.setInt("material.diffuse", 2);
+            cubeShader.setVec3("light.position", 0.0f, 0.0f, 0.0f);
 
             // draw the number
             for (unsigned int i = 0; i < models[j].numTrans.size(); i++)
