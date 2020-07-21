@@ -423,12 +423,12 @@ int main() {
 
         // material properties
         cubeShader.setVec3("material.ambient", 0.5f, 0.5f, 0.5f);
-        cubeShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
+        cubeShader.setVec3("material.specular", 0.2f, 0.2f, 0.2f);
         cubeShader.setFloat("material.shininess", 32.0f);
 
         // light properties
         cubeShader.setVec3("light.ambient",  0.2f, 0.2f, 0.2f);
-        cubeShader.setVec3("light.diffuse",  0.5f, 0.5f, 0.5f);
+        cubeShader.setVec3("light.diffuse",  1.0f, 1.0f, 1.0f);
         cubeShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 
         // render each alphanumeric pair by looping through the array of models
@@ -452,7 +452,9 @@ int main() {
 
             // add shiny texture
             cubeShader.setInt("material.diffuse", 2);
-            cubeShader.setVec3("light.position", 0.0f, 0.0f, 0.0f);
+			cubeShader.setVec3("material.ambient", 0.5f, 0.5f, 0.5f);
+			cubeShader.setVec3("material.specular", 1.0f, 1.0f, 1.0f);
+			cubeShader.setFloat("material.shininess", 64.0f);
 
             // draw the number
             for (unsigned int i = 0; i < models[j].numTrans.size(); i++)
