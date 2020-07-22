@@ -125,9 +125,16 @@ int main() {
                                   0.0f, 0.0f, ULEN, 0.0f, 0.407f, 0.478f, 0.0f, 1.0f,
                                   ULEN, 0.0f, ULEN, 0.0f, 0.407f, 0.478f, 1.0f, 1.0f};
 
-    std::vector<unsigned int> indexGrid = {0, 2, 3, 3, 1, 0};// {0, 1, 0, 2, 2, 3, 1, 3};
-
+    std::vector<unsigned int> indexGrid = {0, 1, 0, 2, 2, 3, 1, 3};
     Grid grid(vertGrid, indexGrid);
+
+    if (textureOn == 0){
+        std::vector<unsigned int> indexGrid = {0, 1, 0, 2, 2, 3, 1, 3};
+        Grid grid(vertGrid, indexGrid);
+    }else if ((textureOn == 1)){
+        std::vector<unsigned int> indexGrid = {0, 2, 3, 3, 1, 0};
+        Grid grid(vertGrid, indexGrid);
+    }
 
     std::vector<float> vertLines = {
             0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
@@ -409,12 +416,16 @@ int main() {
         gridShader.setMat4("view", view);
         gridShader.setMat4("world", worldOrientation);
 
-        // bind grounud texture
-		glActiveTexture(GL_TEXTURE0);
-		glEnable(GL_TEXTURE_2D);
-		groundTexture.bind();
+        glActiveTexture(GL_TEXTURE0);
+        glEnable(GL_TEXTURE_2D);
+        groundTexture.bind();
 
-        grid.draw(gridShader);
+        if (textureOn == 1){
+            // bind ground texture
+            grid.draw(gridShader, GL_TRIANGLES);
+        }else{
+            grid.draw(gridShader, GL_LINES);
+        }
 
         cubeShader.use();
 
@@ -500,14 +511,16 @@ int main() {
 }
 
 void resetTextures(const Shader &shader) {
-    shader.setVec3("material.ambient", 0.0f, 0.0f, 0.0f);
-    shader.setVec3("material.specular", 0.0f, 0.0f, 0.0f);
-    shader.setFloat("material.shininess", 0.0f);
+    shader.setVec3("material.diffuse",  1.0f, 1.0f, 1.0f);
+    shader.setVec3("material.ambient", 0.5f, 0.5f, 0.5f);
+    shader.setVec3("material.specular", 0.2f, 0.2f, 0.2f);
+    shader.setFloat("material.shininess", 32.0f);
 
     // light properties
-    shader.setVec3("light.ambient", 0.0f, 0.0f, 0.0f);
-    shader.setVec3("light.diffuse", 0.0f, 0.0f, 0.0f);
-    shader.setVec3("light.specular", 0.0f, 0.0f, 0.0f);
+    shader.setVec3("light.ambient",  0.2f, 0.2f, 0.2f);
+    shader.setVec3("light.diffuse",  1.0f, 1.0f, 1.0f);
+    shader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+    shader.setVec3("light.position", 0.0f, 30.0*ULEN, 0.0f);
 }
 
 // Process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly

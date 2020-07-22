@@ -19,7 +19,7 @@ public:
 
     Grid(std::vector<float> vertices, std::vector<unsigned int> indices);
 
-    void draw(Shader &shader);
+    void draw(Shader &shader, GLenum type);
 
     void deleteBuffers();
 

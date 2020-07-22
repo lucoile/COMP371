@@ -19,7 +19,7 @@ Grid::Grid(std::vector<float> vertices, std::vector<unsigned int> indices) {
     setupGrid();
 }
 
-void Grid::draw(Shader &shader) {
+void Grid::draw(Shader &shader, GLenum type) {
     glBindVertexArray(VAO);
     for (auto &gridPosition : gridPositions) {
         for (auto &j : gridPosition) {
@@ -27,7 +27,7 @@ void Grid::draw(Shader &shader) {
             model = glm::translate(model, j);
             shader.setMat4("model", model);
 
-            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+            glDrawElements(type, 6, GL_UNSIGNED_INT, nullptr);
 //            glDrawArrays(GL_LINES, 0, 16);
         }
     }
