@@ -380,6 +380,7 @@ int main() {
 	Texture boxTexture("res/textures/box.jpg");
 	Texture groundTexture("res/textures/ground.jpg");
 	Texture shinyTexture("res/textures/yellow.png");
+	Texture greyTexture("res/textures/grey.png");
 
 	// Render Loop
     while (!glfwWindowShouldClose(window)) {
@@ -436,10 +437,13 @@ int main() {
         glEnable(GL_TEXTURE_2D);
         boxTexture.bind();
 
-        // bind shiny texture
-        glActiveTexture(GL_TEXTURE2);
-        glEnable(GL_TEXTURE_2D);
-        shinyTexture.bind();
+		glActiveTexture(GL_TEXTURE2);
+		glEnable(GL_TEXTURE_2D);
+		shinyTexture.bind();
+
+		glActiveTexture(GL_TEXTURE3);
+		glEnable(GL_TEXTURE_2D);
+		greyTexture.bind();
 
         // material properties
         if(textureOn == 1){
@@ -463,9 +467,9 @@ int main() {
             if(textureOn == 1){
                 cubeShader.setInt("material.diffuse", 1);
             }else{
+				cubeShader.setInt("material.diffuse", 3);
                 resetTextures(cubeShader);
             }
-
             // draw the letter
             for (unsigned int i = 0; i < models[j].letterTrans.size(); i++)
             {
@@ -482,8 +486,9 @@ int main() {
                 cubeShader.setInt("material.diffuse", 2);
                 cubeShader.setVec3("material.specular", 1.0f, 1.0f, 1.0f);
                 cubeShader.setFloat("material.shininess", 64.0f);
-            }else{
-                resetTextures(cubeShader);
+            } else {
+				cubeShader.setInt("material.diffuse", 3);
+				resetTextures(cubeShader);
             }
 
             // draw the number
@@ -514,7 +519,6 @@ int main() {
 }
 
 void resetTextures(const Shader &shader) {
-    shader.setVec3("material.diffuse",  1.0f, 1.0f, 1.0f);
     shader.setVec3("material.ambient", 0.5f, 0.5f, 0.5f);
     shader.setVec3("material.specular", 0.2f, 0.2f, 0.2f);
     shader.setFloat("material.shininess", 32.0f);
