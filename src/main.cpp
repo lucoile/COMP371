@@ -125,16 +125,18 @@ int main() {
                                   0.0f, 0.0f, ULEN, 0.0f, 0.407f, 0.478f, 0.0f, 1.0f,
                                   ULEN, 0.0f, ULEN, 0.0f, 0.407f, 0.478f, 1.0f, 1.0f};
 
-    std::vector<unsigned int> indexGrid = {0, 1, 0, 2, 2, 3, 1, 3};
-    Grid grid(vertGrid, indexGrid);
+    std::vector<unsigned int> indexGridTri = {0, 2, 3, 3, 1, 0};
+	std::vector<unsigned int> indexGridLine = {0, 1, 0, 2, 2, 3, 1, 3};
+    Grid gridTri(vertGrid, indexGridTri);
+    Grid gridLine(vertGrid, indexGridLine);
 
-    if (textureOn == 0){
-        std::vector<unsigned int> indexGrid = {0, 1, 0, 2, 2, 3, 1, 3};
-        Grid grid(vertGrid, indexGrid);
-    }else if ((textureOn == 1)){
-        std::vector<unsigned int> indexGrid = {0, 2, 3, 3, 1, 0};
-        Grid grid(vertGrid, indexGrid);
-    }
+//    if (textureOn == 0){
+//        std::vector<unsigned int> indexGrid = {0, 1, 0, 2, 2, 3, 1, 3};
+//        Grid grid(vertGrid, indexGrid);
+//    }else if ((textureOn == 1)){
+//        std::vector<unsigned int> indexGrid = {0, 2, 3, 3, 1, 0};
+//        Grid grid(vertGrid, indexGrid);
+//    }
 
     std::vector<float> vertLines = {
             0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
@@ -422,9 +424,9 @@ int main() {
 
         if (textureOn == 1){
             // bind ground texture
-            grid.draw(gridShader, GL_TRIANGLES);
+            gridTri.draw(gridShader, GL_TRIANGLES);
         }else{
-            grid.draw(gridShader, GL_LINES);
+            gridLine.draw(gridShader, GL_LINES);
         }
 
         cubeShader.use();
@@ -503,7 +505,8 @@ int main() {
 
     // De-allocate all resources once they've outlived their purpose:
     line.deleteBuffers();
-    grid.deleteBuffers();
+    gridTri.deleteBuffers();
+    gridLine.deleteBuffers();
 
     // Terminate, clearing all previously allocated GLFW resources.
     glfwTerminate();
