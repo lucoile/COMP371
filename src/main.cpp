@@ -60,7 +60,9 @@ struct Alphanum {
     glm::mat4 numAdjust;
     glm::mat4 rotation;
     glm::mat4 scale;
+    glm::mat4 sphereScale;
     glm::mat4 translation;
+    glm::mat4 sphereTranslation;
 };
 
 // Alphanumeric models data structure
@@ -72,6 +74,11 @@ glm::mat4 id(1.0f);
 // World Orientation
 glm::mat4 worldOrientation(1.0f);
 
+// Sphere Scaling
+glm::mat4 sphereScale = glm::scale(id, glm::vec3(0.2f, 0.2f, 0.2f));
+
+// Sphere Translation
+glm::mat4 sphereTranslation = glm::translate(id, glm::vec3(0.0f, 6.0*ULEN, 0.0f));
 
 int main() {
     // GLFW: Initialize and configure
@@ -112,7 +119,6 @@ int main() {
     Shader gridShader("../res/shaders/grid.vert", "../res/shaders/grid.frag");
     Shader lineShader("../res/shaders/line.vert", "../res/shaders/line.frag");
     Shader cubeShader("../res/shaders/cube.vert", "../res/shaders/cube.frag");
-    Shader sphereShader("../res/shaders/sphere.vert", "../res/shaders/sphere.frag");
 
     std::vector<float> vertGrid = {0.0f, 0.0f, 0.0f, 0.0f, 0.407f, 0.478f,
                                   ULEN, 0.0f, 0.0f, 0.0f, 0.407f, 0.478f,
@@ -145,7 +151,6 @@ int main() {
 
     // Cube model
     Model sphere("../res/models/sphere/sphere.obj");
-
 
     // glm::mat4 transformations = projection * view * worldOrientation * translation * rotation * scale;
 
@@ -182,6 +187,8 @@ int main() {
     models[0].scale = id;
     models[0].translation = id;
     models[0].rotation = id;
+    models[0].sphereScale = sphereScale;
+    models[0].sphereTranslation = sphereTranslation;
 
     // H6
     models[1].letterTrans.push_back(
@@ -220,6 +227,8 @@ int main() {
     models[1].scale = id;
     models[1].translation = glm::translate(id, glm::vec3(40 * ULEN, 0.0f, 40 * ULEN));
     models[1].rotation = id;
+    models[1].sphereScale = sphereScale;
+    models[1].sphereTranslation = sphereTranslation;
 
     // N5
     models[2].letterTrans.push_back(
@@ -269,6 +278,8 @@ int main() {
     models[2].scale = id;
     models[2].translation = glm::translate(id, glm::vec3(-40 * ULEN, 0.0f, 40 * ULEN));
     models[2].rotation = id;
+    models[2].sphereScale = sphereScale;
+    models[2].sphereTranslation = sphereTranslation;
 
     // 08
     models[3].letterTrans.push_back(
@@ -310,6 +321,8 @@ int main() {
     models[3].scale = id;
     models[3].translation = glm::translate(id, glm::vec3(-40 * ULEN, 0.0f, -40 * ULEN));
     models[3].rotation = id;
+    models[3].sphereScale = sphereScale;
+    models[3].sphereTranslation = sphereTranslation;
 
     // K5
     models[4].letterTrans.push_back(
@@ -365,6 +378,8 @@ int main() {
     models[4].scale = id;
     models[4].translation = glm::translate(id, glm::vec3(40 * ULEN, 0.0f, -40 * ULEN));
     models[4].rotation = id;
+    models[4].sphereScale = sphereScale;
+    models[4].sphereTranslation = sphereTranslation;
 
     // load OpenGL resources needed by the sphere
     // pass the vertex position id to it
@@ -388,16 +403,6 @@ int main() {
 
         // Camera/view transformation
         glm::mat4 view = camera.get_view_matrix();
-
-
-        sphereShader.use();
-        sphereShader.setMat4("projection", projection);
-        sphereShader.setMat4("view", view);
-
-        sphereShader.use();
-        glm::mat4 transformations = projection * view * glm::translate(id, glm::vec3(0.0f, 3.0f * ULEN, 0.0f)) * glm::scale(id, glm::vec3(ULEN, ULEN, ULEN));
-        sphereShader.setMat4("transformations", transformations);
-        sphere.Draw(sphereShader, type);
 
         // Render lines
         // Activate line shader
@@ -455,6 +460,17 @@ int main() {
                 cubeShader.setMat4("model", model);
 
                 cube.Draw(cubeShader, type);
+            }
+
+            // Draw Sphere
+            for (unsigned int i = 0; i < models[j].letterTrans.size(); i++)
+            {
+                glm::mat4 model = worldOrientation * models[j].translation * models[j].sphereTranslation * models[j].rotation * models[j].scale * models[j].sphereScale * models[j].letterAdjust;
+                glm::mat4 transformations = projection * view * model;
+                cubeShader.setMat4("transformations", transformations);
+                cubeShader.setMat4("model", model);
+
+                sphere.Draw(cubeShader, type);
             }
         }
 
