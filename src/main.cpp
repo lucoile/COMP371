@@ -112,7 +112,7 @@ int main() {
     Shader gridShader("../res/shaders/grid.vert", "../res/shaders/grid.frag");
     Shader lineShader("../res/shaders/line.vert", "../res/shaders/line.frag");
     Shader cubeShader("../res/shaders/cube.vert", "../res/shaders/cube.frag");
-
+    Shader sphereShader("../res/shaders/sphere.vert", "../res/shaders/sphere.frag");
 
     std::vector<float> vertGrid = {0.0f, 0.0f, 0.0f, 0.0f, 0.407f, 0.478f,
                                   ULEN, 0.0f, 0.0f, 0.0f, 0.407f, 0.478f,
@@ -142,6 +142,10 @@ int main() {
 
     // Cube model
     Model cube("../res/models/cube/cube.obj");
+
+    // Cube model
+    Model sphere("../res/models/sphere/sphere.obj");
+
 
     // glm::mat4 transformations = projection * view * worldOrientation * translation * rotation * scale;
 
@@ -362,8 +366,8 @@ int main() {
     models[4].translation = glm::translate(id, glm::vec3(40 * ULEN, 0.0f, -40 * ULEN));
     models[4].rotation = id;
 
-
-
+    // load OpenGL resources needed by the sphere
+    // pass the vertex position id to it
     // Render Loop
     while (!glfwWindowShouldClose(window)) {
         // Per Frame Time Logic
@@ -384,6 +388,16 @@ int main() {
 
         // Camera/view transformation
         glm::mat4 view = camera.get_view_matrix();
+
+
+        sphereShader.use();
+        sphereShader.setMat4("projection", projection);
+        sphereShader.setMat4("view", view);
+
+        sphereShader.use();
+        glm::mat4 transformations = projection * view * glm::translate(id, glm::vec3(0.0f, 3.0f * ULEN, 0.0f)) * glm::scale(id, glm::vec3(ULEN, ULEN, ULEN));
+        sphereShader.setMat4("transformations", transformations);
+        sphere.Draw(sphereShader, type);
 
         // Render lines
         // Activate line shader
