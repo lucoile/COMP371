@@ -341,7 +341,6 @@ int main() {
 
             // Draw Sphere
             for (unsigned int i = 0; i < models[j].letterTrans.size(); i++) {
-                glDisable(GL_BLEND);
                 glm::mat4 model =
                         worldOrientation * models[j].translation * models[j].sphereTranslation * models[j].rotation *
                         models[j].scale * models[j].sphereScale * models[j].letterAdjust;
