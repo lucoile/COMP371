@@ -427,6 +427,9 @@ int main() {
             // bind ground texture
             gridTri.draw(gridShader, GL_TRIANGLES);
         }else{
+            glActiveTexture(GL_TEXTURE0);
+            glEnable(GL_TEXTURE_2D);
+            greyTexture.bind();
             gridLine.draw(gridShader, GL_LINES);
         }
 
