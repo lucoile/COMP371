@@ -19,7 +19,7 @@ Grid::Grid(std::vector<float> vertices, std::vector<unsigned int> indices) {
     setupGrid();
 }
 
-void Grid::draw(Shader &shader) {
+void Grid::draw(Shader &shader, GLenum type) {
     glBindVertexArray(VAO);
     for (auto &gridPosition : gridPositions) {
         for (auto &j : gridPosition) {
@@ -27,7 +27,8 @@ void Grid::draw(Shader &shader) {
             model = glm::translate(model, j);
             shader.setMat4("model", model);
 
-            glDrawElements(GL_LINES, 8, GL_UNSIGNED_INT, nullptr);
+            glDrawElements(type, 6, GL_UNSIGNED_INT, nullptr);
+//            glDrawArrays(GL_LINES, 0, 16);
         }
     }
     glBindVertexArray(0);
@@ -52,11 +53,13 @@ void Grid::setupGrid() {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
 
     // Position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *) 0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) 0);
     glEnableVertexAttribArray(0);
     // Color attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *) (3 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) (3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+    // Texture attribute
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) (6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
     glBindVertexArray(0);
-
 }

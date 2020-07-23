@@ -17,6 +17,7 @@
 #include "Utilities/shader_m.h"
 #include "Utilities/camera.h"
 #include "Utilities/model.h"
+#include "Utilities/texture.h"
 
 #include "Grid/grid.h"
 #include "Line/line.h"
@@ -46,6 +47,8 @@ void create08Model();
 
 void createK5Model();
 
+void resetTextures(const Shader &shader);
+
 // Settings
 unsigned int SCR_WIDTH = 1024;
 unsigned int SCR_HEIGHT = 768;
@@ -66,6 +69,9 @@ GLenum type = GL_TRIANGLES;
 
 // Selected Model
 unsigned int selectedModel = 0;
+
+// Texture Toggle
+unsigned int textureOn = 0;
 
 // Alphanumeric class
 struct Alphanum {
@@ -148,17 +154,16 @@ int main() {
     Shader lineShader("../res/shaders/line.vert", "../res/shaders/line.frag");
     Shader cubeShader("../res/shaders/cube.vert", "../res/shaders/cube.frag");
 
-    std::vector<float> vertGrid = {0.0f, 0.0f, 0.0f, 0.0f, 0.407f, 0.478f,
-                                   ULEN, 0.0f, 0.0f, 0.0f, 0.407f, 0.478f,
-                                   0.0f, 0.0f, ULEN, 0.0f, 0.407f, 0.478f,
-                                   ULEN, 0.0f, ULEN, 0.0f, 0.407f, 0.478f};
 
-    std::vector<unsigned int> indexGrid = {0, 1,
-                                           0, 2,
-                                           2, 3,
-                                           1, 3};
+    std::vector<float> vertGrid = {0.0f, 0.0f, 0.0f, 0.0f, 0.407f, 0.478f, 0.0f, 0.0f,
+                                  ULEN, 0.0f, 0.0f, 0.0f, 0.407f, 0.478f, 1.0f, 0.0f,
+                                  0.0f, 0.0f, ULEN, 0.0f, 0.407f, 0.478f, 0.0f, 1.0f,
+                                  ULEN, 0.0f, ULEN, 0.0f, 0.407f, 0.478f, 1.0f, 1.0f};
 
-    Grid grid(vertGrid, indexGrid);
+    std::vector<unsigned int> indexGridTri = {0, 2, 3, 3, 1, 0};
+	std::vector<unsigned int> indexGridLine = {0, 1, 0, 2, 2, 3, 1, 3};
+    Grid gridTri(vertGrid, indexGridTri);
+    Grid gridLine(vertGrid, indexGridLine);
 
     std::vector<float> vertLines = {
             0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
@@ -198,7 +203,13 @@ int main() {
     // K5
     createK5Model();
 
-    // Render Loop
+    // Textures
+    Texture boxTexture("res/textures/box.jpg");
+    Texture groundTexture("res/textures/ground.jpg");
+    Texture shinyTexture("res/textures/yellow.png");
+    Texture greyTexture("res/textures/grey.png");
+
+	// Render Loop
     while (!glfwWindowShouldClose(window)) {
         // Per Frame Time Logic
         auto currentFrame = float(glfwGetTime());
@@ -235,25 +246,60 @@ int main() {
         gridShader.setMat4("view", view);
         gridShader.setMat4("world", worldOrientation);
 
-        grid.draw(gridShader);
+        glActiveTexture(GL_TEXTURE0);
+        glEnable(GL_TEXTURE_2D);
+        groundTexture.bind();
 
-        // Render models
+        if (textureOn == 1){
+            // bind ground texture
+            gridTri.draw(gridShader, GL_TRIANGLES);
+        }else{
+            glActiveTexture(GL_TEXTURE0);
+            glEnable(GL_TEXTURE_2D);
+            greyTexture.bind();
+            gridLine.draw(gridShader, GL_LINES);
+        }
+
         cubeShader.use();
 
-        // light properties
-        cubeShader.setVec3("light.position", 0.0f, 30.0 * ULEN, 0.0f);
-        cubeShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
-        cubeShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
-        cubeShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+        // bind box texture
+        glActiveTexture(GL_TEXTURE1);
+        glEnable(GL_TEXTURE_2D);
+        boxTexture.bind();
+
+		glActiveTexture(GL_TEXTURE2);
+		glEnable(GL_TEXTURE_2D);
+		shinyTexture.bind();
+
+		glActiveTexture(GL_TEXTURE3);
+		glEnable(GL_TEXTURE_2D);
+		greyTexture.bind();
 
         // material properties
-        cubeShader.setVec3("material.ambient", 0.5f, 0.5f, 0.5f);
-        cubeShader.setVec3("material.diffuse", 0.5f, 0.5f, 0.5f);
-        cubeShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
-        cubeShader.setFloat("material.shininess", 32.0f);
+        if(textureOn == 1){
+            cubeShader.setVec3("material.ambient", 0.5f, 0.5f, 0.5f);
+            cubeShader.setVec3("material.specular", 0.2f, 0.2f, 0.2f);
+            cubeShader.setFloat("material.shininess", 32.0f);
+
+            // light properties
+            cubeShader.setVec3("light.ambient",  0.2f, 0.2f, 0.2f);
+            cubeShader.setVec3("light.diffuse",  1.0f, 1.0f, 1.0f);
+            cubeShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+            cubeShader.setVec3("light.position", 0.0f, 30.0*ULEN, 0.0f);
+        } else{
+            resetTextures(cubeShader);
+        }
 
         // render each alphanumeric pair by looping through the array of models
-        for (unsigned int j = 0; j < 5; j++) {
+        for (unsigned int j = 0; j < 5; j++)
+        {
+            // add box texture
+            if(textureOn == 1){
+                cubeShader.setInt("material.diffuse", 1);
+            }else{
+				cubeShader.setInt("material.diffuse", 3);
+                resetTextures(cubeShader);
+            }
             // draw the letter
             for (unsigned int i = 0; i < models[j].letterTrans.size(); i++) {
                 glm::mat4 model =
@@ -264,6 +310,16 @@ int main() {
                 cubeShader.setMat4("model", model);
 
                 cube.Draw(cubeShader, type);
+            }
+
+            // add shiny texture
+            if(textureOn == 1){
+                cubeShader.setInt("material.diffuse", 2);
+                cubeShader.setVec3("material.specular", 1.0f, 1.0f, 1.0f);
+                cubeShader.setFloat("material.shininess", 64.0f);
+            } else {
+				cubeShader.setInt("material.diffuse", 3);
+				resetTextures(cubeShader);
             }
 
             // draw the number
@@ -299,11 +355,24 @@ int main() {
 
     // De-allocate all resources once they've outlived their purpose:
     line.deleteBuffers();
-    grid.deleteBuffers();
+    gridTri.deleteBuffers();
+    gridLine.deleteBuffers();
 
     // Terminate, clearing all previously allocated GLFW resources.
     glfwTerminate();
     return 0;
+}
+
+void resetTextures(const Shader &shader) {
+    shader.setVec3("material.ambient", 0.5f, 0.5f, 0.5f);
+    shader.setVec3("material.specular", 0.2f, 0.2f, 0.2f);
+    shader.setFloat("material.shininess", 32.0f);
+
+    // light properties
+    shader.setVec3("light.ambient",  0.2f, 0.2f, 0.2f);
+    shader.setVec3("light.diffuse",  1.0f, 1.0f, 1.0f);
+    shader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+    shader.setVec3("light.position", 0.0f, 30.0*ULEN, 0.0f);
 }
 
 // Process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
@@ -410,7 +479,6 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
     if ((glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         && ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
             || (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))) {
-
         models[selectedModel].translation = glm::translate(models[selectedModel].translation,
                                                            glm::vec3(0.0f, 0.0f, -ULEN));
     }
@@ -548,6 +616,11 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
         createN5Model();
         create08Model();
         createK5Model();
+    }
+
+    // Press X to toggle textures
+    if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS){
+        textureOn = 1-textureOn;
     }
 }
 
