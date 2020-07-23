@@ -154,14 +154,13 @@ int main() {
     Shader lineShader("../res/shaders/line.vert", "../res/shaders/line.frag");
     Shader cubeShader("../res/shaders/cube.vert", "../res/shaders/cube.frag");
 
-
     std::vector<float> vertGrid = {0.0f, 0.0f, 0.0f, 0.0f, 0.407f, 0.478f, 0.0f, 0.0f,
-                                  ULEN, 0.0f, 0.0f, 0.0f, 0.407f, 0.478f, 1.0f, 0.0f,
-                                  0.0f, 0.0f, ULEN, 0.0f, 0.407f, 0.478f, 0.0f, 1.0f,
-                                  ULEN, 0.0f, ULEN, 0.0f, 0.407f, 0.478f, 1.0f, 1.0f};
+                                   ULEN, 0.0f, 0.0f, 0.0f, 0.407f, 0.478f, 1.0f, 0.0f,
+                                   0.0f, 0.0f, ULEN, 0.0f, 0.407f, 0.478f, 0.0f, 1.0f,
+                                   ULEN, 0.0f, ULEN, 0.0f, 0.407f, 0.478f, 1.0f, 1.0f};
 
     std::vector<unsigned int> indexGridTri = {0, 2, 3, 3, 1, 0};
-	std::vector<unsigned int> indexGridLine = {0, 1, 0, 2, 2, 3, 1, 3};
+    std::vector<unsigned int> indexGridLine = {0, 1, 0, 2, 2, 3, 1, 3};
     Grid gridTri(vertGrid, indexGridTri);
     Grid gridLine(vertGrid, indexGridLine);
 
@@ -209,7 +208,7 @@ int main() {
     Texture shinyTexture("res/textures/yellow.png");
     Texture greyTexture("res/textures/grey.png");
 
-	// Render Loop
+    // Render Loop
     while (!glfwWindowShouldClose(window)) {
         // Per Frame Time Logic
         auto currentFrame = float(glfwGetTime());
@@ -250,10 +249,10 @@ int main() {
         glEnable(GL_TEXTURE_2D);
         groundTexture.bind();
 
-        if (textureOn == 1){
+        if (textureOn == 1) {
             // bind ground texture
             gridTri.draw(gridShader, GL_TRIANGLES);
-        }else{
+        } else {
             glActiveTexture(GL_TEXTURE0);
             glEnable(GL_TEXTURE_2D);
             greyTexture.bind();
@@ -267,37 +266,36 @@ int main() {
         glEnable(GL_TEXTURE_2D);
         boxTexture.bind();
 
-		glActiveTexture(GL_TEXTURE2);
-		glEnable(GL_TEXTURE_2D);
-		shinyTexture.bind();
+        glActiveTexture(GL_TEXTURE2);
+        glEnable(GL_TEXTURE_2D);
+        shinyTexture.bind();
 
-		glActiveTexture(GL_TEXTURE3);
-		glEnable(GL_TEXTURE_2D);
-		greyTexture.bind();
+        glActiveTexture(GL_TEXTURE3);
+        glEnable(GL_TEXTURE_2D);
+        greyTexture.bind();
 
         // material properties
-        if(textureOn == 1){
+        if (textureOn == 1) {
             cubeShader.setVec3("material.ambient", 0.5f, 0.5f, 0.5f);
             cubeShader.setVec3("material.specular", 0.2f, 0.2f, 0.2f);
             cubeShader.setFloat("material.shininess", 32.0f);
 
             // light properties
-            cubeShader.setVec3("light.ambient",  0.2f, 0.2f, 0.2f);
-            cubeShader.setVec3("light.diffuse",  1.0f, 1.0f, 1.0f);
+            cubeShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
+            cubeShader.setVec3("light.diffuse", 1.0f, 1.0f, 1.0f);
             cubeShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-            cubeShader.setVec3("light.position", 0.0f, 30.0*ULEN, 0.0f);
-        } else{
+            cubeShader.setVec3("light.position", 0.0f, 30.0 * ULEN, 0.0f);
+        } else {
             resetTextures(cubeShader);
         }
 
         // render each alphanumeric pair by looping through the array of models
-        for (unsigned int j = 0; j < 5; j++)
-        {
+        for (unsigned int j = 0; j < 5; j++) {
             // add box texture
-            if(textureOn == 1){
+            if (textureOn == 1) {
                 cubeShader.setInt("material.diffuse", 1);
-            }else{
-				cubeShader.setInt("material.diffuse", 3);
+            } else {
+                cubeShader.setInt("material.diffuse", 3);
                 resetTextures(cubeShader);
             }
             // draw the letter
@@ -313,13 +311,13 @@ int main() {
             }
 
             // add shiny texture
-            if(textureOn == 1){
+            if (textureOn == 1) {
                 cubeShader.setInt("material.diffuse", 2);
                 cubeShader.setVec3("material.specular", 1.0f, 1.0f, 1.0f);
                 cubeShader.setFloat("material.shininess", 64.0f);
             } else {
-				cubeShader.setInt("material.diffuse", 3);
-				resetTextures(cubeShader);
+                cubeShader.setInt("material.diffuse", 3);
+                resetTextures(cubeShader);
             }
 
             // draw the number
@@ -335,9 +333,9 @@ int main() {
             }
 
             // Change to grey diffuse texture and reset material
-			resetTextures(cubeShader);
-			cubeShader.setInt("material.diffuse", 3);
-			cubeShader.setVec3("material.specular", glm::vec3(0.0f, 0.0f, 0.0f));
+            resetTextures(cubeShader);
+            cubeShader.setInt("material.diffuse", 3);
+            cubeShader.setVec3("material.specular", glm::vec3(0.0f, 0.0f, 0.0f));
 
             // Draw Sphere
             for (unsigned int i = 0; i < models[j].letterTrans.size(); i++) {
@@ -373,10 +371,10 @@ void resetTextures(const Shader &shader) {
     shader.setFloat("material.shininess", 32.0f);
 
     // light properties
-    shader.setVec3("light.ambient",  0.2f, 0.2f, 0.2f);
-    shader.setVec3("light.diffuse",  1.0f, 1.0f, 1.0f);
+    shader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
+    shader.setVec3("light.diffuse", 1.0f, 1.0f, 1.0f);
     shader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-    shader.setVec3("light.position", 0.0f, 30.0*ULEN, 0.0f);
+    shader.setVec3("light.position", 0.0f, 30.0 * ULEN, 0.0f);
 }
 
 // Process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
@@ -623,8 +621,8 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
     }
 
     // Press X to toggle textures
-    if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS){
-        textureOn = 1-textureOn;
+    if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) {
+        textureOn = 1 - textureOn;
     }
 }
 
@@ -632,7 +630,7 @@ void moveModelForwardAnimation(float translationX, float translationZ) {
     if (models[selectedModel].animationTimeValue == 0) {
         // Translate Letter Leg Forward
         models[selectedModel].letterTranslation = glm::translate(models[selectedModel].letterTranslation,
-                                                              glm::vec3(translationX, 0.0f, translationZ));
+                                                                 glm::vec3(translationX, 0.0f, translationZ));
         // Rotate Letter Leg Backward to -23 Degrees
         models[selectedModel].letterRotation = glm::rotate(id,
                                                            glm::radians(-23.0f),
@@ -646,8 +644,7 @@ void moveModelForwardAnimation(float translationX, float translationZ) {
                                                            glm::vec3(1.0f, 0.0f, 0.0f));
         // Increment Animation Time
         models[selectedModel].animationTimeValue++;
-    }
-    else if (models[selectedModel].animationTimeValue == 1) {
+    } else if (models[selectedModel].animationTimeValue == 1) {
         // Rotate Letter Leg Backward to -45 Degrees
         models[selectedModel].letterRotation = glm::rotate(id,
                                                            glm::radians(-45.0f),
@@ -658,8 +655,7 @@ void moveModelForwardAnimation(float translationX, float translationZ) {
                                                            glm::vec3(1.0f, 0.0f, 0.0f));
         // Increment Animation Time
         models[selectedModel].animationTimeValue++;
-    }
-    else if (models[selectedModel].animationTimeValue == 2) {
+    } else if (models[selectedModel].animationTimeValue == 2) {
         // Rotate Letter Leg Backward to -23 Degrees
         models[selectedModel].letterRotation = glm::rotate(id,
                                                            glm::radians(-23.0f),
@@ -670,8 +666,7 @@ void moveModelForwardAnimation(float translationX, float translationZ) {
                                                            glm::vec3(1.0f, 0.0f, 0.0f));
         // Increment Animation Time
         models[selectedModel].animationTimeValue++;
-    }
-    else if (models[selectedModel].animationTimeValue == 3) {
+    } else if (models[selectedModel].animationTimeValue == 3) {
         // Original Letter Translation
         models[selectedModel].letterTranslation = id;
         // Original Letter Rotation
@@ -686,8 +681,7 @@ void moveModelForwardAnimation(float translationX, float translationZ) {
                                                            glm::vec3(1.0f, 0.0f, 0.0f));
         // Increment Animation Time
         models[selectedModel].animationTimeValue++;
-    }
-    else if (models[selectedModel].animationTimeValue == 4) {
+    } else if (models[selectedModel].animationTimeValue == 4) {
         // Translate Letter Leg Forward
         models[selectedModel].letterTranslation = glm::translate(models[selectedModel].letterTranslation,
                                                                  glm::vec3(-translationX, 0.0f, -translationZ));
@@ -704,8 +698,7 @@ void moveModelForwardAnimation(float translationX, float translationZ) {
                                                            glm::vec3(1.0f, 0.0f, 0.0f));
         // Increment Animation Time
         models[selectedModel].animationTimeValue++;
-    }
-    else if (models[selectedModel].animationTimeValue == 5) {
+    } else if (models[selectedModel].animationTimeValue == 5) {
         // Rotate Letter Leg Backward to -23 Degrees
         models[selectedModel].letterRotation = glm::rotate(id,
                                                            glm::radians(45.0f),
