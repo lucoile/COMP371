@@ -2,6 +2,8 @@
 // main.cpp
 // Created by Thomas Buffard on 6/26/20.
 
+#define _USE_MATH_DEFINES
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -22,6 +24,7 @@
 #include <iostream>
 #include <istream>
 #include <vector>
+#include <math.h>
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 
@@ -59,6 +62,7 @@ struct Alphanum {
     glm::mat4 letterAdjust;
     glm::mat4 numAdjust;
     glm::mat4 rotation;
+    float rotationAngle;
     glm::mat4 scale;
     glm::mat4 sphereScale;
     glm::mat4 translation;
@@ -187,6 +191,7 @@ int main() {
     models[0].scale = id;
     models[0].translation = id;
     models[0].rotation = id;
+    models[0].rotationAngle = 0.0f;
     models[0].sphereScale = sphereScale;
     models[0].sphereTranslation = sphereTranslation;
 
@@ -227,6 +232,7 @@ int main() {
     models[1].scale = id;
     models[1].translation = glm::translate(id, glm::vec3(40 * ULEN, 0.0f, 40 * ULEN));
     models[1].rotation = id;
+    models[1].rotationAngle = 0.0f;
     models[1].sphereScale = sphereScale;
     models[1].sphereTranslation = sphereTranslation;
 
@@ -278,6 +284,7 @@ int main() {
     models[2].scale = id;
     models[2].translation = glm::translate(id, glm::vec3(-40 * ULEN, 0.0f, 40 * ULEN));
     models[2].rotation = id;
+    models[2].rotationAngle = 0.0f;
     models[2].sphereScale = sphereScale;
     models[2].sphereTranslation = sphereTranslation;
 
@@ -321,6 +328,7 @@ int main() {
     models[3].scale = id;
     models[3].translation = glm::translate(id, glm::vec3(-40 * ULEN, 0.0f, -40 * ULEN));
     models[3].rotation = id;
+    models[3].rotationAngle = 0.0f;
     models[3].sphereScale = sphereScale;
     models[3].sphereTranslation = sphereTranslation;
 
@@ -378,6 +386,7 @@ int main() {
     models[4].scale = id;
     models[4].translation = glm::translate(id, glm::vec3(40 * ULEN, 0.0f, -40 * ULEN));
     models[4].rotation = id;
+    models[4].rotationAngle = 0.0f;
     models[4].sphereScale = sphereScale;
     models[4].sphereTranslation = sphereTranslation;
 
@@ -604,6 +613,7 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
         models[selectedModel].translation = glm::translate(models[selectedModel].translation,
                 glm::vec3(-ULEN, 0.0f, 0.0f));
     } else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+        models[selectedModel].rotationAngle = models[selectedModel].rotationAngle - 5.0f;
         models[selectedModel].rotation = glm::rotate(models[selectedModel].rotation,
                 glm::radians(-5.0f),
                 glm::vec3(0.0f, 1.0f, 0.0f));
@@ -625,6 +635,7 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
         models[selectedModel].translation = glm::translate(models[selectedModel].translation,
                 glm::vec3(ULEN, 0.0f, 0.0f));
     } else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+        models[selectedModel].rotationAngle = models[selectedModel].rotationAngle + 5.0f;
         models[selectedModel].rotation = glm::rotate(models[selectedModel].rotation,
                 glm::radians(5.0f),
                 glm::vec3(0.0f, 1.0f, 0.0f));
@@ -649,6 +660,25 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
     if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
         worldOrientation = glm::rotate(worldOrientation, glm::radians(-1.0f), glm::vec3(0.0f, ULEN, 0.0f));
     }
+
+    // Forward Model Movement with Legs
+    if (glfwGetKey(window, GLFW_KEY_KP_8) == GLFW_PRESS) {
+        float translationX = sin (models[selectedModel].rotationAngle * (M_PI / 180)) * ULEN;
+        float translationZ = cos (models[selectedModel].rotationAngle * (M_PI / 180)) * ULEN;
+
+        models[selectedModel].translation = glm::translate(models[selectedModel].translation,
+                                                           glm::vec3(translationX, 0.0f, translationZ));
+    }
+
+    // Reverse Model Movement with Legs
+    if (glfwGetKey(window, GLFW_KEY_KP_2) == GLFW_PRESS) {
+        float translationX = sin (models[selectedModel].rotationAngle * (M_PI / 180)) * ULEN;
+        float translationZ = cos (models[selectedModel].rotationAngle * (M_PI / 180)) * ULEN;
+
+        models[selectedModel].translation = glm::translate(models[selectedModel].translation,
+                                                           glm::vec3(-translationX, 0.0f, -translationZ));
+    }
+
 
     // Reset world orientation and camera by pressing Home button
     if (glfwGetKey(window, GLFW_KEY_HOME) == GLFW_PRESS) {
