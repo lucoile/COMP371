@@ -334,6 +334,11 @@ int main() {
                 cube.Draw(cubeShader, type);
             }
 
+            // Change to grey diffuse texture and reset material
+			resetTextures(cubeShader);
+			cubeShader.setInt("material.diffuse", 3);
+			cubeShader.setVec3("material.specular", glm::vec3(0.0f, 0.0f, 0.0f));
+
             // Draw Sphere
             for (unsigned int i = 0; i < models[j].letterTrans.size(); i++) {
                 glDisable(GL_BLEND);
