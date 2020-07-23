@@ -29,7 +29,7 @@ private:
     std::string directory;
 
     // textures
-    std::vector<Texture> textures_loaded;
+    std::vector<LightingTexture> textures_loaded;
 
     // loads a model with supported ASSIMP extensions from file
     // and stores the resulting meshes in the meshes vector.
@@ -43,7 +43,7 @@ private:
 
     // checks all material textures of a given type and loads the textures if they're not loaded yet.
     // the required info is returned as a Texture struct.
-    std::vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName);
+    std::vector<LightingTexture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName);
 
     unsigned int TextureFromFile(const char *path, const std::string &directory);
 };
