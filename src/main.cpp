@@ -49,6 +49,10 @@ void createK5Model();
 
 void resetTextures(const Shader &shader);
 
+void renderScene(Shader shader);
+
+void shadowSetup(GLuint &depth_map_texture, GLuint &depth_map_fbo);
+
 // Settings
 unsigned int SCR_WIDTH = 1024;
 unsigned int SCR_HEIGHT = 768;
@@ -153,6 +157,9 @@ int main() {
     Shader gridShader("../res/shaders/grid.vert", "../res/shaders/grid.frag");
     Shader lineShader("../res/shaders/line.vert", "../res/shaders/line.frag");
     Shader cubeShader("../res/shaders/cube.vert", "../res/shaders/cube.frag");
+    Shader shadowShader("../res/shaders/shadow.vert", "../res/shaders/shadow.frag");
+    Shader sceneShader("../res/shaders/scene.vert", "../res/shaders/scene.frag");
+    Shader debugShader("../res/shaders/debugShadow.vert", "../res/shaders/debugShadow.frag");
 
     std::vector<float> vertGrid = {0.0f, 0.0f, 0.0f, 0.0f, 0.407f, 0.478f, 0.0f, 0.0f,
                                    ULEN, 0.0f, 0.0f, 0.0f, 0.407f, 0.478f, 1.0f, 0.0f,
@@ -207,6 +214,23 @@ int main() {
     Texture groundTexture("res/textures/ground.jpg");
     Texture shinyTexture("res/textures/yellow.png");
     Texture greyTexture("res/textures/grey.png");
+    shadowSetup();
+
+    GLuint depth_map_texture;
+    GLuint depth_map_fbo;
+    shadowSetup(depth_map_texture, depth_map_fbo);
+
+    // debug shader configuration
+    debugShader.use();
+    debugShader.setInt("depthMap", 0);
+
+    // Other OpenGL states to set once
+    // Enable Backface culling
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+
+    // lighting
+    glm::vec3 lightPos(0.0f, 30.0 * ULEN, 0.0f);
 
     // Render Loop
     while (!glfwWindowShouldClose(window)) {
@@ -228,6 +252,85 @@ int main() {
 
         // Camera/view transformation
         glm::mat4 view = camera.get_view_matrix();
+        // 1. render depth of scene to texture (from light's perspective)
+        // --------------------------------------------------------------
+        // light parameters
+        glm::vec3 lightFocus(0.0, 0.0, -1.0);      // the point in 3D space the light "looks" at
+        glm::vec3 lightDirection = normalize(lightFocus - lightPos);
+
+        float lightNearPlane = 1.0f;
+        float lightFarPlane = 180.0f;
+
+        glm::mat4 lightProjectionMatrix = glm::frustum(-1.0f, 1.0f, -1.0f, 1.0f, lightNearPlane, lightFarPlane);
+        glm::mat4 lightViewMatrix = lookAt(lightPos, lightFocus, glm::vec3(0.0f, 1.0f, 0.0f));
+        glm::mat4 lightSpaceMatrix = lightProjectionMatrix * lightViewMatrix;
+
+        // Set light space matrix on both shaders
+        shadowShader.setMat4( "light_view_proj_matrix", lightSpaceMatrix);
+        sceneShader.setMat4( "light_view_proj_matrix", lightSpaceMatrix);
+
+        // Set light far and near planes on scene shader
+        sceneShader.setFloat("light_near_plane", lightNearPlane);
+        sceneShader.setFloat("light_far_plane", lightFarPlane);
+
+        // Set light position on scene shader
+        sceneShader.setVec3("light_position", lightPos);
+
+        // Set light direction on scene shader
+        sceneShader.setVec3("light_direction", lightDirection);
+
+        // render scene from light's point of view
+        shadowShader.use();
+        shadowShader.setMat4("light_view_proj_matrix", lightSpaceMatrix);
+
+        // Set model matrix and send to both shaders
+        glm::mat4 modelMatrix = glm::mat4(1.0f);
+        sceneShader.setMat4( "model_matrix", modelMatrix);// SetUniformMat4(shaderScene,);
+        shadowShader.setMat4("model_matrix", modelMatrix);//SetUniformMat4(shaderShadow, );
+
+        // Camera parameters for view transform
+        glm::vec3 cameraPosition(0.6f, 2.0f, 3.0f);
+        glm::vec3 cameraLookAt(0.0f, 0.0f, -1.0f);
+        glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
+
+        // Other camera parameters
+        float cameraSpeed = 1.0f;
+        float cameraFastSpeed = 3 * cameraSpeed;
+        float cameraHorizontalAngle = 90.0f;
+        float cameraVerticalAngle = 0.0f;
+
+        // Set the view matrix for first person camera and send to both shaders
+        glm::mat4 viewMatrix = lookAt(cameraPosition, cameraPosition + cameraLookAt, cameraUp);
+        sceneShader.setMat4("view_matrix", viewMatrix);
+
+        // Set view position on scene shader
+        sceneShader.setVec3("view_position", cameraPosition);
+
+        // 1. Render depth map
+            shadowShader.use();
+            glViewport(0, 0, 1024, 1024);
+            glBindFramebuffer(GL_FRAMEBUFFER, depth_map_fbo);
+            glClear(GL_DEPTH_BUFFER_BIT);
+            //TODO: render
+
+        // 2. Render scene
+            sceneShader.use();
+            int width, height;
+            glfwGetFramebufferSize(window, &width, &height);
+            glViewport(0, 0, width, height);
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            // TODO: render
+
+
+        // render debug TODO: delete afterwards
+        debugShader.use();
+        debugShader.setFloat("near_plane", lightNearPlane);
+        debugShader.setFloat("far_plane", lightFarPlane);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, depth_map_texture);
 
         // Render lines
         // Activate line shader
@@ -363,6 +466,29 @@ int main() {
     // Terminate, clearing all previously allocated GLFW resources.
     glfwTerminate();
     return 0;
+}
+
+void shadowSetup(GLuint &depth_map_texture, GLuint &depth_map_fbo) {
+    const unsigned int DEPTH_MAP_TEXTURE_SIZE = 1024;
+    glGenTextures(1, &depth_map_texture);
+    glBindTexture(GL_TEXTURE_2D, depth_map_texture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, DEPTH_MAP_TEXTURE_SIZE, DEPTH_MAP_TEXTURE_SIZE, 0, GL_DEPTH_COMPONENT, GL_FLOAT,
+                 NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    glGenFramebuffers(1, &depth_map_fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, depth_map_fbo);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depth_map_texture, 0);
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void renderScene(Shader shader) {
+
 }
 
 void resetTextures(const Shader &shader) {
