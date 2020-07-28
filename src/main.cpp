@@ -49,7 +49,7 @@ void createK5Model();
 
 void resetTextures(const Shader &shader);
 
-void renderScene(Shader &sceneShader, Shader &lineShader, Model cube, Model sphere, Line line);
+void renderScene(Shader &shader, Model cube, Model sphere);
 
 void renderGrid(Shader &shader, Model cube);
 
@@ -77,7 +77,7 @@ GLenum type = GL_TRIANGLES;
 unsigned int selectedModel = 0;
 
 // Texture Toggle
-unsigned int textureOn = 0;
+unsigned int textureOn = 1;
 
 // Alphanumeric class
 struct Alphanum {
@@ -115,7 +115,7 @@ glm::mat4 id(1.0f);
 glm::mat4 worldOrientation(1.0f);
 
 // Sphere Scaling
-glm::mat4 sphereScale = glm::scale(id, glm::vec3(0.2f, 0.2f, 0.2f));
+glm::mat4 sphereScale = glm::scale(id, glm::vec3(5.0f, 5.0f, 5.0f));
 
 // Sphere Translation
 glm::mat4 sphereTranslation = glm::translate(id, glm::vec3(0.0f, 6.0 * ULEN, 0.0f));
@@ -157,12 +157,15 @@ int main() {
 
     // Configure Global Opengl State
     glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
 
-    // Build and Compile our Shader Program
+    // Build and Compile our Shader Programs
     Shader lineShader("../res/shaders/line.vert", "../res/shaders/line.frag");
     Shader sceneShader("../res/shaders/scene.vert", "../res/shaders/scene.frag");
+    Shader shadowShader("../res/shaders/shadow.vert", "../res/shaders/shadow.frag");
 
-    std::vector<float> vertLines = {
+	// Lines
+	std::vector<float> vertLines = {
             0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
             0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
             0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
@@ -175,28 +178,22 @@ int main() {
             1, 4,   // Green y-axis line
             2, 5    // Blue z-axis line
     };
-
-    // Lines
     Line line(vertLines, indexLines);
 
     // Cube model
     Model cube("../res/models/cube/cube.obj");
-
     // Sphere model
     Model sphere("../res/models/sphere/sphere.obj");
 
+    // Initialize alphanumeric models
     // R1
     createR1Model();
-
     // H6
     createH6Model();
-
     // N5
     createN5Model();
-
     // 08
     create08Model();
-
     // K5
     createK5Model();
 
@@ -223,6 +220,44 @@ int main() {
 	glEnable(GL_TEXTURE_2D);
 	greyTexture.bind();
 
+
+	// Depth map frame buffer
+	unsigned int depthMapFBO;
+	glGenFramebuffers(1, &depthMapFBO);
+
+	// Create texture for the depth map
+	const unsigned int SHADOW_WIDTH = 2048, SHADOW_HEIGHT = 2048;
+
+	unsigned int depthMap;
+	glGenTextures(1, &depthMap);
+	glBindTexture(GL_TEXTURE_2D, depthMap);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
+			SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	// Attach depth map to the frame buffer
+	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+
+	// Set color buffer to none
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	// Check that framebuffer is complete
+	if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	glActiveTexture(GL_TEXTURE4);
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, depthMap);
+
+
     // Render Loop
     while (!glfwWindowShouldClose(window)) {
         // Per Frame Time Logic
@@ -242,19 +277,67 @@ int main() {
         // Set camera/view matrix
         view = camera.get_view_matrix();
 
-        // Activate line shader
-        lineShader.use();
-        lineShader.setMat4("projection", projection);
-        lineShader.setMat4("view", view);
+		// Set orthographic frustum for shadows
+		float near_plane = 1.0f, far_plane = 5.0f;
+		glm::mat4 lightProjection = glm::frustum(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+
+		// View matrix from light perspective
+		// Shadows only render correctly if the light is offset by some amount >0
+		glm::vec3 lightPos(0.001f, 30.0 * ULEN, 0.001f);
+		glm::mat4 lightView = glm::lookAt(lightPos,
+				glm::vec3( 0.0f, 0.0f,  0.0f),
+				glm::vec3( 0.0f, 1.0f,  0.0f));
+
+		glm::mat4 lightSpaceMatrix = lightProjection * lightView;
+
+		shadowShader.use();
+		shadowShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
+
+		// Bind grey texture
+		// Not sure why but if we don't bind it here it just renders as red
+		glActiveTexture(GL_TEXTURE3);
+		glEnable(GL_TEXTURE_2D);
+		greyTexture.bind();
+
+		// Set viewport size and bind depth map frame buffer
+		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		// Render scene with shadow/depth map shader
+		renderScene(shadowShader, cube, sphere);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		// Reset window size
+		int width, height;
+		glfwGetFramebufferSize(window, &width, &height);
+		glViewport(0, 0, width, height);
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Activate scene shader
         sceneShader.use();
         sceneShader.setMat4("projection", projection);
 		sceneShader.setMat4("view", view);
 		sceneShader.setMat4("world", worldOrientation);
+		sceneShader.setVec3("viewPos", camera.Position);
+		sceneShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
 
-		// Render the scene
-		renderScene(sceneShader, lineShader, cube, sphere, line);
+		// Set shadow map
+		sceneShader.setInt("shadowMap", 4);
+
+		// Render the scene using shadow map
+		renderScene(sceneShader, cube, sphere);
+
+		// Render lines
+		lineShader.use();
+		lineShader.setMat4("projection", projection);
+		lineShader.setMat4("view", view);
+		line.draw(lineShader);
+
+		// Reset framebuffer
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         // GLFW: Swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         glfwSwapBuffers(window);
@@ -269,25 +352,15 @@ int main() {
     return 0;
 }
 
-void renderScene(Shader &sceneShader, Shader &lineShader, Model cube, Model sphere, Line line)
+void renderScene(Shader &shader, Model cube, Model sphere)
 {
-	line.draw(lineShader);
-	renderGrid(sceneShader, cube);
-	renderAlphanum(sceneShader, cube, sphere);
+	renderGrid(shader, cube);
+	renderAlphanum(shader, cube, sphere);
 }
-
-std::vector<float> vertGrid = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-							   ULEN, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
-							   0.0f, 0.0f, ULEN, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
-							   ULEN, 0.0f, ULEN, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f};
-
-std::vector<unsigned int> indexGridTri = {0, 2, 3, 3, 1, 0};
-std::vector<unsigned int> indexGridLine = {0, 1, 0, 2, 2, 3, 1, 3};
 
 void renderGrid(Shader &shader, Model cube)
 {
 	GLenum type = GL_LINES;
-//	glm::vec3 gridPositions[100][100];
 
 	if (textureOn == 1) {
 		shader.setVec3("material.ambient", 0.5f, 0.5f, 0.5f);
@@ -311,7 +384,7 @@ void renderGrid(Shader &shader, Model cube)
 	for (int i = -50; i < 50; i++) {
 		for (int j = -50; j < 50; j++) {
 			glm::vec3 pos((float) i * ULEN, -1.0 * ULEN, (float) j * ULEN);
-			glm::mat4 model = glm::translate(id, pos);
+			glm::mat4 model = worldOrientation * glm::translate(id, pos);
 			shader.setMat4("model", model);
 
 			cube.Draw(shader, type);
@@ -377,13 +450,12 @@ void renderAlphanum(Shader &shader, Model cube, Model sphere)
 		// Change to grey diffuse texture and reset material
 		resetTextures(shader);
 		shader.setInt("material.diffuse", 3);
-		shader.setVec3("material.specular", glm::vec3(0.0f, 0.0f, 0.0f));
 
 		// Draw Sphere
 		for (unsigned int i = 0; i < models[j].letterTrans.size(); i++) {
 			glm::mat4 model =
-					worldOrientation * models[j].translation * models[j].sphereTranslation * models[j].rotation *
-					models[j].scale * models[j].sphereScale * models[j].letterAdjust;
+					worldOrientation * models[j].translation * models[j].rotation *
+					models[j].scale * models[j].sphereTranslation * models[j].sphereScale;
 			shader.setMat4("model", model);
 
 			sphere.Draw(shader, type);
@@ -393,7 +465,7 @@ void renderAlphanum(Shader &shader, Model cube, Model sphere)
 }
 
 void resetTextures(const Shader &shader) {
-    shader.setVec3("material.ambient", 0.5f, 0.5f, 0.5f);
+    shader.setVec3("material.ambient", 0.3f, 0.3f, 0.3f);
     shader.setVec3("material.specular", 0.2f, 0.2f, 0.2f);
     shader.setFloat("material.shininess", 32.0f);
 
@@ -817,7 +889,7 @@ void createK5Model() {
     models[4].numAdjust = glm::translate(id, glm::vec3(2.0 * ULEN, 0.0f, 0.0f));
 
     models[4].scale = id;
-    models[4].translation = glm::translate(id, glm::vec3(40 * ULEN, 0.0f, -40 * ULEN));
+    models[4].translation = glm::translate(id, glm::vec3(20 * ULEN, 0.0f, -20 * ULEN));
     models[4].rotation = id;
     models[4].rotationAngle = 0.0f;
     models[4].letterTranslation = id;
@@ -867,7 +939,7 @@ void create08Model() {
     models[3].numAdjust = glm::translate(id, glm::vec3(2.0 * ULEN, 0.0f, 0.0f));
 
     models[3].scale = id;
-    models[3].translation = glm::translate(id, glm::vec3(-40 * ULEN, 0.0f, -40 * ULEN));
+    models[3].translation = glm::translate(id, glm::vec3(-20 * ULEN, 0.0f, -20 * ULEN));
     models[3].rotation = id;
     models[3].letterTranslation = id;
     models[3].numberTranslation = id;
@@ -925,7 +997,7 @@ void createN5Model() {
     models[2].numAdjust = glm::translate(id, glm::vec3(2.0 * ULEN, 0.0f, 0.0f));
 
     models[2].scale = id;
-    models[2].translation = glm::translate(id, glm::vec3(-40 * ULEN, 0.0f, 40 * ULEN));
+    models[2].translation = glm::translate(id, glm::vec3(-20 * ULEN, 0.0f, 20 * ULEN));
     models[2].rotation = id;
     models[2].letterTranslation = id;
     models[2].numberTranslation = id;
@@ -972,7 +1044,7 @@ void createH6Model() {
     models[1].numAdjust = glm::translate(id, glm::vec3(2.0 * ULEN, 0.0f, 0.0f));
 
     models[1].scale = id;
-    models[1].translation = glm::translate(id, glm::vec3(40 * ULEN, 0.0f, 40 * ULEN));
+    models[1].translation = glm::translate(id, glm::vec3(20 * ULEN, 0.0f, 20 * ULEN));
     models[1].rotation = id;
     models[1].letterTranslation = id;
     models[1].numberTranslation = id;
