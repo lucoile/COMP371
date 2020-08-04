@@ -10,7 +10,6 @@ add_executable(main
         src/Utilities/shader_m.cpp
         src/Utilities/model.cpp
         src/Utilities/mesh.cpp
-        src/Grid/grid.cpp
         src/Line/line.cpp)
 set_property(TARGET main PROPERTY CXX_STANDARD 11)
 target_compile_options(main PRIVATE -Wall)
