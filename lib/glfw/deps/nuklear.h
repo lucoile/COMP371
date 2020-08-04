@@ -6964,7 +6964,7 @@ nk_vsnprintf(char *buf, int buf_size, const char *fmt, va_list args)
             else if ((flag & NK_ARG_FLAG_SPACE) && value >= 0 && len < buf_size)
                 buf[len++] = ' ';
 
-            /* fill up to precision number of digits with '0' */
+            /* fill up to precision number of components with '0' */
             num_print = NK_MAX(cur_precision, num_len);
             while (precision && (num_print > num_len) && (len < buf_size)) {
                 buf[len++] = '0';
@@ -7026,7 +7026,7 @@ nk_vsnprintf(char *buf, int buf_size, const char *fmt, va_list args)
                 }
             }
 
-            /* fill up to precision number of digits */
+            /* fill up to precision number of components */
             if (num_print && (flag & NK_ARG_FLAG_NUM)) {
                 if ((*iter == 'o') && (len < buf_size)) {
                     buf[len++] = '0';

@@ -198,7 +198,7 @@ private:
         }
 
         // JSON does not support writing Inf/Nan
-        // [RFC 4672: "Numeric values that cannot be represented as sequences of digits
+        // [RFC 4672: "Numeric values that cannot be represented as sequences of components
         // (such as Infinity and NaN) are not permitted."]
         // Nevertheless, many parsers will accept the special keywords Infinity, -Infinity and NaN
         if (std::numeric_limits<float>::infinity() == fabs(f)) {

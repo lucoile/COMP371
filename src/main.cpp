@@ -27,40 +27,32 @@
 #include <math.h>
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
-
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
-
 void process_input(GLFWwindow *window);
-
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
 
-void moveModelForwardAnimation(float translationX, float translationZ);
-
-void createR1Model();
-
-void createH6Model();
-
-void createN5Model();
-
-void create08Model();
-
-void createK5Model();
+void createTimexModel();
+void createAxes();
 
 void resetTextures(const Shader &shader);
 
 void renderScene(Shader &shader, Model cube, Model sphere);
-
 void renderGrid(Shader &shader, Model cube);
-
 void renderAlphanum(Shader &shader, Model cube, Model sphere);
+void renderAxes(Shader &shader, Model cube);
 
 // Settings
 unsigned int SCR_WIDTH = 1024;
 unsigned int SCR_HEIGHT = 768;
 const float ULEN = 0.1f; // Unit Length
 
-// Camera
-Camera camera(glm::vec3(0.0f, 0.1f, 2.0f));
+// Cameras
+Camera camera0(glm::vec3(0.0f, ULEN, 20.0 * ULEN));
+Camera camera1(glm::vec3(0.0f, ULEN, 5.0 * ULEN));
+Camera camera2(glm::vec3(0.0f, ULEN, -5.0 * ULEN));
+
+Camera cameras[3] = {camera0, camera1, camera2};
+
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -78,37 +70,39 @@ unsigned int selectedModel = 0;
 // Texture Toggle
 unsigned int textureOn = 1;
 
-// Alphanumeric class
-struct Alphanum {
-    std::vector<glm::mat4> letterTrans; // Vector of Cube Meshes Transformations
-    std::vector<glm::mat4> numTrans;    // Vector of Number Meshes Transformations
+// Light toggle
+unsigned int lightToggle = 1;
 
-    glm::mat4 letterAdjust; // Letter Adjustment Matrix
-    glm::mat4 numAdjust;    // Number Adjustment Matrix
-
-    glm::mat4 rotation;    // Model Rotation Matrix
-    glm::mat4 scale;       // Model Scale Matrix
-    glm::mat4 translation; // Model Translation Matrix
-
-    glm::mat4 sphereScale;       // Sphere Scale Matrix
-    glm::mat4 sphereTranslation; // Sphere Translation Matrix
-
-    glm::mat4 numberRotation;    // Number Rotation Matrix
-    glm::mat4 numberTranslation; // Number Translation Matrix
-
-    glm::mat4 letterRotation;    // Letter Rotation Matrix
-    glm::mat4 letterTranslation; // Letter Translation Matrix
-
-    float rotationAngle; // Model Rotation Angle
-
-    int animationTimeValue; // Model Movement Animation Current Time Value
-};
-
-// Alphanumeric models data structure
-Alphanum models[5];
+// Camera toggle
+unsigned int cameraToggle = 0;
 
 // Identity matrix
 glm::mat4 id(1.0f);
+
+// Alphanumeric class
+struct CubeComponent {
+    std::vector<glm::mat4> cubeTrans; // Vector of Cube Meshes Transformations
+
+    glm::mat4 adjust = id; // Digit Adjustment Matrix
+
+    glm::mat4 rotation = id;    // Model Rotation Matrix
+    glm::mat4 scale = id;       // Model Scale Matrix
+    glm::mat4 translation = id; // Model Translation Matrix
+
+    unsigned int diffuse = 0;
+};
+
+struct ModelStruct {
+	std::vector<CubeComponent> components;
+
+	glm::mat4 rotation = id;    // Model Rotation Matrix
+	glm::mat4 scale = id;       // Model Scale Matrix
+	glm::mat4 translation = id; // Model Translation Matrix
+
+	float rotationAngle;
+} timexModel, axesModel;
+
+std::vector<glm::mat4> skate;
 
 // World Orientation
 glm::mat4 worldOrientation(1.0f);
@@ -121,6 +115,9 @@ glm::mat4 sphereTranslation = glm::translate(id, glm::vec3(0.0f, 6.0 * ULEN, 0.0
 
 glm::mat4 projection(1.0f);
 glm::mat4 view(1.0f);
+
+// Light position
+glm::vec3 lightPos;
 
 int main() {
     // GLFW: Initialize and configure
@@ -159,25 +156,8 @@ int main() {
 	glDepthFunc(GL_LESS);
 
     // Build and Compile our Shader Programs
-    Shader lineShader("../res/shaders/line.vert", "../res/shaders/line.frag");
     Shader sceneShader("../res/shaders/scene.vert", "../res/shaders/scene.frag");
     Shader shadowShader("../res/shaders/shadow.vert", "../res/shaders/shadow.frag");
-
-	// Lines
-	std::vector<float> vertLines = {
-            0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-            0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-            0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-            ULEN * 5, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-            0.0f, ULEN * 5, 0.0f, 0.0f, 1.0f, 0.0f,
-            0.0f, 0.0f, ULEN * 5, 0.0f, 0.0f, 1.0f
-    };
-    std::vector<unsigned int> indexLines = {
-            0, 3,   // Red x-axis line
-            1, 4,   // Green y-axis line
-            2, 5    // Blue z-axis line
-    };
-    Line line(vertLines, indexLines);
 
     // Cube model
     Model cube("../res/models/cube/cube.obj");
@@ -185,16 +165,8 @@ int main() {
     Model sphere("../res/models/sphere/sphere.obj");
 
     // Initialize alphanumeric models
-    // R1
-    createR1Model();
-    // H6
-    createH6Model();
-    // N5
-    createN5Model();
-    // 08
-    create08Model();
-    // K5
-    createK5Model();
+	createTimexModel();
+	createAxes();
 
     // Textures
     Texture boxTexture("res/textures/box.jpg");
@@ -274,39 +246,51 @@ int main() {
         projection = glm::perspective(45.0f, (float) SCR_WIDTH / (float) SCR_HEIGHT, 0.1f,100.0f);
 
         // Set camera/view matrix
-        view = camera.get_view_matrix();
+        view = cameras[cameraToggle].get_view_matrix();
 
-		// Set orthographic frustum for shadows
-		float near_plane = 1.0f, far_plane = 5.0f;
-		glm::mat4 lightProjection = glm::frustum(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+		glm::mat4 lightSpaceMatrix;
 
-		// View matrix from light perspective
-		// Shadows only render correctly if the light is offset by some amount >0
-		glm::vec3 lightPos(0.001f, 30.0 * ULEN, 0.001f);
-		glm::mat4 lightView = glm::lookAt(lightPos,
-				glm::vec3( 0.0f, 0.0f,  0.0f),
-				glm::vec3( 0.0f, 1.0f,  0.0f));
+        if (lightToggle) {
+			// Set orthographic frustum for shadows
+			float near_plane = .1f, far_plane = 10.0f;
+			glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
 
-		glm::mat4 lightSpaceMatrix = lightProjection * lightView;
+			// View matrix from light perspective
+			// Shadows only render correctly if the light is offset by some amount >0
+			lightPos = glm::vec3(0.0f, 10.0 * ULEN, 30.0 * ULEN);
+			glm::mat4 lightView = glm::lookAt(lightPos,
+					glm::vec3( 0.0f, 0.0f,  0.0f),
+					glm::vec3( 0.0f, 1.0f,  0.0f));
 
-		shadowShader.use();
-		shadowShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
+			lightSpaceMatrix = lightProjection * lightView;
 
-		// Bind grey texture
-		// Not sure why but if we don't bind it here it just renders as red
-		glActiveTexture(GL_TEXTURE3);
-		glEnable(GL_TEXTURE_2D);
-		greyTexture.bind();
+			shadowShader.use();
+			shadowShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
 
-		// Set viewport size and bind depth map frame buffer
-		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			// Bind grey texture
+			// Not sure why but if we don't bind it here it just renders as red
+			glActiveTexture(GL_TEXTURE3);
+			glEnable(GL_TEXTURE_2D);
+			greyTexture.bind();
 
-		// Render scene with shadow/depth map shader
-		renderScene(shadowShader, cube, sphere);
+			// Set viewport size and bind depth map frame buffer
+			glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+			glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			// Render scene with shadow/depth map shader
+			renderScene(shadowShader, cube, sphere);
+
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        } else {
+			// Clear frame buffer so no shadows render
+			glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+			glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+			lightPos = glm::vec3(0.0f);
+        }
 
 		// Reset window size
 		int width, height;
@@ -320,7 +304,7 @@ int main() {
         sceneShader.setMat4("projection", projection);
 		sceneShader.setMat4("view", view);
 		sceneShader.setMat4("world", worldOrientation);
-		sceneShader.setVec3("viewPos", camera.Position);
+		sceneShader.setVec3("viewPos", cameras[cameraToggle].Position);
 		sceneShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
 
 		// Set shadow map
@@ -329,12 +313,6 @@ int main() {
 		// Render the scene using shadow map
 		renderScene(sceneShader, cube, sphere);
 
-		// Render lines
-		lineShader.use();
-		lineShader.setMat4("projection", projection);
-		lineShader.setMat4("view", view);
-		line.draw(lineShader);
-
 		// Reset framebuffer
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -342,9 +320,6 @@ int main() {
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
-
-    // De-allocate all resources once they've outlived their purpose:
-    line.deleteBuffers();
 
     // Terminate, clearing all previously allocated GLFW resources.
     glfwTerminate();
@@ -355,6 +330,7 @@ void renderScene(Shader &shader, Model cube, Model sphere)
 {
 	renderGrid(shader, cube);
 	renderAlphanum(shader, cube, sphere);
+	renderAxes(shader, cube);
 }
 
 void renderGrid(Shader &shader, Model cube)
@@ -371,7 +347,7 @@ void renderGrid(Shader &shader, Model cube)
 		shader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
 		shader.setVec3("light.diffuse", 1.0f, 1.0f, 1.0f);
 		shader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-		shader.setVec3("light.position", 0.0f, 30.0 * ULEN, 0.0f);
+		shader.setVec3("light.position", lightPos);
 		type = GL_TRIANGLES;
 
 	} else {
@@ -402,65 +378,75 @@ void renderAlphanum(Shader &shader, Model cube, Model sphere)
 		shader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
 		shader.setVec3("light.diffuse", 1.0f, 1.0f, 1.0f);
 		shader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-		shader.setVec3("light.position", 0.0f, 30.0 * ULEN, 0.0f);
+		shader.setVec3("light.position", lightPos);
 	} else {
 		resetTextures(shader);
 	}
 
 	// render each alphanumeric pair by looping through the array of models
-	for (unsigned int j = 0; j < 5; j++) {
+	for (unsigned int j = 0; j < timexModel.components.size(); j++) {
 		// add box texture
 		if (textureOn == 1) {
-			shader.setInt("material.diffuse", 0);
+			shader.setInt("material.diffuse", timexModel.components[j].diffuse);
 		} else {
 			shader.setInt("material.diffuse", 3);
 			resetTextures(shader);
 		}
 		// draw the letter
-		for (unsigned int i = 0; i < models[j].letterTrans.size(); i++) {
+		for (unsigned int i = 0; i < timexModel.components[j].cubeTrans.size(); i++) {
+
 			glm::mat4 model =
-					worldOrientation * models[j].translation * models[j].letterTranslation * models[j].rotation *
-					models[j].scale * models[j].letterAdjust * models[j].letterRotation * models[j].letterTrans[i];
+					worldOrientation * timexModel.translation * timexModel.rotation * timexModel.scale *
+					timexModel.components[j].adjust * timexModel.components[j].translation * timexModel.components[j].rotation *
+					timexModel.components[j].scale * timexModel.components[j].cubeTrans[i];
 			shader.setMat4("model", model);
 
 			cube.Draw(shader, type);
-		}
-
-		// add shiny texture
-		if (textureOn == 1) {
-			shader.setInt("material.diffuse", 2);
-			shader.setVec3("material.specular", 1.0f, 1.0f, 1.0f);
-			shader.setFloat("material.shininess", 64.0f);
-		} else {
-			shader.setInt("material.diffuse", 3);
-			resetTextures(shader);
-		}
-
-		// draw the number
-		for (unsigned int i = 0; i < models[j].numTrans.size(); i++) {
-			glm::mat4 model =
-					worldOrientation * models[j].translation * models[j].numberTranslation * models[j].rotation *
-					models[j].scale * models[j].numAdjust * models[j].numberRotation * models[j].numTrans[i];
-			shader.setMat4("model", model);
-
-			cube.Draw(shader, type);
-		}
-
-		// Change to grey diffuse texture and reset material
-		resetTextures(shader);
-		shader.setInt("material.diffuse", 3);
-
-		// Draw Sphere
-		for (unsigned int i = 0; i < models[j].letterTrans.size(); i++) {
-			glm::mat4 model =
-					worldOrientation * models[j].translation * models[j].rotation *
-					models[j].scale * models[j].sphereTranslation * models[j].sphereScale;
-			shader.setMat4("model", model);
-
-			sphere.Draw(shader, type);
 		}
 	}
 
+	// add shiny texture
+	shader.setInt("material.diffuse", 3);
+	shader.setInt("material.diffuse", 3);
+	shader.setVec3("material.specular", 1.0f, 1.0f, 1.0f);
+	shader.setFloat("material.shininess", 64.0f);
+
+	glm::mat4 skateTrans[2] = {
+			glm::translate(id, glm::vec3(-3.0*ULEN, 0.0f, 0.0f)),
+			glm::translate(id, glm::vec3(3.0*ULEN, 0.0f, 0.0f))
+	};
+
+	// Render skates
+	for (unsigned int j = 0; j < 2; j++) {
+		for (unsigned int i = 0; i < skate.size(); i++) {
+			glm::mat4 model =
+					worldOrientation * timexModel.translation * timexModel.rotation * timexModel.scale *
+					skateTrans[j] * skate[i];
+			shader.setMat4("model", model);
+
+			cube.Draw(shader, type);
+		}
+	}
+}
+
+void renderAxes(Shader &shader, Model cube) {
+	resetTextures(shader);
+
+	for (unsigned int j = 0; j < axesModel.components.size(); j++) {
+		// set texture
+		shader.setInt("material.diffuse", axesModel.components[j].diffuse);
+		// draw the letter
+		for (unsigned int i = 0; i < axesModel.components[j].cubeTrans.size(); i++) {
+
+			glm::mat4 model =
+					worldOrientation * axesModel.translation * axesModel.rotation * axesModel.scale *
+					axesModel.components[j].adjust * axesModel.components[j].translation * axesModel.components[j].rotation *
+					axesModel.components[j].scale * axesModel.components[j].cubeTrans[i];
+			shader.setMat4("model", model);
+
+			cube.Draw(shader, type);
+		}
+	}
 }
 
 void resetTextures(const Shader &shader) {
@@ -472,7 +458,7 @@ void resetTextures(const Shader &shader) {
     shader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
     shader.setVec3("light.diffuse", 1.0f, 1.0f, 1.0f);
     shader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-    shader.setVec3("light.position", 0.0f, 30.0 * ULEN, 0.0f);
+    shader.setVec3("light.position", lightPos);
 }
 
 // Process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
@@ -487,25 +473,27 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 
 // GLFW: Whenever the mouse moves, this callback is called
 void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
-    if (firstMouse) {
-        lastX = float(xpos);
-        lastY = float(ypos);
-        firstMouse = false;
-    }
+	if (cameraToggle == 0) {
+		if (firstMouse) {
+			lastX = float(xpos);
+			lastY = float(ypos);
+			firstMouse = false;
+		}
 
-    auto xoffset = float(xpos - lastX);
-    auto yoffset = float(lastY - ypos); // Reversed since y-coordinates go from bottom to top
+		auto xoffset = float(xpos - lastX);
+		auto yoffset = float(lastY - ypos); // Reversed since y-coordinates go from bottom to top
 
-    lastX = float(xpos);
-    lastY = float(ypos);
+		lastX = float(xpos);
+		lastY = float(ypos);
 
-    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
-        camera.process_mouse_movement(xoffset, 0, PAN);
-    } else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-        camera.process_mouse_movement(0, yoffset, ZOOM);
-    } else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS) {
-        camera.process_mouse_movement(0, yoffset, TILT);
-    }
+		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
+			cameras[cameraToggle].process_mouse_movement(xoffset, 0, PAN);
+		} else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+			cameras[cameraToggle].process_mouse_movement(0, yoffset, ZOOM);
+		} else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS) {
+			cameras[cameraToggle].process_mouse_movement(0, yoffset, TILT);
+		}
+	}
 }
 
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
@@ -515,107 +503,65 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
         glfwSetWindowShouldClose(window, true);
     }
 
-    // Switch rendering type
-    // Pressing P = Points
-    // Pressing L = Lines
-    // Pressing T = Triangles
-    if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
-        type = GL_POINTS;
-    } else if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) {
-        type = GL_LINES;
-    } else if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) {
-        type = GL_TRIANGLES;
-    }
+    // L to toggle lighting
+	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) {
+		if (lightToggle) { lightToggle = 0; } else { lightToggle = 1; }
+	}
 
-    //Select which model to alter
-    // Pressing 0 = Model 1 (R1)
-    // Pressing 1 = Model 2 (H6)
-    // Pressing 2 = Model 3 (N5)
-    // Pressing 3 = Model 4 (O8)
-    // Pressing 4 = Model 5 (K5)
-    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
-        selectedModel = 0;
-        std::cout << "Model 0 Selected" << std::endl;
-    } else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) {
-        selectedModel = 1;
-        std::cout << "Model 1 Selected" << std::endl;
-    } else if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) {
-        selectedModel = 2;
-        std::cout << "Model 2 Selected" << std::endl;
-    } else if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS) {
-        selectedModel = 3;
-        std::cout << "Model 3 Selected" << std::endl;
-    } else if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS) {
-        selectedModel = 4;
-        std::cout << "Model 4 Selected" << std::endl;
-    }
+	// Camera views
+	// M
 
-    // Press Spacebar to reposition selected model to a random spot on the grid
-    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-        glm::mat4 translation = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-
-        //Random Number Between -50 and 50 Normalized
-        float randomX = (rand() % 101 + (-50)) / (1 / ULEN);
-        float randomZ = (rand() % 101 + (-50)) / (1 / ULEN);
-
-        //Translate to the new random position on the grid.
-        translation = glm::translate(translation, glm::vec3(randomX, 0, randomZ));
-        models[selectedModel].translation = translation;
-    }
-
-    // Press U to scale up selected model
+    // Press U to scale up model
     if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS) {
-        models[selectedModel].scale = glm::scale(models[selectedModel].scale,
+        timexModel.scale = glm::scale(timexModel.scale,
                                                  glm::vec3(1.0f + ULEN, 1.0f + ULEN, 1.0f + ULEN));
     }
-
-    // Press J to scale down selected model
+    // Press J to scale down model
     if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS) {
-        models[selectedModel].scale = glm::scale(models[selectedModel].scale,
+		timexModel.scale = glm::scale(timexModel.scale,
                                                  glm::vec3(1.0f - ULEN, 1.0f - ULEN, 1.0f - ULEN));
     }
-
-    // Press Shift + W to translate selected model in the -Z direction
+    // Press Shift + W to translate model in the -Z direction
     if ((glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         && ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
             || (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))) {
-        models[selectedModel].translation = glm::translate(models[selectedModel].translation,
+        timexModel.translation = glm::translate(timexModel.translation,
                                                            glm::vec3(0.0f, 0.0f, -ULEN));
     }
 
-    // Press Shift + A to translate selected model in the -X direction
-    // Press A to rotate selected model by -5.0 degrees
+    // Press Shift + A to translate model in the -X direction
+    // Press A to rotate model by -5.0 degrees
     if ((glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
         && ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
             || (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))) {
-        models[selectedModel].translation = glm::translate(models[selectedModel].translation,
+        timexModel.translation = glm::translate(timexModel.translation,
                                                            glm::vec3(-ULEN, 0.0f, 0.0f));
     } else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        models[selectedModel].rotationAngle = models[selectedModel].rotationAngle - 5.0f;
-        models[selectedModel].rotation = glm::rotate(models[selectedModel].rotation,
+        timexModel.rotationAngle = timexModel.rotationAngle - 5.0f;
+        timexModel.rotation = glm::rotate(timexModel.rotation,
                                                      glm::radians(-5.0f),
                                                      glm::vec3(0.0f, 1.0f, 0.0f));
 
     }
 
-    // Press Shift + S to translate selected model in the Z direction
+    // Press Shift + S to translate model in the Z direction
     if ((glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
         && ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
             || (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))) {
-        models[selectedModel].translation = glm::translate(models[selectedModel].translation,
+        timexModel.translation = glm::translate(timexModel.translation,
                                                            glm::vec3(0.0f, 0.0f, ULEN));
     }
 
-    // Press Shift + D to translate selected model in the X direction
+    // Press Shift + D to translate model in the X direction
     // Press D to rotate selected model by 5.0 degrees
     if ((glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         && ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
             || (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))) {
-        models[selectedModel].translation = glm::translate(models[selectedModel].translation,
+        timexModel.translation = glm::translate(timexModel.translation,
                                                            glm::vec3(ULEN, 0.0f, 0.0f));
     } else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        models[selectedModel].rotationAngle = models[selectedModel].rotationAngle + 5.0f;
-        models[selectedModel].rotation = glm::rotate(models[selectedModel].rotation,
+        timexModel.rotationAngle = timexModel.rotationAngle + 5.0f;
+        timexModel.rotation = glm::rotate(timexModel.rotation,
                                                      glm::radians(5.0f),
                                                      glm::vec3(0.0f, 1.0f, 0.0f));
     }
@@ -640,460 +586,128 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
         worldOrientation = glm::rotate(worldOrientation, glm::radians(-1.0f), glm::vec3(0.0f, ULEN, 0.0f));
     }
 
-    // Forward Left Movement
-    if (glfwGetKey(window, GLFW_KEY_KP_6) == GLFW_PRESS) {
-        models[selectedModel].rotation = glm::rotate(models[selectedModel].rotation,
-                                                     glm::radians(5.0f),
-                                                     glm::vec3(0.0f, 1.0f, 0.0f));
-        models[selectedModel].rotationAngle = models[selectedModel].rotationAngle + 5.0f;
-
-        float translationX = sin(models[selectedModel].rotationAngle * (M_PI / 180)) * ULEN;
-        float translationZ = cos(models[selectedModel].rotationAngle * (M_PI / 180)) * ULEN;
-
-        models[selectedModel].translation = glm::translate(models[selectedModel].translation,
-                                                           glm::vec3(translationX, 0.0f, translationZ));
-
-        translationX = translationX * 2;
-        translationZ = translationZ * 2;
-
-        moveModelForwardAnimation(translationX, translationZ);
-    }
-
-
-    // Forward Right Movement
-    if (glfwGetKey(window, GLFW_KEY_KP_4) == GLFW_PRESS) {
-        models[selectedModel].rotation = glm::rotate(models[selectedModel].rotation,
-                                                     glm::radians(-5.0f),
-                                                     glm::vec3(0.0f, 1.0f, 0.0f));
-        models[selectedModel].rotationAngle = models[selectedModel].rotationAngle - 5.0f;
-
-        float translationX = sin(models[selectedModel].rotationAngle * (M_PI / 180)) * ULEN;
-        float translationZ = cos(models[selectedModel].rotationAngle * (M_PI / 180)) * ULEN;
-
-        models[selectedModel].translation = glm::translate(models[selectedModel].translation,
-                                                           glm::vec3(translationX, 0.0f, translationZ));
-
-        translationX = translationX * 2;
-        translationZ = translationZ * 2;
-
-        moveModelForwardAnimation(translationX, translationZ);
-    }
-
-    // Forward Model Movement with Legs
-    if (glfwGetKey(window, GLFW_KEY_KP_8) == GLFW_PRESS) {
-        float translationX = sin(models[selectedModel].rotationAngle * (M_PI / 180)) * ULEN;
-        float translationZ = cos(models[selectedModel].rotationAngle * (M_PI / 180)) * ULEN;
-
-        models[selectedModel].translation = glm::translate(models[selectedModel].translation,
-                                                           glm::vec3(translationX, 0.0f, translationZ));
-
-        translationX = translationX * 2;
-        translationZ = translationZ * 2;
-
-        moveModelForwardAnimation(translationX, translationZ);
-    }
-
-    // Reverse Model Movement with Legs
-    if (glfwGetKey(window, GLFW_KEY_KP_2) == GLFW_PRESS) {
-        float translationX = sin(models[selectedModel].rotationAngle * (M_PI / 180)) * ULEN;
-        float translationZ = cos(models[selectedModel].rotationAngle * (M_PI / 180)) * ULEN;
-
-        models[selectedModel].translation = glm::translate(models[selectedModel].translation,
-                                                           glm::vec3(-translationX, 0.0f, -translationZ));
-
-        translationX = translationX * 2;
-        translationZ = translationZ * 2;
-
-        moveModelForwardAnimation(translationX, translationZ);
-    }
-
     // Reset world orientation and camera by pressing Home button
     if (glfwGetKey(window, GLFW_KEY_HOME) == GLFW_PRESS) {
         worldOrientation = glm::mat4(1.0f);
-        camera = Camera(glm::vec3(0.0f, 0.1f, 2.0f));
-        createR1Model();
-        createH6Model();
-        createN5Model();
-        create08Model();
-        createK5Model();
-    }
-
-    // Press X to toggle textures
-    if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) {
-        textureOn = 1 - textureOn;
+        cameras[cameraToggle] = Camera(glm::vec3(0.0f, 0.1f, 2.0f));
+		createTimexModel();
     }
 }
 
-void moveModelForwardAnimation(float translationX, float translationZ) {
-    if (models[selectedModel].animationTimeValue == 0) {
-        // Translate Letter Leg Forward
-        models[selectedModel].letterTranslation = glm::translate(models[selectedModel].letterTranslation,
-                                                                 glm::vec3(translationX, 0.0f, translationZ));
-        // Rotate Letter Leg Backward to -23 Degrees
-        models[selectedModel].letterRotation = glm::rotate(id,
-                                                           glm::radians(-23.0f),
-                                                           glm::vec3(1.0f, 0.0f, 0.0f));
-        // Translate Number Leg Backward
-        models[selectedModel].numberTranslation = glm::translate(models[selectedModel].numberTranslation,
-                                                                 glm::vec3(-translationX, 0.0f, -translationZ));
-        // Rotate Number Leg Forward to 23 Degrees
-        models[selectedModel].numberRotation = glm::rotate(id,
-                                                           glm::radians(23.0f),
-                                                           glm::vec3(1.0f, 0.0f, 0.0f));
-        // Increment Animation Time
-        models[selectedModel].animationTimeValue++;
-    } else if (models[selectedModel].animationTimeValue == 1) {
-        // Rotate Letter Leg Backward to -45 Degrees
-        models[selectedModel].letterRotation = glm::rotate(id,
-                                                           glm::radians(-45.0f),
-                                                           glm::vec3(1.0f, 0.0f, 0.0f));
-        // Rotate Number Leg Forward to 45 Degrees
-        models[selectedModel].numberRotation = glm::rotate(id,
-                                                           glm::radians(45.0f),
-                                                           glm::vec3(1.0f, 0.0f, 0.0f));
-        // Increment Animation Time
-        models[selectedModel].animationTimeValue++;
-    } else if (models[selectedModel].animationTimeValue == 2) {
-        // Rotate Letter Leg Backward to -23 Degrees
-        models[selectedModel].letterRotation = glm::rotate(id,
-                                                           glm::radians(-23.0f),
-                                                           glm::vec3(1.0f, 0.0f, 0.0f));
-        // Rotate Number Leg Forward to 23 Degrees
-        models[selectedModel].numberRotation = glm::rotate(id,
-                                                           glm::radians(23.0f),
-                                                           glm::vec3(1.0f, 0.0f, 0.0f));
-        // Increment Animation Time
-        models[selectedModel].animationTimeValue++;
-    } else if (models[selectedModel].animationTimeValue == 3) {
-        // Original Letter Translation
-        models[selectedModel].letterTranslation = id;
-        // Original Letter Rotation
-        models[selectedModel].letterRotation = glm::rotate(id,
-                                                           glm::radians(0.0f),
-                                                           glm::vec3(1.0f, 0.0f, 0.0f));
-        // Original Number Translation
-        models[selectedModel].numberTranslation = id;
-        // Original Number Rotation
-        models[selectedModel].numberRotation = glm::rotate(id,
-                                                           glm::radians(0.0f),
-                                                           glm::vec3(1.0f, 0.0f, 0.0f));
-        // Increment Animation Time
-        models[selectedModel].animationTimeValue++;
-    } else if (models[selectedModel].animationTimeValue == 4) {
-        // Translate Letter Leg Forward
-        models[selectedModel].letterTranslation = glm::translate(models[selectedModel].letterTranslation,
-                                                                 glm::vec3(-translationX, 0.0f, -translationZ));
-        // Rotate Letter Leg Backward to -23 Degrees
-        models[selectedModel].letterRotation = glm::rotate(id,
-                                                           glm::radians(23.0f),
-                                                           glm::vec3(1.0f, 0.0f, 0.0f));
-        // Translate Number Leg Backward
-        models[selectedModel].numberTranslation = glm::translate(models[selectedModel].numberTranslation,
-                                                                 glm::vec3(translationX, 0.0f, translationZ));
-        // Rotate Number Leg Forward to 23 Degrees
-        models[selectedModel].numberRotation = glm::rotate(id,
-                                                           glm::radians(-23.0f),
-                                                           glm::vec3(1.0f, 0.0f, 0.0f));
-        // Increment Animation Time
-        models[selectedModel].animationTimeValue++;
-    } else if (models[selectedModel].animationTimeValue == 5) {
-        // Rotate Letter Leg Backward to -23 Degrees
-        models[selectedModel].letterRotation = glm::rotate(id,
-                                                           glm::radians(45.0f),
-                                                           glm::vec3(1.0f, 0.0f, 0.0f));
-        // Rotate Number Leg Forward to 23 Degrees
-        models[selectedModel].numberRotation = glm::rotate(id,
-                                                           glm::radians(-45.0f),
-                                                           glm::vec3(1.0f, 0.0f, 0.0f));
-        // Increment Animation Time
-        models[selectedModel].animationTimeValue++;
-    } else if (models[selectedModel].animationTimeValue == 6) {
-        // Rotate Letter Leg Backward to -23 Degrees
-        models[selectedModel].letterRotation = glm::rotate(id,
-                                                           glm::radians(23.0f),
-                                                           glm::vec3(1.0f, 0.0f, 0.0f));
-        // Rotate Number Leg Forward to 23 Degrees
-        models[selectedModel].numberRotation = glm::rotate(id,
-                                                           glm::radians(-23.0f),
-                                                           glm::vec3(1.0f, 0.0f, 0.0f));
-        // Increment Animation Time
-        models[selectedModel].animationTimeValue++;
-    } else if (models[selectedModel].animationTimeValue == 7) {
-        // Original Letter Translation
-        models[selectedModel].letterTranslation = id;
-        // Original Letter Rotation
-        models[selectedModel].letterRotation = glm::rotate(id,
-                                                           glm::radians(0.0f),
-                                                           glm::vec3(1.0f, 0.0f, 0.0f));
-        // Original Number Translation
-        models[selectedModel].numberTranslation = id;
-        // Original Number Rotation
-        models[selectedModel].numberRotation = glm::rotate(id,
-                                                           glm::radians(0.0f),
-                                                           glm::vec3(1.0f, 0.0f, 0.0f));
-        // Set Time back to 0 (End of Animation)
-        models[selectedModel].animationTimeValue = 0;
-    }
+void createTimexModel() {
+	// Letter T
+	CubeComponent T;
+	T.cubeTrans.push_back(
+			glm::scale(id, glm::vec3(1.0f, 4.0f, 1.0f))
+			);
+	T.cubeTrans.push_back(
+			glm::translate(id, glm::vec3(0.0*ULEN, 4.0*ULEN, 0.0*ULEN)) *
+			glm::scale(id, glm::vec3(3.0f, 1.0f, 1.0f))
+	);
+	T.adjust = glm::translate(id, glm::vec3(-6.0*ULEN, 2.0*ULEN, 0.0*ULEN));
+	T.diffuse = 0;
+	timexModel.components.push_back(T);
+
+	// Number 3
+	CubeComponent three;
+	three.cubeTrans.push_back(
+			glm::translate(id, glm::vec3(1.5*ULEN, 0.0*ULEN, 0.0*ULEN)) *
+			glm::scale(id, glm::vec3(1.0f, 5.0f, 1.0f)));
+	three.cubeTrans.push_back(
+			glm::translate(id, glm::vec3(0.0*ULEN, 0.0*ULEN, 0.0*ULEN)) *
+			glm::scale(id, glm::vec3(2.0f, 1.0f, 1.0f)));
+	three.cubeTrans.push_back(
+			glm::translate(id, glm::vec3(0.0*ULEN, 2.0*ULEN, 0.0*ULEN)) *
+			glm::scale(id, glm::vec3(2.0f, 1.0f, 1.0f)));
+	three.cubeTrans.push_back(
+			glm::translate(id, glm::vec3(0.0*ULEN, 4.0*ULEN, 0.0*ULEN)) *
+			glm::scale(id, glm::vec3(2.0f, 1.0f, 1.0f)));
+	three.adjust = glm::translate(id, glm::vec3(-2.5*ULEN, 2.0*ULEN, 0.0*ULEN));
+	three.diffuse = 1;
+	timexModel.components.push_back(three);
+
+	// Letter H
+	CubeComponent H;
+	H.cubeTrans.push_back(
+			glm::translate(id, glm::vec3(-1.0 * ULEN, 0.0f, 0.0f)) *
+			glm::scale(id, glm::vec3(1.0f, 5.0f, 1.0f)));
+	H.cubeTrans.push_back(
+			glm::translate(id, glm::vec3(0.0f, 2.0 * ULEN, 0.0f)));
+	H.cubeTrans.push_back(
+			glm::translate(id, glm::vec3(1.0 * ULEN, 0.0f, 0.0f)) *
+			glm::scale(id, glm::vec3(1.0f, 5.0f, 1.0f)));
+	H.adjust = glm::translate(id, glm::vec3(2.0*ULEN, 2.0*ULEN, 0.0*ULEN));
+	H.diffuse = 2;
+	timexModel.components.push_back(H);
+
+	// Number 2
+	CubeComponent two;
+	two.cubeTrans.push_back(
+			glm::scale(id, glm::vec3(3.0f, 1.0f, 1.0f)));
+	two.cubeTrans.push_back(
+			glm::translate(id, glm::vec3(0.0 * ULEN, 4.0 * ULEN, 0.0 * ULEN)) *
+			glm::scale(id, glm::vec3(3.0f, 1.0f, 1.0f)));
+	two.cubeTrans.push_back(
+			glm::translate(id, glm::vec3(0.0 * ULEN, 2.0 * ULEN, 0.0 * ULEN)) *
+			glm::scale(id, glm::vec3(3.0f, 1.0f, 1.0f)));
+	two.cubeTrans.push_back(
+			glm::translate(id, glm::vec3(-1.0 * ULEN, 1.0 * ULEN, 0.0 * ULEN)));
+	two.cubeTrans.push_back(
+			glm::translate(id, glm::vec3(1.0 * ULEN, 3.0 * ULEN, 0.0 * ULEN)));
+	two.adjust = glm::translate(id, glm::vec3(6.0*ULEN, 2.0*ULEN, 0.0*ULEN));
+	two.diffuse = 3;
+	timexModel.components.push_back(two);
+
+	// Skate model
+	skate.push_back(
+			glm::translate(id, glm::vec3(0.0 * ULEN, 1.0 * ULEN, 0.0 * ULEN)) *
+			glm::scale(id, glm::vec3(3.0f, 1.0f, 4.0f)));
+	skate.push_back(
+			glm::scale(id, glm::vec3(1.0f, 1.0f, 4.0f)));
+
 }
 
-void createK5Model() {
-    models[4].letterTrans.push_back(
-            glm::translate(id, glm::vec3(-1.0 * ULEN, 0.0f, 0.0f)) *
-            glm::scale(id, glm::vec3(1.0f, 5.0f, 1.0f))
-    );
-    glm::mat4 shearKTop = {
-            1.0f, 0.0f, 0.0f, 0.0f,
-            2.0, 1.0f, 0.0f, 0.0f,
-            0.0f, 0.0f, 1.0f, 0.0f,
-            0.0f, 0.0f, 0.0f, 1.0f
-    };
-    models[4].letterTrans.push_back(
-            glm::translate(id, glm::vec3(-1.0 * ULEN, 3.0 * ULEN, 0.0f)) *
-            glm::scale(id, glm::vec3(1.0f, 2.0f, 1.0f)) * shearKTop
-    );
-    glm::mat4 shearKBottom = {
-            1.0f, 0.0f, 0.0f, 0.0f,
-            -2.0, 1.0f, 0.0f, 0.0f,
-            0.0f, 0.0f, 1.0f, 0.0f,
-            0.0f, 0.0f, 0.0f, 1.0f
-    };
-    models[4].letterTrans.push_back(
-            glm::translate(id, glm::vec3(1.0 * ULEN, 0.0f, 0.0f)) *
-            glm::scale(id, glm::vec3(1.0f, 3.0f, 1.0f)) * shearKBottom
-    );
+void createAxes() {
+	glm::mat4 shearLeft = {
+			1.0f, 0.0f, 0.0f, 0.0f,
+			-1.0, 1.0f, 0.0f, 0.0f,
+			0.0f, 0.0f, 1.0f, 0.0f,
+			0.0f, 0.0f, 0.0f, 1.0f
+	};
+	glm::mat4 shearRight = {
+			1.0f, 0.0f, 0.0f, 0.0f,
+			1.0, 1.0f, 0.0f, 0.0f,
+			0.0f, 0.0f, 1.0f, 0.0f,
+			0.0f, 0.0f, 0.0f, 1.0f
+	};
 
-    models[4].numTrans.push_back(
-            glm::translate(id, glm::vec3(-1.0 * ULEN, 0.0f, 0.0f))
-    );
-    models[4].numTrans.push_back(
-            glm::translate(id, glm::vec3(-1.0 * ULEN, 2.0 * ULEN, 0.0f)) *
-            glm::scale(id, glm::vec3(1.0f, 3.0f, 1.0f))
-    );
-    models[4].numTrans.push_back(
-            glm::translate(id, glm::vec3(0.0f, 2.0 * ULEN, 0.0f))
-    );
-    models[4].numTrans.push_back(
-            glm::translate(id, glm::vec3(0.5 * ULEN, 4.0 * ULEN, 0.0f)) *
-            glm::scale(id, glm::vec3(2.0f, 1.0f, 1.0f))
-    );
-    models[4].numTrans.push_back(
-            id
-    );
-    models[4].numTrans.push_back(
-            glm::translate(id, glm::vec3(1.0 * ULEN, 0.0f, 0.0f)) *
-            glm::scale(id, glm::vec3(1.0f, 3.0f, 1.0f))
-    );
+	std::vector<glm::mat4> arrow;
+	arrow.push_back(
+			glm::scale(id, glm::vec3(0.25f, 5.0f, 0.25f)));
+	arrow.push_back(
+			glm::translate(id, glm::vec3(-0.25*ULEN, 4.5*ULEN, 0.*ULEN)) *
+			glm::scale(id, glm::vec3(0.25f, 0.5f, 0.25f)) * shearRight);
+	arrow.push_back(
+			glm::translate(id, glm::vec3(0.25*ULEN, 4.5*ULEN, 0.*ULEN)) *
+			glm::scale(id, glm::vec3(0.25f, 0.5f, 0.25f)) * shearLeft);
 
-    models[4].letterAdjust = glm::translate(id, glm::vec3(-2.0 * ULEN, 0.0f, 0.0f));
-    models[4].numAdjust = glm::translate(id, glm::vec3(2.0 * ULEN, 0.0f, 0.0f));
+	CubeComponent X;
+	X.cubeTrans = arrow;
+	X.rotation = glm::rotate(id, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	X.rotation = glm::rotate(X.rotation, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	X.diffuse = 3;
 
-    models[4].scale = id;
-    models[4].translation = glm::translate(id, glm::vec3(20 * ULEN, 0.0f, -20 * ULEN));
-    models[4].rotation = id;
-    models[4].rotationAngle = 0.0f;
-    models[4].letterTranslation = id;
-    models[4].numberTranslation = id;
-    models[4].sphereScale = sphereScale;
-    models[4].sphereTranslation = sphereTranslation;
-    models[4].numberRotation = glm::rotate(id, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    models[4].animationTimeValue = 0;
-    models[4].letterRotation = glm::rotate(id, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-}
+	CubeComponent Y;
+	Y.cubeTrans = arrow;
+	Y.diffuse = 3;
 
-void create08Model() {
-    models[3].letterTrans.push_back(
-            glm::translate(id, glm::vec3(-1 * ULEN, 0.0f, 0.0f)) *
-            glm::scale(id, glm::vec3(1.0f, 5.0f, 1.0f))
-    );
-    models[3].letterTrans.push_back(
-            glm::translate(id, glm::vec3(1 * ULEN, 0.0f, 0.0f)) *
-            glm::scale(id, glm::vec3(1.0f, 5.0f, 1.0f))
-    );
-    models[3].letterTrans.push_back(
-            id
-    );
-    models[3].letterTrans.push_back(
-            glm::translate(id, glm::vec3(0.0f, 4.0 * ULEN, 0.0f))
-    );
+	CubeComponent Z;
+	Z.cubeTrans = arrow;
+	Z.rotation = glm::rotate(id, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	Z.rotation = glm::rotate(X.rotation, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	Z.diffuse = 3;
 
-    models[3].numTrans.push_back(
-            glm::translate(id, glm::vec3(-1 * ULEN, 0.0f, 0.0f)) *
-            glm::scale(id, glm::vec3(1.0f, 5.0f, 1.0f))
-    );
-    models[3].numTrans.push_back(
-            glm::translate(id, glm::vec3(1 * ULEN, 0.0f, 0.0f)) *
-            glm::scale(id, glm::vec3(1.0f, 5.0f, 1.0f))
-    );
-    models[3].numTrans.push_back(
-            id
-    );
-    models[3].numTrans.push_back(
-            glm::translate(id, glm::vec3(0.0f, 4.0 * ULEN, 0.0f))
-    );
-    models[3].numTrans.push_back(
-            glm::translate(id, glm::vec3(0.0f, 2.0 * ULEN, 0.0f))
-    );
-
-    models[3].letterAdjust = glm::translate(id, glm::vec3(-2.0 * ULEN, 0.0f, 0.0f));
-    models[3].numAdjust = glm::translate(id, glm::vec3(2.0 * ULEN, 0.0f, 0.0f));
-
-    models[3].scale = id;
-    models[3].translation = glm::translate(id, glm::vec3(-20 * ULEN, 0.0f, -20 * ULEN));
-    models[3].rotation = id;
-    models[3].letterTranslation = id;
-    models[3].numberTranslation = id;
-    models[3].rotationAngle = 0.0f;
-    models[3].sphereScale = sphereScale;
-    models[3].sphereTranslation = sphereTranslation;
-    models[3].numberRotation = glm::rotate(id, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    models[3].animationTimeValue = 0;
-    models[3].letterRotation = glm::rotate(id, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-}
-
-void createN5Model() {
-    models[2].letterTrans.push_back(
-            glm::translate(id, glm::vec3(-1.5 * ULEN, 0.0f, 0.0f)) *
-            glm::scale(id, glm::vec3(1.0f, 5.0f, 1.0f))
-    );
-    models[2].letterTrans.push_back(
-            glm::translate(id, glm::vec3(1.5 * ULEN, 0.0f, 0.0f)) *
-            glm::scale(id, glm::vec3(1.0f, 5.0f, 1.0f))
-    );
-    glm::mat4 shearN = {
-            1.0f, 0.0f, 0.0f, 0.0f,
-            -3.0, 1.0f, 0.0f, 0.0f,
-            0.0f, 0.0f, 1.0f, 0.0f,
-            0.0f, 0.0f, 0.0f, 1.0f
-    };
-    models[2].letterTrans.push_back(
-            glm::translate(id, glm::vec3(1.5 * ULEN, 0.0f, 0.0f)) *
-            glm::scale(id, glm::vec3(1.0f, 5.0f, 1.0f)) * shearN
-    );
-
-    models[2].numTrans.push_back(
-            glm::translate(id, glm::vec3(-1.0 * ULEN, 0.0f, 0.0f))
-    );
-    models[2].numTrans.push_back(
-            glm::translate(id, glm::vec3(-1.0 * ULEN, 2.0 * ULEN, 0.0f)) *
-            glm::scale(id, glm::vec3(1.0f, 3.0f, 1.0f))
-    );
-    models[2].numTrans.push_back(
-            glm::translate(id, glm::vec3(0.0f, 2.0 * ULEN, 0.0f))
-    );
-    models[2].numTrans.push_back(
-            glm::translate(id, glm::vec3(0.5 * ULEN, 4.0 * ULEN, 0.0f)) *
-            glm::scale(id, glm::vec3(2.0f, 1.0f, 1.0f))
-    );
-    models[2].numTrans.push_back(
-            id
-    );
-    models[2].numTrans.push_back(
-            glm::translate(id, glm::vec3(1.0 * ULEN, 0.0f, 0.0f)) *
-            glm::scale(id, glm::vec3(1.0f, 3.0f, 1.0f))
-    );
-
-    models[2].letterAdjust = glm::translate(id, glm::vec3(-2.5 * ULEN, 0.0f, 0.0f));
-    models[2].numAdjust = glm::translate(id, glm::vec3(2.0 * ULEN, 0.0f, 0.0f));
-
-    models[2].scale = id;
-    models[2].translation = glm::translate(id, glm::vec3(-20 * ULEN, 0.0f, 20 * ULEN));
-    models[2].rotation = id;
-    models[2].letterTranslation = id;
-    models[2].numberTranslation = id;
-    models[2].rotationAngle = 0.0f;
-    models[2].sphereScale = sphereScale;
-    models[2].sphereTranslation = sphereTranslation;
-    models[2].numberRotation = glm::rotate(id, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    models[2].animationTimeValue = 0;
-    models[2].letterRotation = glm::rotate(id, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-}
-
-void createH6Model() {
-    models[1].letterTrans.push_back(
-            glm::translate(id, glm::vec3(-1.0 * ULEN, 0.0f, 0.0f)) *
-            glm::scale(id, glm::vec3(1.0f, 5.0f, 1.0f))
-    );
-    models[1].letterTrans.push_back(
-            glm::translate(id, glm::vec3(0.0f, 2 * ULEN, 0.0f))
-    );
-    models[1].letterTrans.push_back(
-            glm::translate(id, glm::vec3(1.0 * ULEN, 0.0f, 0.0f)) *
-            glm::scale(id, glm::vec3(1.0f, 5.0f, 1.0f))
-    );
-
-    models[1].numTrans.push_back(
-            glm::translate(id, glm::vec3(-1.0 * ULEN, 0.0f, 0.0f)) *
-            glm::scale(id, glm::vec3(1.0f, 5.0f, 1.0f))
-    );
-    models[1].numTrans.push_back(
-            glm::translate(id, glm::vec3(0.0f, 2.0 * ULEN, 0.0f))
-    );
-    models[1].numTrans.push_back(
-            glm::translate(id, glm::vec3(0.0f, 4.0 * ULEN, 0.0f))
-    );
-    models[1].numTrans.push_back(
-            id
-    );
-    models[1].numTrans.push_back(
-            glm::translate(id, glm::vec3(1.0 * ULEN, 0.0f, 0.0f)) *
-            glm::scale(id, glm::vec3(1.0f, 3.0f, 1.0f))
-    );
-
-    models[1].letterAdjust = glm::translate(id, glm::vec3(-2.0 * ULEN, 0.0f, 0.0f));
-    models[1].numAdjust = glm::translate(id, glm::vec3(2.0 * ULEN, 0.0f, 0.0f));
-
-    models[1].scale = id;
-    models[1].translation = glm::translate(id, glm::vec3(20 * ULEN, 0.0f, 20 * ULEN));
-    models[1].rotation = id;
-    models[1].letterTranslation = id;
-    models[1].numberTranslation = id;
-    models[1].rotationAngle = 0.0f;
-    models[1].sphereScale = sphereScale;
-    models[1].sphereTranslation = sphereTranslation;
-    models[1].numberRotation = glm::rotate(id, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    models[1].animationTimeValue = 0;
-    models[1].letterRotation = glm::rotate(id, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-}
-
-void createR1Model() {
-    models[0].letterTrans.push_back(
-            glm::scale(id, glm::vec3(1.0f, 5.0f, 1.0f))
-    );
-    models[0].letterTrans.push_back(
-            glm::translate(id, glm::vec3(1.0 * ULEN, 4.0f * ULEN, 0.0f))
-    );
-    models[0].letterTrans.push_back(
-            glm::translate(id, glm::vec3(2.0 * ULEN, 2.0 * ULEN, 0.0f)) *
-            glm::scale(id, glm::vec3(1.0f, 3.0f, 1.0f))
-    );
-    models[0].letterTrans.push_back(
-            glm::translate(id, glm::vec3(1.0 * ULEN, 2.0 * ULEN, 0.0f))
-    );
-    glm::mat4 shearR = {
-            1.0f, 0.0f, 0.0f, 0.0f,
-            -1.0, 1.0f, 0.0f, 0.0f,
-            0.0f, 0.0f, 1.0f, 0.0f,
-            0.0f, 0.0f, 0.0f, 1.0f
-    };
-    models[0].letterTrans.push_back(
-            glm::translate(id, glm::vec3(2.0 * ULEN, 0.0f, 0.0f)) *
-            glm::scale(id, glm::vec3(1.0f, 2.0f, 1.0f)) * shearR
-    );
-
-    models[0].numTrans.push_back(glm::scale(id, glm::vec3(1.0f, 5.0f, 1.0f)));
-
-    models[0].letterAdjust = glm::translate(id, glm::vec3(-3 * ULEN, 0.0f, 0.0f));
-    models[0].numAdjust = glm::translate(id, glm::vec3(ULEN, 0.0f, 0.0f));
-
-    models[0].scale = id;
-    models[0].translation = id;
-    models[0].rotation = id;
-    models[0].letterTranslation = id;
-    models[0].numberTranslation = id;
-    models[0].rotationAngle = 0.0f;
-    models[0].sphereScale = sphereScale;
-    models[0].sphereTranslation = sphereTranslation;
-    models[0].numberRotation = glm::rotate(id, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    models[0].animationTimeValue = 0;
-    models[0].letterRotation = glm::rotate(id, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	axesModel.components.push_back(X);
+	axesModel.components.push_back(Y);
+	axesModel.components.push_back(Z);
 }

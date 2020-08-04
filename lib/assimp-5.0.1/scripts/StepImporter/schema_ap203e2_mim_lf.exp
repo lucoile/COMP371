@@ -13997,7 +13997,7 @@ FUNCTION default_tolerance_table_cell_wr3
 	(agg: compound_item_definition) : BOOLEAN;
 BEGIN 
 IF (SIZEOF(QUERY ( i <* agg | (('AP203_CONFIGURATION_CONTROLLED_3D_DESIGN_OF_MECHANICAL_PARTS_AND_ASSEMBLIES_MIM_LF.MEASURE_REPRESENTATION_ITEM' IN TYPEOF(i)) 
-  AND (i\representation_item.name = 'significant number of digits')) )) = 1) OR 
+  AND (i\representation_item.name = 'significant number of components')) )) = 1) OR
 ((SIZEOF(QUERY ( i <* agg | (('AP203_CONFIGURATION_CONTROLLED_3D_DESIGN_OF_MECHANICAL_PARTS_AND_ASSEMBLIES_MIM_LF.MEASURE_REPRESENTATION_ITEM' IN TYPEOF(i)) AND 
   (i\representation_item.name = 'lower limit')) )) = 1) AND 
 (SIZEOF( QUERY ( i <* agg | (('AP203_CONFIGURATION_CONTROLLED_3D_DESIGN_OF_MECHANICAL_PARTS_AND_ASSEMBLIES_MIM_LF.MEASURE_REPRESENTATION_ITEM' IN TYPEOF(i)) AND 

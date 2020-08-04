@@ -303,7 +303,7 @@ const char* fast_atoreal_move(const char* c, Real& out, bool check_comma = true)
         // strtol_64 is used to prevent integer overflow.
 
         // Another fix: this tends to become 0 for long numbers if we don't limit the maximum
-        // number of digits to be read. AI_FAST_ATOF_RELAVANT_DECIMALS can be a value between
+        // number of components to be read. AI_FAST_ATOF_RELAVANT_DECIMALS can be a value between
         // 1 and 15.
         unsigned int diff = AI_FAST_ATOF_RELAVANT_DECIMALS;
         double pl = static_cast<double>( strtoul10_64 ( c, &c, &diff ));

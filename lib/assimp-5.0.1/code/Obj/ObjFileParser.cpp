@@ -458,7 +458,7 @@ void ObjFileParser::getFace( aiPrimitiveType type ) {
             //OBJ USES 1 Base ARRAYS!!!!
             const int iVal( ::atoi( & ( *m_DataIt ) ) );
 
-            // increment iStep position based off of the sign and # of digits
+            // increment iStep position based off of the sign and # of components
             int tmp = iVal;
             if ( iVal < 0 ) {
                 ++iStep;

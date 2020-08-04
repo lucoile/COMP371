@@ -1339,7 +1339,7 @@ unsigned int XFileParser::ReadInt()
         if( !isdigit( *mP))
             ThrowException( "Number expected.");
 
-        // read digits
+        // read components
         unsigned int number = 0;
         while( mP < mEnd)
         {

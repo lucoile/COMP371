@@ -165,7 +165,7 @@ inline bool StrtodDiyFp(const char* decimals, size_t length, size_t decimalPosit
         int  adjustment = dExp - actualExp - 1;
         RAPIDJSON_ASSERT(adjustment >= 0 && adjustment < 7);
         v = v * kPow10[adjustment];
-        if (length + static_cast<unsigned>(adjustment)> 19u) // has more digits than decimal digits in 64-bit
+        if (length + static_cast<unsigned>(adjustment)> 19u) // has more components than decimal components in 64-bit
             error += kUlp / 2;
     }
 
@@ -243,7 +243,7 @@ inline double StrtodFullPrecision(double d, int p, const char* decimals, size_t 
         exp++;
     }
 
-    // Trim right-most digits
+    // Trim right-most components
     const int kMaxDecimalDigit = 780;
     if (static_cast<int>(length) > kMaxDecimalDigit) {
         int delta = (static_cast<int>(length) - kMaxDecimalDigit);

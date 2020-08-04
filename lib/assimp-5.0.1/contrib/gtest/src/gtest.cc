@@ -245,7 +245,7 @@ GTEST_DEFINE_string_(
     "If a directory is specified, output files will be created "
     "within that directory, with file-names based on the test "
     "executable's name and, if necessary, made unique by adding "
-    "digits.");
+    "components.");
 
 GTEST_DEFINE_bool_(
     print_time,
