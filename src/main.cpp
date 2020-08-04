@@ -19,7 +19,6 @@
 #include "Utilities/model.h"
 #include "Utilities/texture.h"
 
-#include "Grid/grid.h"
 #include "Line/line.h"
 
 #include <iostream>
