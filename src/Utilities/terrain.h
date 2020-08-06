@@ -8,11 +8,14 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <algorithm>
+
 #include "shader_m.h"
 #include "model.h"
 
 #include "../../lib/libnoise/include/noise/noise.h"
 #include "../../lib/libnoise/include/noise/noiseutils.h"
+
 
 class Terrain
 {
@@ -21,12 +24,13 @@ public:
 	noise::utils::NoiseMap heightMap;
 	// Terrain size
 	unsigned int size;
+	unsigned int renderSize = 100;
 
 	// Terrain class constructor
-	Terrain(unsigned int size, Model cube, int octaveCount = 6, float frequency = 1.0, float persistence = 0.5);
+	Terrain(unsigned int size, Model cube, int octaveCount = 6, float frequency = 1.0, float persistence = 0.5, int renderSize = 100);
 
 	// Render terrain
-	void Render(Shader &shader, glm::mat4 world);
+	void Render(Shader &shader, glm::mat4 world, glm::vec2 worldPos);
 
 private:
 	// Terrain unit size

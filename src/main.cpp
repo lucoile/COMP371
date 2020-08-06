@@ -10,10 +10,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-
 #include "../lib/libnoise/include/noise/noise.h"
 #include "../lib/libnoise/include/noise/noiseutils.h"
 
@@ -55,10 +51,11 @@ unsigned int SCR_HEIGHT = 768;
 const float ULEN = 0.1f; // Unit Length
 
 // Terrain settings
-unsigned int TERRAIN_SIZE = 100;
+unsigned int TERRAIN_SIZE = 1000;
 int OCTAVE_COUNT = 6;
-float FREQUENCY = 0.5;
+float FREQUENCY = 5.0;
 float PERSISTENCE = 0.25;
+glm::vec2 worldPos(0.0f);
 
 // Camera
 Camera camera(glm::vec3(0.0f, 10.0 * ULEN, 2.0f));
@@ -280,6 +277,8 @@ int main() {
         projection = glm::perspective(45.0f, (float) SCR_WIDTH / (float) SCR_HEIGHT, 0.1f,100.0f);
 
         // Set camera/view matrix
+//        glm::vec3 cameraPos(0.0f, camera.Position.y, 0.0f);
+//        view = glm::lookAt(cameraPos, cameraPos + camera.Front, camera.Up);
         view = camera.get_view_matrix();
 
 		// Set orthographic frustum for shadows
@@ -366,7 +365,7 @@ void renderScene(Shader &shader, Model cube, Terrain terrain)
 	shader.setVec3("material.ambient", glm::vec3(1.0f));
 	shader.setVec3("light.ambient", glm::vec3(1.0f));
 
-	terrain.Render(shader, worldOrientation);
+	terrain.Render(shader, worldOrientation, worldPos);
 }
 
 void renderAlphanum(Shader &shader, Model cube, Model sphere)
@@ -554,48 +553,25 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
     }
 
     // Press Shift + W to translate selected model in the -Z direction
-    if ((glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        && ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-            || (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))) {
-        models[selectedModel].translation = glm::translate(models[selectedModel].translation,
-                                                           glm::vec3(0.0f, 0.0f, -ULEN));
+    if ((glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)) {
+        worldPos.y -= 1.0;
     }
 
     // Press Shift + A to translate selected model in the -X direction
     // Press A to rotate selected model by -5.0 degrees
-    if ((glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        && ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-            || (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))) {
-        models[selectedModel].translation = glm::translate(models[selectedModel].translation,
-                                                           glm::vec3(-ULEN, 0.0f, 0.0f));
-    } else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        models[selectedModel].rotationAngle = models[selectedModel].rotationAngle - 5.0f;
-        models[selectedModel].rotation = glm::rotate(models[selectedModel].rotation,
-                                                     glm::radians(-5.0f),
-                                                     glm::vec3(0.0f, 1.0f, 0.0f));
-
+    if ((glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)) {
+        worldPos.x -= 1.0;
     }
 
     // Press Shift + S to translate selected model in the Z direction
-    if ((glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        && ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-            || (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))) {
-        models[selectedModel].translation = glm::translate(models[selectedModel].translation,
-                                                           glm::vec3(0.0f, 0.0f, ULEN));
+    if ((glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)) {
+        worldPos.y += 1.0;
     }
 
     // Press Shift + D to translate selected model in the X direction
     // Press D to rotate selected model by 5.0 degrees
-    if ((glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        && ((glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-            || (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS))) {
-        models[selectedModel].translation = glm::translate(models[selectedModel].translation,
-                                                           glm::vec3(ULEN, 0.0f, 0.0f));
-    } else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        models[selectedModel].rotationAngle = models[selectedModel].rotationAngle + 5.0f;
-        models[selectedModel].rotation = glm::rotate(models[selectedModel].rotation,
-                                                     glm::radians(5.0f),
-                                                     glm::vec3(0.0f, 1.0f, 0.0f));
+    if ((glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)) {
+        worldPos.x += 1.0;
     }
 
     // Press Left Arrow Key to Rx
