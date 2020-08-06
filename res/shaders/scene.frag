@@ -26,6 +26,7 @@ uniform sampler2D shadowMap;
 uniform vec3 viewPos;
 uniform Material material;
 uniform Light light;
+uniform int lightingToggle;
 
 float ShadowCalculation(vec4 fragPosLightSpace, vec3 lightDir)
 {

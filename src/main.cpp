@@ -14,53 +14,54 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+#include "../lib/libnoise/include/noise/noise.h"
+#include "../lib/libnoise/include/noise/noiseutils.h"
+
 #include "Utilities/shader_m.h"
 #include "Utilities/camera.h"
 #include "Utilities/model.h"
 #include "Utilities/texture.h"
+#include "Utilities/terrain.h"
+
 
 #include "Line/line.h"
 
 #include <iostream>
 #include <istream>
 #include <vector>
-#include <math.h>
+
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
-
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
-
 void process_input(GLFWwindow *window);
-
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
-
 void moveModelForwardAnimation(float translationX, float translationZ);
 
 void createR1Model();
-
 void createH6Model();
-
 void createN5Model();
-
 void create08Model();
-
 void createK5Model();
 
 void resetTextures(const Shader &shader);
 
-void renderScene(Shader &shader, Model cube, Model sphere);
-
-void renderGrid(Shader &shader, Model cube);
-
+void renderScene(Shader &shader, Model cube, Terrain terrain);
 void renderAlphanum(Shader &shader, Model cube, Model sphere);
+
 
 // Settings
 unsigned int SCR_WIDTH = 1024;
 unsigned int SCR_HEIGHT = 768;
 const float ULEN = 0.1f; // Unit Length
 
+// Terrain settings
+unsigned int TERRAIN_SIZE = 100;
+int OCTAVE_COUNT = 6;
+float FREQUENCY = 0.5;
+float PERSISTENCE = 0.25;
+
 // Camera
-Camera camera(glm::vec3(0.0f, 0.1f, 2.0f));
+Camera camera(glm::vec3(0.0f, 10.0 * ULEN, 2.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -121,6 +122,8 @@ glm::mat4 sphereTranslation = glm::translate(id, glm::vec3(0.0f, 6.0 * ULEN, 0.0
 
 glm::mat4 projection(1.0f);
 glm::mat4 view(1.0f);
+
+glm::vec3 lightPos;
 
 int main() {
     // GLFW: Initialize and configure
@@ -183,6 +186,9 @@ int main() {
     Model cube("../res/models/cube/cube.obj");
     // Sphere model
     Model sphere("../res/models/sphere/sphere.obj");
+
+    // Initialize terrain
+	Terrain terrain(TERRAIN_SIZE, cube, OCTAVE_COUNT, FREQUENCY, PERSISTENCE);
 
     // Initialize alphanumeric models
     // R1
@@ -282,7 +288,7 @@ int main() {
 
 		// View matrix from light perspective
 		// Shadows only render correctly if the light is offset by some amount >0
-		glm::vec3 lightPos(0.001f, 30.0 * ULEN, 0.001f);
+		lightPos = glm::vec3(0.001f, 50.0 * ULEN, 0.001f);
 		glm::mat4 lightView = glm::lookAt(lightPos,
 				glm::vec3( 0.0f, 0.0f,  0.0f),
 				glm::vec3( 0.0f, 1.0f,  0.0f));
@@ -304,7 +310,7 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// Render scene with shadow/depth map shader
-		renderScene(shadowShader, cube, sphere);
+		renderScene(shadowShader, cube, terrain);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -327,7 +333,7 @@ int main() {
 		sceneShader.setInt("shadowMap", 4);
 
 		// Render the scene using shadow map
-		renderScene(sceneShader, cube, sphere);
+		renderScene(sceneShader, cube, terrain);
 
 		// Render lines
 		lineShader.use();
@@ -351,44 +357,16 @@ int main() {
     return 0;
 }
 
-void renderScene(Shader &shader, Model cube, Model sphere)
+void renderScene(Shader &shader, Model cube, Terrain terrain)
 {
-	renderGrid(shader, cube);
-	renderAlphanum(shader, cube, sphere);
-}
+//	renderAlphanum(shader, cube, sphere);
 
-void renderGrid(Shader &shader, Model cube)
-{
-	GLenum type = GL_LINES;
+	resetTextures(shader);
+	shader.setInt("material.diffuse", 3);
+	shader.setVec3("material.ambient", glm::vec3(1.0f));
+	shader.setVec3("light.ambient", glm::vec3(1.0f));
 
-	if (textureOn == 1) {
-		shader.setVec3("material.ambient", 0.5f, 0.5f, 0.5f);
-		shader.setInt("material.diffuse", 1);
-		shader.setVec3("material.specular", 0.2f, 0.2f, 0.2f);
-		shader.setFloat("material.shininess", 32.0f);
-
-		// light properties
-		shader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
-		shader.setVec3("light.diffuse", 1.0f, 1.0f, 1.0f);
-		shader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-		shader.setVec3("light.position", 0.0f, 30.0 * ULEN, 0.0f);
-		type = GL_TRIANGLES;
-
-	} else {
-		resetTextures(shader);
-		shader.setInt("material.diffuse", 3);
-		type = GL_LINES;
-	}
-
-	for (int i = -50; i < 50; i++) {
-		for (int j = -50; j < 50; j++) {
-			glm::vec3 pos((float) i * ULEN, -1.0 * ULEN, (float) j * ULEN);
-			glm::mat4 model = worldOrientation * glm::translate(id, pos);
-			shader.setMat4("model", model);
-
-			cube.Draw(shader, type);
-		}
-	}
+	terrain.Render(shader, worldOrientation);
 }
 
 void renderAlphanum(Shader &shader, Model cube, Model sphere)
@@ -472,7 +450,7 @@ void resetTextures(const Shader &shader) {
     shader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
     shader.setVec3("light.diffuse", 1.0f, 1.0f, 1.0f);
     shader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-    shader.setVec3("light.position", 0.0f, 30.0 * ULEN, 0.0f);
+    shader.setVec3("light.position", lightPos);
 }
 
 // Process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
@@ -1097,3 +1075,5 @@ void createR1Model() {
     models[0].animationTimeValue = 0;
     models[0].letterRotation = glm::rotate(id, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 }
+
+
