@@ -31,9 +31,9 @@ void Terrain::Render(Shader& shader, glm::mat4 world, glm::vec2 worldPos)
 			float height = (heightMap.GetValue(x, z) / 2.0) + 0.5;
 
 			// Calculate position of voxel on x-z plane
-			glm::vec3 voxelPos((float) (x - (renderSize / 2.0) - (size / 2)) * ULEN,
+			glm::vec3 voxelPos((float) (x - (renderSize / 2.0) - startX) * ULEN,
 					0.0f,
-					(float) (z - (renderSize  / 2.0) - (size / 2)) * ULEN);
+					(float) (z - (renderSize  / 2.0) - startZ) * ULEN);
 
 			// Scale each voxel to the height in height map rounded to the nearest unit
 			glm::mat4 model = world *
