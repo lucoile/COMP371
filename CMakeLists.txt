@@ -39,3 +39,7 @@ target_link_libraries(main PRIVATE assimp)
 ## libnoise
 add_subdirectory(lib/libnoise EXCLUDE_FROM_ALL)
 target_link_libraries(main PRIVATE libnoise)
+
+## FastNoiseSIMD
+add_subdirectory(lib/FastNoiseSIMD EXCLUDE_FROM_ALL)
+target_link_libraries(main PRIVATE FastNoiseSIMD)
