@@ -52,7 +52,7 @@ const float ULEN = 0.1f; // Unit Length
 
 // Terrain settings
 unsigned int TERRAIN_SIZE = 1000;
-int OCTAVE_COUNT = 3;
+int OCTAVE_COUNT = 6;
 float FREQUENCY = 5.0;
 float PERSISTENCE = 0.25;
 glm::vec2 worldPos(0.0f);
@@ -350,9 +350,6 @@ int main() {
 
     // De-allocate all resources once they've outlived their purpose:
     line.deleteBuffers();
-
-    // Deallocate height map resources
-    terrain.Free();
 
     // Terminate, clearing all previously allocated GLFW resources.
     glfwTerminate();

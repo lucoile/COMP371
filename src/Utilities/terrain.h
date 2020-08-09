@@ -16,9 +16,6 @@
 #include "../../lib/libnoise/include/noise/noise.h"
 #include "../../lib/libnoise/include/noise/noiseutils.h"
 
-#include <FastNoiseSIMD/FastNoiseSIMD.h>
-
-
 class Terrain
 {
 public:
@@ -28,15 +25,18 @@ public:
 
 	// Terrain height map
 	noise::utils::NoiseMap heightMap;
-	float* heightMapArray;
+  	noise::utils::NoiseMap heightMap2;
 
 	// Terrain class constructor
-	Terrain(unsigned int size, Model cube, int octaveCount = 6, float frequency = 1.0, float persistence = 0.5, int renderSize = 100);
+	Terrain(unsigned int size,
+		Model cube,
+		int octaveCount = 6,
+		float frequency = 1.0,
+		float persistence = 0.5,
+		int renderSize = 100);
 
 	// Render terrain
 	void Render(Shader &shader, glm::mat4 world, glm::vec2 worldPos);
-
-	void Free();
 
 private:
 	// Terrain unit size
