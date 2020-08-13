@@ -185,7 +185,7 @@ int main() {
     Model sphere("../res/models/sphere/sphere.obj");
 
     // Initialize terrain
-	Terrain terrain(TERRAIN_SIZE, cube, OCTAVE_COUNT, FREQUENCY, PERSISTENCE);
+	Terrain terrain(TERRAIN_SIZE, cube, sphere, OCTAVE_COUNT, FREQUENCY, PERSISTENCE);
 
     // Initialize alphanumeric models
     // R1
