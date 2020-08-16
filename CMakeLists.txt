@@ -10,6 +10,7 @@ add_executable(main
         src/Utilities/shader_m.cpp
         src/Utilities/model.cpp
         src/Utilities/mesh.cpp
+        src/Utilities/terrain.cpp
         src/Line/line.cpp)
 set_property(TARGET main PROPERTY CXX_STANDARD 11)
 target_compile_options(main PRIVATE -Wall)
@@ -34,3 +35,7 @@ target_link_libraries(main PRIVATE glm)
 ## assimp
 add_subdirectory(lib/assimp-5.0.1 EXCLUDE_FROM_ALL)
 target_link_libraries(main PRIVATE assimp)
+
+## libnoise
+add_subdirectory(lib/libnoise EXCLUDE_FROM_ALL)
+target_link_libraries(main PRIVATE libnoise)
