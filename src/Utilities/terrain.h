@@ -54,7 +54,9 @@ public:
     };
 
     // Alphanumeric models data structure
-    Alphanum O8Model;
+    Alphanum models[6];
+
+    int modelCount = 0;
 
     // Sphere Scaling
     glm::mat4 sphereScale = glm::scale(id, glm::vec3(5.0f, 5.0f, 5.0f));
@@ -73,8 +75,12 @@ public:
 
 	// Render terrain
 	void Render(Shader &shader, glm::mat4 world, glm::vec2 worldPos);
-
-	void create08Model();
+    void createR1Model();
+    void createH6Model();
+    void createN5Model();
+    void create08Model();
+    void createK5Model();
+    void createTreeModel();
 
 private:
 	// Terrain unit size
@@ -96,6 +102,9 @@ private:
 
     // Height map generation function
 	void genHeightMap();
+    void RenderModel(Shader &shader, const glm::mat4 &world, int startX, int startZ, int x, int z, float height);
+    void RenderTree(Shader &shader, const glm::mat4 &world, int startX, int startZ, int x, int z, float height);
+    void RenderVegetationAndModels(Shader &shader, const glm::mat4 &world, int startX, int startZ, int x, int z, float height);
 };
 
 
