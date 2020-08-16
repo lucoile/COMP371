@@ -46,12 +46,11 @@ unsigned int SCR_WIDTH = 1024;
 unsigned int SCR_HEIGHT = 768;
 const float ULEN = 0.1f; // Unit Length
 
-// Cameras
-Camera camera0(glm::vec3(0.0f, ULEN, 20.0 * ULEN));
-Camera camera1(glm::vec3(0.0f, ULEN, 5.0 * ULEN));
-Camera camera2(glm::vec3(0.0f, ULEN, -5.0 * ULEN));
+// Identity matrix
+glm::mat4 id(1.0f);
 
-Camera cameras[3] = {camera0, camera1, camera2};
+// Cameras
+Camera camera(glm::vec3(0.0f, ULEN, 20.0 * ULEN));
 
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
@@ -76,8 +75,8 @@ unsigned int lightToggle = 1;
 // Camera toggle
 unsigned int cameraToggle = 0;
 
-// Identity matrix
-glm::mat4 id(1.0f);
+// Skybox toggle
+unsigned int skyboxToggle = 0;
 
 // Alphanumeric class
 struct CubeComponent {
@@ -173,6 +172,7 @@ int main() {
     Texture groundTexture("res/textures/ground.jpg");
     Texture shinyTexture("res/textures/yellow.png");
     Texture greyTexture("res/textures/grey.png");
+    Texture skybox("res/textures/skybox.jpg");
 
 	// bind textures
 	glActiveTexture(GL_TEXTURE0);
@@ -245,8 +245,28 @@ int main() {
         // Set projection matrix
         projection = glm::perspective(45.0f, (float) SCR_WIDTH / (float) SCR_HEIGHT, 0.1f,100.0f);
 
-        // Set camera/view matrix
-        view = cameras[cameraToggle].get_view_matrix();
+        // Project camera
+        if (cameraToggle == 0) {
+			glm::mat4 pos = glm::translate(id, camera.Position);
+			view = glm::inverse(pos) * worldOrientation * pos * camera.get_view_matrix();
+        }
+        // Front camera
+		if (cameraToggle == 1){
+			glm::mat4 pos = glm::translate(id, glm::vec3(0.0f, 5.0 * ULEN, 20.0 * ULEN));
+			view =  glm::inverse(pos * timexModel.translation * glm::inverse(pos) * timexModel.rotation * pos *
+					camera.get_view_matrix());
+		}
+		// Back camera
+		if (cameraToggle == 2){
+			glm::mat4 pos = glm::translate(id, glm::vec3(0.0f, 5.0 * ULEN, -20.0 * ULEN));
+			view =  glm::rotate(id, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f)) *
+					glm::inverse(pos * timexModel.translation * glm::inverse(pos) * timexModel.rotation * pos *
+					camera.get_view_matrix());
+		}
+		// Light camera
+		if (cameraToggle == 3){
+			view = camera.get_view_matrix();
+		}
 
 		glm::mat4 lightSpaceMatrix;
 
@@ -257,9 +277,9 @@ int main() {
 
 			// View matrix from light perspective
 			// Shadows only render correctly if the light is offset by some amount >0
-			lightPos = glm::vec3(0.0f, 10.0 * ULEN, 30.0 * ULEN);
+			lightPos = glm::vec3(0.0f, 5.0 * ULEN, 30.0 * ULEN);
 			glm::mat4 lightView = glm::lookAt(lightPos,
-					glm::vec3( 0.0f, 0.0f,  0.0f),
+					glm::vec3( 0.0f, 3.0 * ULEN,  0.0f),
 					glm::vec3( 0.0f, 1.0f,  0.0f));
 
 			lightSpaceMatrix = lightProjection * lightView;
@@ -303,8 +323,8 @@ int main() {
         sceneShader.use();
         sceneShader.setMat4("projection", projection);
 		sceneShader.setMat4("view", view);
-		sceneShader.setMat4("world", worldOrientation);
-		sceneShader.setVec3("viewPos", cameras[cameraToggle].Position);
+		sceneShader.setMat4("world", id);
+		sceneShader.setVec3("viewPos", camera.Position);
 		sceneShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
 
 		// Set shadow map
@@ -312,6 +332,25 @@ int main() {
 
 		// Render the scene using shadow map
 		renderScene(sceneShader, cube, sphere);
+
+		// Render skybox
+		resetTextures(sceneShader);
+		sceneShader.setVec3("light.position", glm::vec3(0.0f));
+
+		glActiveTexture(GL_TEXTURE5);
+		glEnable(GL_TEXTURE_2D);
+		skybox.bind();
+		sceneShader.setInt("material.diffuse", 5);
+
+		if(skyboxToggle) {
+			sceneShader.setMat4("model", glm::scale(id, glm::vec3(75.0, 75.0, 75.0)));
+			sphere.Draw(sceneShader, type);
+		} else {
+			glm::mat4 model = glm::translate(id, glm::vec3(0.0f, -32.5 * ULEN, 0.0f)) *
+					glm::scale(id, glm::vec3(75.0, 75.0, 75.0));
+			sceneShader.setMat4("model", model);
+			cube.Draw(sceneShader, type);
+		}
 
 		// Reset framebuffer
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -359,7 +398,7 @@ void renderGrid(Shader &shader, Model cube)
 	for (int i = -50; i < 50; i++) {
 		for (int j = -50; j < 50; j++) {
 			glm::vec3 pos((float) i * ULEN, -1.0 * ULEN, (float) j * ULEN);
-			glm::mat4 model = worldOrientation * glm::translate(id, pos);
+			glm::mat4 model = glm::translate(id, pos);
 			shader.setMat4("model", model);
 
 			cube.Draw(shader, type);
@@ -396,7 +435,7 @@ void renderAlphanum(Shader &shader, Model cube, Model sphere)
 		for (unsigned int i = 0; i < timexModel.components[j].cubeTrans.size(); i++) {
 
 			glm::mat4 model =
-					worldOrientation * timexModel.translation * timexModel.rotation * timexModel.scale *
+					timexModel.translation * timexModel.rotation * timexModel.scale *
 					timexModel.components[j].adjust * timexModel.components[j].translation * timexModel.components[j].rotation *
 					timexModel.components[j].scale * timexModel.components[j].cubeTrans[i];
 			shader.setMat4("model", model);
@@ -412,15 +451,15 @@ void renderAlphanum(Shader &shader, Model cube, Model sphere)
 	shader.setFloat("material.shininess", 64.0f);
 
 	glm::mat4 skateTrans[2] = {
-			glm::translate(id, glm::vec3(-3.0*ULEN, 0.0f, 0.0f)),
-			glm::translate(id, glm::vec3(3.0*ULEN, 0.0f, 0.0f))
+			glm::translate(id, glm::vec3(-3.5*ULEN, 0.0f, 0.0f)),
+			glm::translate(id, glm::vec3(3.5*ULEN, 0.0f, 0.0f))
 	};
 
 	// Render skates
 	for (unsigned int j = 0; j < 2; j++) {
 		for (unsigned int i = 0; i < skate.size(); i++) {
 			glm::mat4 model =
-					worldOrientation * timexModel.translation * timexModel.rotation * timexModel.scale *
+					timexModel.translation * timexModel.rotation * timexModel.scale *
 					skateTrans[j] * skate[i];
 			shader.setMat4("model", model);
 
@@ -439,7 +478,7 @@ void renderAxes(Shader &shader, Model cube) {
 		for (unsigned int i = 0; i < axesModel.components[j].cubeTrans.size(); i++) {
 
 			glm::mat4 model =
-					worldOrientation * axesModel.translation * axesModel.rotation * axesModel.scale *
+					axesModel.translation * axesModel.rotation * axesModel.scale *
 					axesModel.components[j].adjust * axesModel.components[j].translation * axesModel.components[j].rotation *
 					axesModel.components[j].scale * axesModel.components[j].cubeTrans[i];
 			shader.setMat4("model", model);
@@ -487,11 +526,11 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
 		lastY = float(ypos);
 
 		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
-			cameras[cameraToggle].process_mouse_movement(xoffset, 0, PAN);
+			camera.process_mouse_movement(xoffset, 0, PAN);
 		} else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-			cameras[cameraToggle].process_mouse_movement(0, yoffset, ZOOM);
+			camera.process_mouse_movement(0, yoffset, ZOOM);
 		} else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS) {
-			cameras[cameraToggle].process_mouse_movement(0, yoffset, TILT);
+			camera.process_mouse_movement(0, yoffset, TILT);
 		}
 	}
 }
@@ -508,8 +547,29 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
 		if (lightToggle) { lightToggle = 0; } else { lightToggle = 1; }
 	}
 
+	// Q to toggle skybox
+	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
+		if (skyboxToggle) { skyboxToggle = 0; } else { skyboxToggle = 1; }
+	}
+
 	// Camera views
-	// M
+	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
+		cameraToggle = 0;
+		camera = Camera(glm::vec3(0.0f, ULEN, 20.0 * ULEN));
+		worldOrientation = glm::mat4(1.0f);
+	}
+	if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS) {
+		cameraToggle = 1;
+		camera = Camera(glm::vec3(0.0f));
+	}
+	if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS) {
+		cameraToggle = 2;
+		camera = Camera(glm::vec3(0.0f, ULEN, 20.0 * ULEN));
+	}
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+		cameraToggle = 3;
+		camera = Camera(lightPos - glm::vec3(0.0f, 0.0f, 1.0 *ULEN));
+	}
 
     // Press U to scale up model
     if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS) {
@@ -568,28 +628,18 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
 
     // Press Left Arrow Key to Rx
     if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-        worldOrientation = glm::rotate(worldOrientation, glm::radians(1.0f), glm::vec3(ULEN, 0.0f, 0.0f));
+        worldOrientation = glm::rotate(worldOrientation, glm::radians(5.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     }
 
     // Press Right Arrow Key to R-x
     if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-        worldOrientation = glm::rotate(worldOrientation, glm::radians(-1.0f), glm::vec3(ULEN, 0.0f, 0.0f));
-    }
-
-    // Press Up Arrow Key to Ry
-    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-        worldOrientation = glm::rotate(worldOrientation, glm::radians(1.0f), glm::vec3(0.0f, ULEN, 0.0f));
-    }
-
-    // Press Up Arrow Key to R-y
-    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-        worldOrientation = glm::rotate(worldOrientation, glm::radians(-1.0f), glm::vec3(0.0f, ULEN, 0.0f));
+        worldOrientation = glm::rotate(worldOrientation, glm::radians(-5.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     }
 
     // Reset world orientation and camera by pressing Home button
     if (glfwGetKey(window, GLFW_KEY_HOME) == GLFW_PRESS) {
         worldOrientation = glm::mat4(1.0f);
-        cameras[cameraToggle] = Camera(glm::vec3(0.0f, 0.1f, 2.0f));
+        camera = Camera(glm::vec3(0.0f, 0.1f, 2.0f));
 		createTimexModel();
     }
 }
@@ -664,7 +714,6 @@ void createTimexModel() {
 			glm::scale(id, glm::vec3(3.0f, 1.0f, 4.0f)));
 	skate.push_back(
 			glm::scale(id, glm::vec3(1.0f, 1.0f, 4.0f)));
-
 }
 
 void createAxes() {
@@ -711,3 +760,4 @@ void createAxes() {
 	axesModel.components.push_back(Y);
 	axesModel.components.push_back(Z);
 }
+

@@ -30,7 +30,7 @@ uniform Light light;
 float ShadowCalculation(vec4 fragPosLightSpace, vec3 lightDir)
 {
     // set the bias based on the angle of the light hitting the surface
-    float bias = max(0.05 * (1.0 - dot(fs_in.Normal, lightDir)), 0.005);
+    float bias = max(0.01 * (1.0 - dot(fs_in.Normal, lightDir)), 0.005);
 
     // perform perspective divide to get coordinates in [-1,1]
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
