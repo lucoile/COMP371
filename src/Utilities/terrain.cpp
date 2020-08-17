@@ -15,8 +15,8 @@ Terrain::Terrain(unsigned int size, Model cube, Model sphere, int octaveCount, f
     this->persistence = persistence;
     this->renderSize = renderSize;
 
-//    heightMap = (float*) malloc(size * size * sizeof(float));
     heightMap = new float[size * size];
+    vegetationMap = new int[size * size];
 
     createR1Model();
     createH6Model();
@@ -46,8 +46,7 @@ void Terrain::Render(Shader &shader, glm::mat4 world, glm::vec2 worldPos) {
                                (float) (z - (renderSize / 2.0) - startZ) * ULEN);
 
             // Scale each voxel to the height in height map rounded to the nearest unit
-            glm::mat4 model = world *
-                              glm::scale(id, glm::vec3(1.0f, 1.0 + round(10.0 * height), 1.0f)) *
+            glm::mat4 model = world * glm::scale(id, glm::vec3(1.0f, 1.0 + round(10.0 * height), 1.0f)) *
                               glm::translate(id, voxelPos);
 
             // Render cube with position and height
@@ -85,11 +84,11 @@ void Terrain::genHeightMap() {
 	heightMapBuilder.SetBounds(0.0, 5.0, 0.0, 5.0);
 	heightMapBuilder.Build();
 
-	for(unsigned int i = 0; i < size; i++)
+	for(int i = 0; i < size; i++)
 	{
-		for(unsigned int j = 0; j < size; j++)
+		for(int j = 0; j < size; j++)
 		{
-			heightMap[i * size + j] = (((heightMap1.GetValue(i, j) / 2.0) + 0.5) *
+			heightMap[i * size + j] = (float) (((heightMap1.GetValue(i, j) / 2.0) + 0.5) *
 				(((heightMap2.GetValue(i, j) / 2.0) + 0.5) * 2.0f));
 		}
 	}
@@ -100,13 +99,14 @@ void Terrain::genHeightMap() {
 
 void Terrain::RenderVegetationAndModels(Shader &shader, const glm::mat4 &world, int startX, int startZ, int x, int z,
                                         float height) {
+
     module::Perlin perlinModule;
 
     // Responsible for the generation of a model
     double val = perlinModule.GetValue(x, height, z);
 
     // Responsible for the generation of which model
-    double val2 = perlinModule.GetValue(z, height ,x);
+    double val2 = perlinModule.GetValue(z, height, x);
 
     modelCount = 5;
 
@@ -186,22 +186,22 @@ void Terrain::RenderTree(Shader &shader, const glm::mat4 &world, int startX, int
                         (float) (z - (renderSize / 2.0) - startZ) * ULEN);
 
     // Draw the Trunk
-    for (unsigned int i = 0; i < models[modelCount].letterTrans.size(); i++) {
+    for (auto & letterTran : models[modelCount].letterTrans) {
         glm::mat4 model =
                 world * glm::translate(id, voxelPos2) * models[modelCount].letterTranslation *
                 models[modelCount].rotation *
                 models[modelCount].scale * models[modelCount].letterAdjust * models[modelCount].letterRotation *
-                models[modelCount].letterTrans[i];
+                letterTran;
         shader.setMat4("model", model);
 
         cube.Draw(shader, GL_TRIANGLES);
     }
 
     // Draw the Leaves
-    for (unsigned int i = 0; i < models[modelCount].numTrans.size(); i++) {
+    for (auto & numTran : models[modelCount].numTrans) {
         glm::mat4 model =
                 world * glm::translate(id, voxelPos2) * models[modelCount].numberTranslation * models[modelCount].rotation *
-                models[modelCount].scale * models[modelCount].numAdjust * models[modelCount].numberRotation * models[modelCount].numTrans[i];
+                models[modelCount].scale * models[modelCount].numAdjust * models[modelCount].numberRotation * numTran;
         shader.setMat4("model", model);
 
         cube.Draw(shader, GL_TRIANGLES);
@@ -210,19 +210,19 @@ void Terrain::RenderTree(Shader &shader, const glm::mat4 &world, int startX, int
 
 void Terrain::createTreeModel(){
     models[5].letterTrans.push_back(
-            glm::scale(id, glm::vec3(1.0f, 5.0f, 1.0f))
-    );
-    models[5].numTrans.push_back(
-            glm::translate(id, glm::vec3(0.0, 5.0f * ULEN, 0.0f)) *
-            glm::scale(id, glm::vec3(5.0f, 2.0f, 5.0f))
+            glm::scale(id, glm::vec3(1.0f, 7.0f, 1.0f))
     );
     models[5].numTrans.push_back(
             glm::translate(id, glm::vec3(0.0, 7.0f * ULEN, 0.0f)) *
+            glm::scale(id, glm::vec3(5.0f, 2.0f, 5.0f))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(0.0, 9.0f * ULEN, 0.0f)) *
             glm::scale(id, glm::vec3(3.0f, 1.0f, 3.0f))
     );
 
     models[5].numTrans.push_back(
-            glm::translate(id, glm::vec3(0.0, 8.0f * ULEN, 0.0f))
+            glm::translate(id, glm::vec3(0.0, 10.0f * ULEN, 0.0f))
     );
 
     models[5].scale = id;
@@ -505,7 +505,10 @@ float Terrain::GetValue(int x, int y)
 	return heightMap[int((x + round(size / 2) + (renderSize / 2.0)) * size + (y + round(size / 2) + (renderSize / 2.0)))];
 }
 
-
+int Terrain::GetVegetationValue(int x, int y)
+{
+	return vegetationMap[int((x + round(size / 2) + (renderSize / 2.0)) * size + (y + round(size / 2) + (renderSize / 2.0)))];
+}
 
 
 

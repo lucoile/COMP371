@@ -79,6 +79,7 @@ glm::mat4 id(1.0f);
 
 // World Orientation
 glm::mat4 worldOrientation(1.0f);
+glm::mat4 worldRotation(1.0f);
 
 // Sphere Scaling
 glm::mat4 sphereScale = glm::scale(id, glm::vec3(5.0f, 5.0f, 5.0f));
@@ -90,6 +91,8 @@ glm::mat4 projection(1.0f);
 glm::mat4 view(1.0f);
 
 glm::vec3 lightPos;
+
+Camera_Movement lastMove;
 
 int main() {
     // GLFW: Initialize and configure
@@ -115,7 +118,7 @@ int main() {
     glfwSetKeyCallback(window, key_callback);
 
     // Tell GLFW to capture our mouse
-    glfwSetInputMode(window, GLFW_CURSOR, false);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     // Load all OpenGL function pointers
     if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
@@ -234,10 +237,18 @@ int main() {
         // Set projection matrix
         projection = glm::perspective(45.0f, (float) SCR_WIDTH / (float) SCR_HEIGHT, 0.1f,100.0f);
 
+        // Make sure camera isn't colliding with anything
+		int cameraX = int(round(camera.Position.x));
+		int cameraZ = int(round(camera.Position.z));
+
+        // Update worldPos
+        worldPos.x = cameraX;
+		worldPos.y = cameraZ;
+
         // Set camera/view matrix
 		float terrainHeight = terrain.GetValue(worldPos.x, worldPos.y);
-		camera.Position = glm::vec3(0.0f, terrainHeight + (5.0f * ULEN), 0.0f);
-        view = camera.get_view_matrix();
+		glm::vec3 Position = glm::vec3(0.0f, (round(terrainHeight * 10.0f) / 10.0f) + (5.0f * ULEN), 0.0f);
+		view = glm::lookAt(Position, Position + camera.Front, camera.Up);
 
 		// Set orthographic frustum for shadows
 		float near_plane = 1.0f, far_plane = 5.0f;
@@ -291,12 +302,6 @@ int main() {
 
 		// Render the scene using shadow map
 		renderScene(sceneShader, cube, terrain);
-
-		// Render lines
-		lineShader.use();
-		lineShader.setMat4("projection", projection);
-		lineShader.setMat4("view", view);
-		line.draw(lineShader);
 
 		// Reset framebuffer
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -422,7 +427,8 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 
 // GLFW: Whenever the mouse moves, this callback is called
 void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
-    if (firstMouse) {
+    if (firstMouse)
+    {
         lastX = float(xpos);
         lastY = float(ypos);
         firstMouse = false;
@@ -434,13 +440,7 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
     lastX = float(xpos);
     lastY = float(ypos);
 
-    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
-        camera.process_mouse_movement(xoffset, 0, PAN);
-    } else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-        camera.process_mouse_movement(0, yoffset, ZOOM);
-    } else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS) {
-        camera.process_mouse_movement(0, yoffset, TILT);
-    }
+	camera.process_mouse_movement(xoffset, yoffset);
 }
 
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
@@ -462,33 +462,14 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
         type = GL_TRIANGLES;
     }
 
-    // Press Shift + W to translate selected model in the -Z direction
-    if ((glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)) {
-        worldPos.y -= 1.0;
-    }
-
-    // Press Shift + A to translate selected model in the -X direction
-    // Press A to rotate selected model by -5.0 degrees
-    if ((glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)) {
-        worldPos.x -= 1.0;
-    }
-
-    // Press Shift + S to translate selected model in the Z direction
-    if ((glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)) {
-        worldPos.y += 1.0;
-    }
-
-    // Press Shift + D to translate selected model in the X direction
-    // Press D to rotate selected model by 5.0 degrees
-    if ((glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)) {
-        worldPos.x += 1.0;
-    }
-
-//    // Reset world orientation and camera by pressing Home button
-//    if (glfwGetKey(window, GLFW_KEY_HOME) == GLFW_PRESS) {
-//        worldOrientation = glm::mat4(1.0f);
-//        camera = Camera(glm::vec3(0.0f, 0.1f, 2.0f));
-//    }
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		camera.process_keyboard_input(FORWARD, deltaTime); lastMove = FORWARD;
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		camera.process_keyboard_input(BACKWARD, deltaTime); lastMove = BACKWARD;
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		camera.process_keyboard_input(LEFT, deltaTime); lastMove = LEFT;
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		camera.process_keyboard_input(RIGHT, deltaTime); lastMove = RIGHT;
 
     // Press X to toggle textures
     if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) {

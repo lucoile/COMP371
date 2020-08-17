@@ -55,6 +55,8 @@ public:
   	noise::utils::NoiseMap heightMap2;
   	float *heightMap;
 
+	int *vegetationMap;
+
     // Alphanumeric models data structure
     Alphanum models[6];
 
@@ -79,8 +81,9 @@ public:
 	void Render(Shader &shader, glm::mat4 world, glm::vec2 worldPos);
 
 	float GetValue(int x, int y);
+	int GetVegetationValue(int x, int y);
 
-private:
+ private:
 	// Terrain unit size
 	float ULEN = 0.1f;
 	// Identity matrix
