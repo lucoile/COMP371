@@ -15,6 +15,9 @@ Terrain::Terrain(unsigned int size, Model cube, Model sphere, int octaveCount, f
     this->persistence = persistence;
     this->renderSize = renderSize;
 
+//    heightMap = (float*) malloc(size * size * sizeof(float));
+    heightMap = new float[size * size];
+
     createR1Model();
     createH6Model();
     createN5Model();
@@ -35,8 +38,7 @@ void Terrain::Render(Shader &shader, glm::mat4 world, glm::vec2 worldPos) {
         for (int z = startZ; z < endZ; z++) {
             // Get height value by combining the two height maps
             // using a scale factor of 2.0f for the second
-            float height = ((heightMap.GetValue(x, z) / 2.0) + 0.5) *
-                           (((heightMap2.GetValue(x, z) / 2.0) + 0.5) * 2.0f);
+            float height = heightMap[x * size + z];
 
             // Calculate position of voxel on x-z plane
             glm::vec3 voxelPos((float) (x - (renderSize / 2.0) - startX) * ULEN,
@@ -45,7 +47,7 @@ void Terrain::Render(Shader &shader, glm::mat4 world, glm::vec2 worldPos) {
 
             // Scale each voxel to the height in height map rounded to the nearest unit
             glm::mat4 model = world *
-                              glm::scale(id, glm::vec3(1.0f, 1.0 + round((10.0 * height)), 1.0f)) *
+                              glm::scale(id, glm::vec3(1.0f, 1.0 + round(10.0 * height), 1.0f)) *
                               glm::translate(id, voxelPos);
 
             // Render cube with position and height
@@ -55,6 +57,45 @@ void Terrain::Render(Shader &shader, glm::mat4 world, glm::vec2 worldPos) {
             RenderVegetationAndModels(shader, world, startX, startZ, x, z, height);
         }
     }
+}
+
+void Terrain::genHeightMap() {
+	// libnoise Perlin height map generator
+	// Set noise parameters
+	PerlinGen.SetOctaveCount(octaveCount);
+	PerlinGen.SetFrequency(frequency);
+	PerlinGen.SetPersistence(persistence);
+
+	// Generate first terrain height map using Perlin noise
+	utils::NoiseMapBuilderPlane heightMapBuilder;
+	heightMapBuilder.SetSourceModule(PerlinGen);
+	heightMapBuilder.SetDestNoiseMap(heightMap1);
+	heightMapBuilder.SetDestSize(size, size);
+	heightMapBuilder.SetBounds(0.0, 5.0, 0.0, 5.0);
+	heightMapBuilder.Build();
+
+	PerlinGen.SetOctaveCount(octaveCount);
+	PerlinGen.SetFrequency(frequency / 2.0f);
+	PerlinGen.SetPersistence(persistence * 1.5f);
+
+	// Generate second terrain height map using Perlin noise
+	heightMapBuilder.SetSourceModule(PerlinGen);
+	heightMapBuilder.SetDestNoiseMap(heightMap2);
+	heightMapBuilder.SetDestSize(size, size);
+	heightMapBuilder.SetBounds(0.0, 5.0, 0.0, 5.0);
+	heightMapBuilder.Build();
+
+	for(unsigned int i = 0; i < size; i++)
+	{
+		for(unsigned int j = 0; j < size; j++)
+		{
+			heightMap[i * size + j] = (((heightMap1.GetValue(i, j) / 2.0) + 0.5) *
+				(((heightMap2.GetValue(i, j) / 2.0) + 0.5) * 2.0f));
+		}
+	}
+
+	heightMap1.ReclaimMem();
+	heightMap2.ReclaimMem();
 }
 
 void Terrain::RenderVegetationAndModels(Shader &shader, const glm::mat4 &world, int startX, int startZ, int x, int z,
@@ -165,33 +206,6 @@ void Terrain::RenderTree(Shader &shader, const glm::mat4 &world, int startX, int
 
         cube.Draw(shader, GL_TRIANGLES);
     }
-}
-
-void Terrain::genHeightMap() {
-    // libnoise Perlin height map generator
-    // Set noise parameters
-    PerlinGen.SetOctaveCount(octaveCount);
-    PerlinGen.SetFrequency(frequency);
-    PerlinGen.SetPersistence(persistence);
-
-    // Generate first terrain height map using Perlin noise
-    utils::NoiseMapBuilderPlane heightMapBuilder;
-    heightMapBuilder.SetSourceModule(PerlinGen);
-    heightMapBuilder.SetDestNoiseMap(heightMap);
-    heightMapBuilder.SetDestSize(size, size);
-    heightMapBuilder.SetBounds(0.0, 5.0, 0.0, 5.0);
-    heightMapBuilder.Build();
-
-    PerlinGen.SetOctaveCount(octaveCount);
-    PerlinGen.SetFrequency(frequency / 2.0f);
-    PerlinGen.SetPersistence(persistence * 1.5f);
-
-    // Generate second terrain height map using Perlin noise
-    heightMapBuilder.SetSourceModule(PerlinGen);
-    heightMapBuilder.SetDestNoiseMap(heightMap2);
-    heightMapBuilder.SetDestSize(size, size);
-    heightMapBuilder.SetBounds(0.0, 5.0, 0.0, 5.0);
-    heightMapBuilder.Build();
 }
 
 void Terrain::createTreeModel(){
@@ -484,6 +498,11 @@ void Terrain::createR1Model() {
     models[0].numberRotation = glm::rotate(id, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     models[0].animationTimeValue = 0;
     models[0].letterRotation = glm::rotate(id, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+}
+
+float Terrain::GetValue(int x, int y)
+{
+	return heightMap[int((x + round(size / 2) + (renderSize / 2.0)) * size + (y + round(size / 2) + (renderSize / 2.0)))];
 }
 
 

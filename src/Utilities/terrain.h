@@ -8,6 +8,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <stdlib.h>
 #include <algorithm>
 
 #include "shader_m.h"
@@ -15,6 +16,32 @@
 
 #include "../../lib/libnoise/include/noise/noise.h"
 #include "../../lib/libnoise/include/noise/noiseutils.h"
+
+// Alphanumeric class
+struct Alphanum {
+	std::vector<glm::mat4> letterTrans; // Vector of Cube Meshes Transformations
+	std::vector<glm::mat4> numTrans;    // Vector of Number Meshes Transformations
+
+	glm::mat4 letterAdjust; // Letter Adjustment Matrix
+	glm::mat4 numAdjust;    // Number Adjustment Matrix
+
+	glm::mat4 rotation;    // Model Rotation Matrix
+	glm::mat4 scale;       // Model Scale Matrix
+	glm::mat4 translation; // Model Translation Matrix
+
+	glm::mat4 sphereScale;       // Sphere Scale Matrix
+	glm::mat4 sphereTranslation; // Sphere Translation Matrix
+
+	glm::mat4 numberRotation;    // Number Rotation Matrix
+	glm::mat4 numberTranslation; // Number Translation Matrix
+
+	glm::mat4 letterRotation;    // Letter Rotation Matrix
+	glm::mat4 letterTranslation; // Letter Translation Matrix
+
+	float rotationAngle; // Model Rotation Angle
+
+	int animationTimeValue; // Model Movement Animation Current Time Value
+};
 
 class Terrain
 {
@@ -24,34 +51,9 @@ public:
 	unsigned int renderSize = 100;
 
 	// Terrain height map
-	noise::utils::NoiseMap heightMap;
+	noise::utils::NoiseMap heightMap1;
   	noise::utils::NoiseMap heightMap2;
-
-    // Alphanumeric class
-    struct Alphanum {
-        std::vector<glm::mat4> letterTrans; // Vector of Cube Meshes Transformations
-        std::vector<glm::mat4> numTrans;    // Vector of Number Meshes Transformations
-
-        glm::mat4 letterAdjust; // Letter Adjustment Matrix
-        glm::mat4 numAdjust;    // Number Adjustment Matrix
-
-        glm::mat4 rotation;    // Model Rotation Matrix
-        glm::mat4 scale;       // Model Scale Matrix
-        glm::mat4 translation; // Model Translation Matrix
-
-        glm::mat4 sphereScale;       // Sphere Scale Matrix
-        glm::mat4 sphereTranslation; // Sphere Translation Matrix
-
-        glm::mat4 numberRotation;    // Number Rotation Matrix
-        glm::mat4 numberTranslation; // Number Translation Matrix
-
-        glm::mat4 letterRotation;    // Letter Rotation Matrix
-        glm::mat4 letterTranslation; // Letter Translation Matrix
-
-        float rotationAngle; // Model Rotation Angle
-
-        int animationTimeValue; // Model Movement Animation Current Time Value
-    };
+  	float *heightMap;
 
     // Alphanumeric models data structure
     Alphanum models[6];
@@ -75,12 +77,8 @@ public:
 
 	// Render terrain
 	void Render(Shader &shader, glm::mat4 world, glm::vec2 worldPos);
-    void createR1Model();
-    void createH6Model();
-    void createN5Model();
-    void create08Model();
-    void createK5Model();
-    void createTreeModel();
+
+	float GetValue(int x, int y);
 
 private:
 	// Terrain unit size
@@ -105,6 +103,14 @@ private:
     void RenderModel(Shader &shader, const glm::mat4 &world, int startX, int startZ, int x, int z, float height);
     void RenderTree(Shader &shader, const glm::mat4 &world, int startX, int startZ, int x, int z, float height);
     void RenderVegetationAndModels(Shader &shader, const glm::mat4 &world, int startX, int startZ, int x, int z, float height);
+
+    void createR1Model();
+	void createH6Model();
+	void createN5Model();
+	void create08Model();
+	void createK5Model();
+
+	void createTreeModel();
 };
 
 
