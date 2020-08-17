@@ -131,25 +131,8 @@ int main() {
 	glDepthFunc(GL_LESS);
 
     // Build and Compile our Shader Programs
-    Shader lineShader("../res/shaders/line.vert", "../res/shaders/line.frag");
     Shader sceneShader("../res/shaders/scene.vert", "../res/shaders/scene.frag");
     Shader shadowShader("../res/shaders/shadow.vert", "../res/shaders/shadow.frag");
-
-	// Lines
-	std::vector<float> vertLines = {
-            0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-            0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-            0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-            ULEN * 5, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-            0.0f, ULEN * 5, 0.0f, 0.0f, 1.0f, 0.0f,
-            0.0f, 0.0f, ULEN * 5, 0.0f, 0.0f, 1.0f
-    };
-    std::vector<unsigned int> indexLines = {
-            0, 3,   // Red x-axis line
-            1, 4,   // Green y-axis line
-            2, 5    // Blue z-axis line
-    };
-    Line line(vertLines, indexLines);
 
     // Cube model
     Model cube("../res/models/cube/cube.obj");
@@ -247,7 +230,7 @@ int main() {
 
         // Set camera/view matrix
 		float terrainHeight = terrain.GetValue(worldPos.x, worldPos.y);
-		glm::vec3 Position = glm::vec3(0.0f, (round(terrainHeight * 10.0f) / 10.0f) + (5.0f * ULEN), 0.0f);
+		glm::vec3 Position = glm::vec3(0.0f,(round(terrainHeight * 10.0f) / 10.0f) + (5.0f * ULEN),0.0f);
 		view = glm::lookAt(Position, Position + camera.Front, camera.Up);
 
 		// Set orthographic frustum for shadows
@@ -310,9 +293,6 @@ int main() {
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
-
-    // De-allocate all resources once they've outlived their purpose:
-    line.deleteBuffers();
 
     // Terminate, clearing all previously allocated GLFW resources.
     glfwTerminate();
