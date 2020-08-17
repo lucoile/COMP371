@@ -33,12 +33,6 @@ void process_input(GLFWwindow *window);
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
 void moveModelForwardAnimation(float translationX, float translationZ);
 
-void createR1Model();
-void createH6Model();
-void createN5Model();
-void create08Model();
-void createK5Model();
-
 void resetTextures(const Shader &shader);
 
 void renderScene(Shader &shader, Model cube, Terrain terrain);
@@ -187,17 +181,6 @@ int main() {
     // Initialize terrain
 	Terrain terrain(TERRAIN_SIZE, cube, sphere, OCTAVE_COUNT, FREQUENCY, PERSISTENCE);
 
-    // Initialize alphanumeric models
-    // R1
-    createR1Model();
-    // H6
-    createH6Model();
-    // N5
-    createN5Model();
-    // 08
-    create08Model();
-    // K5
-    createK5Model();
 
     // Textures
     Texture boxTexture("res/textures/box.jpg");
@@ -665,11 +648,6 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
     if (glfwGetKey(window, GLFW_KEY_HOME) == GLFW_PRESS) {
         worldOrientation = glm::mat4(1.0f);
         camera = Camera(glm::vec3(0.0f, 0.1f, 2.0f));
-        createR1Model();
-        createH6Model();
-        createN5Model();
-        create08Model();
-        createK5Model();
     }
 
     // Press X to toggle textures
@@ -853,203 +831,4 @@ void createK5Model() {
     models[4].animationTimeValue = 0;
     models[4].letterRotation = glm::rotate(id, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 }
-
-void create08Model() {
-    models[3].letterTrans.push_back(
-            glm::translate(id, glm::vec3(-1 * ULEN, 0.0f, 0.0f)) *
-            glm::scale(id, glm::vec3(1.0f, 5.0f, 1.0f))
-    );
-    models[3].letterTrans.push_back(
-            glm::translate(id, glm::vec3(1 * ULEN, 0.0f, 0.0f)) *
-            glm::scale(id, glm::vec3(1.0f, 5.0f, 1.0f))
-    );
-    models[3].letterTrans.push_back(
-            id
-    );
-    models[3].letterTrans.push_back(
-            glm::translate(id, glm::vec3(0.0f, 4.0 * ULEN, 0.0f))
-    );
-
-    models[3].numTrans.push_back(
-            glm::translate(id, glm::vec3(-1 * ULEN, 0.0f, 0.0f)) *
-            glm::scale(id, glm::vec3(1.0f, 5.0f, 1.0f))
-    );
-    models[3].numTrans.push_back(
-            glm::translate(id, glm::vec3(1 * ULEN, 0.0f, 0.0f)) *
-            glm::scale(id, glm::vec3(1.0f, 5.0f, 1.0f))
-    );
-    models[3].numTrans.push_back(
-            id
-    );
-    models[3].numTrans.push_back(
-            glm::translate(id, glm::vec3(0.0f, 4.0 * ULEN, 0.0f))
-    );
-    models[3].numTrans.push_back(
-            glm::translate(id, glm::vec3(0.0f, 2.0 * ULEN, 0.0f))
-    );
-
-    models[3].letterAdjust = glm::translate(id, glm::vec3(-2.0 * ULEN, 0.0f, 0.0f));
-    models[3].numAdjust = glm::translate(id, glm::vec3(2.0 * ULEN, 0.0f, 0.0f));
-
-    models[3].scale = id;
-    models[3].translation = glm::translate(id, glm::vec3(-20 * ULEN, 0.0f, -20 * ULEN));
-    models[3].rotation = id;
-    models[3].letterTranslation = id;
-    models[3].numberTranslation = id;
-    models[3].rotationAngle = 0.0f;
-    models[3].sphereScale = sphereScale;
-    models[3].sphereTranslation = sphereTranslation;
-    models[3].numberRotation = glm::rotate(id, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    models[3].animationTimeValue = 0;
-    models[3].letterRotation = glm::rotate(id, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-}
-
-void createN5Model() {
-    models[2].letterTrans.push_back(
-            glm::translate(id, glm::vec3(-1.5 * ULEN, 0.0f, 0.0f)) *
-            glm::scale(id, glm::vec3(1.0f, 5.0f, 1.0f))
-    );
-    models[2].letterTrans.push_back(
-            glm::translate(id, glm::vec3(1.5 * ULEN, 0.0f, 0.0f)) *
-            glm::scale(id, glm::vec3(1.0f, 5.0f, 1.0f))
-    );
-    glm::mat4 shearN = {
-            1.0f, 0.0f, 0.0f, 0.0f,
-            -3.0, 1.0f, 0.0f, 0.0f,
-            0.0f, 0.0f, 1.0f, 0.0f,
-            0.0f, 0.0f, 0.0f, 1.0f
-    };
-    models[2].letterTrans.push_back(
-            glm::translate(id, glm::vec3(1.5 * ULEN, 0.0f, 0.0f)) *
-            glm::scale(id, glm::vec3(1.0f, 5.0f, 1.0f)) * shearN
-    );
-
-    models[2].numTrans.push_back(
-            glm::translate(id, glm::vec3(-1.0 * ULEN, 0.0f, 0.0f))
-    );
-    models[2].numTrans.push_back(
-            glm::translate(id, glm::vec3(-1.0 * ULEN, 2.0 * ULEN, 0.0f)) *
-            glm::scale(id, glm::vec3(1.0f, 3.0f, 1.0f))
-    );
-    models[2].numTrans.push_back(
-            glm::translate(id, glm::vec3(0.0f, 2.0 * ULEN, 0.0f))
-    );
-    models[2].numTrans.push_back(
-            glm::translate(id, glm::vec3(0.5 * ULEN, 4.0 * ULEN, 0.0f)) *
-            glm::scale(id, glm::vec3(2.0f, 1.0f, 1.0f))
-    );
-    models[2].numTrans.push_back(
-            id
-    );
-    models[2].numTrans.push_back(
-            glm::translate(id, glm::vec3(1.0 * ULEN, 0.0f, 0.0f)) *
-            glm::scale(id, glm::vec3(1.0f, 3.0f, 1.0f))
-    );
-
-    models[2].letterAdjust = glm::translate(id, glm::vec3(-2.5 * ULEN, 0.0f, 0.0f));
-    models[2].numAdjust = glm::translate(id, glm::vec3(2.0 * ULEN, 0.0f, 0.0f));
-
-    models[2].scale = id;
-    models[2].translation = glm::translate(id, glm::vec3(-20 * ULEN, 0.0f, 20 * ULEN));
-    models[2].rotation = id;
-    models[2].letterTranslation = id;
-    models[2].numberTranslation = id;
-    models[2].rotationAngle = 0.0f;
-    models[2].sphereScale = sphereScale;
-    models[2].sphereTranslation = sphereTranslation;
-    models[2].numberRotation = glm::rotate(id, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    models[2].animationTimeValue = 0;
-    models[2].letterRotation = glm::rotate(id, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-}
-
-void createH6Model() {
-    models[1].letterTrans.push_back(
-            glm::translate(id, glm::vec3(-1.0 * ULEN, 0.0f, 0.0f)) *
-            glm::scale(id, glm::vec3(1.0f, 5.0f, 1.0f))
-    );
-    models[1].letterTrans.push_back(
-            glm::translate(id, glm::vec3(0.0f, 2 * ULEN, 0.0f))
-    );
-    models[1].letterTrans.push_back(
-            glm::translate(id, glm::vec3(1.0 * ULEN, 0.0f, 0.0f)) *
-            glm::scale(id, glm::vec3(1.0f, 5.0f, 1.0f))
-    );
-
-    models[1].numTrans.push_back(
-            glm::translate(id, glm::vec3(-1.0 * ULEN, 0.0f, 0.0f)) *
-            glm::scale(id, glm::vec3(1.0f, 5.0f, 1.0f))
-    );
-    models[1].numTrans.push_back(
-            glm::translate(id, glm::vec3(0.0f, 2.0 * ULEN, 0.0f))
-    );
-    models[1].numTrans.push_back(
-            glm::translate(id, glm::vec3(0.0f, 4.0 * ULEN, 0.0f))
-    );
-    models[1].numTrans.push_back(
-            id
-    );
-    models[1].numTrans.push_back(
-            glm::translate(id, glm::vec3(1.0 * ULEN, 0.0f, 0.0f)) *
-            glm::scale(id, glm::vec3(1.0f, 3.0f, 1.0f))
-    );
-
-    models[1].letterAdjust = glm::translate(id, glm::vec3(-2.0 * ULEN, 0.0f, 0.0f));
-    models[1].numAdjust = glm::translate(id, glm::vec3(2.0 * ULEN, 0.0f, 0.0f));
-
-    models[1].scale = id;
-    models[1].translation = glm::translate(id, glm::vec3(20 * ULEN, 0.0f, 20 * ULEN));
-    models[1].rotation = id;
-    models[1].letterTranslation = id;
-    models[1].numberTranslation = id;
-    models[1].rotationAngle = 0.0f;
-    models[1].sphereScale = sphereScale;
-    models[1].sphereTranslation = sphereTranslation;
-    models[1].numberRotation = glm::rotate(id, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    models[1].animationTimeValue = 0;
-    models[1].letterRotation = glm::rotate(id, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-}
-
-void createR1Model() {
-    models[0].letterTrans.push_back(
-            glm::scale(id, glm::vec3(1.0f, 5.0f, 1.0f))
-    );
-    models[0].letterTrans.push_back(
-            glm::translate(id, glm::vec3(1.0 * ULEN, 4.0f * ULEN, 0.0f))
-    );
-    models[0].letterTrans.push_back(
-            glm::translate(id, glm::vec3(2.0 * ULEN, 2.0 * ULEN, 0.0f)) *
-            glm::scale(id, glm::vec3(1.0f, 3.0f, 1.0f))
-    );
-    models[0].letterTrans.push_back(
-            glm::translate(id, glm::vec3(1.0 * ULEN, 2.0 * ULEN, 0.0f))
-    );
-    glm::mat4 shearR = {
-            1.0f, 0.0f, 0.0f, 0.0f,
-            -1.0, 1.0f, 0.0f, 0.0f,
-            0.0f, 0.0f, 1.0f, 0.0f,
-            0.0f, 0.0f, 0.0f, 1.0f
-    };
-    models[0].letterTrans.push_back(
-            glm::translate(id, glm::vec3(2.0 * ULEN, 0.0f, 0.0f)) *
-            glm::scale(id, glm::vec3(1.0f, 2.0f, 1.0f)) * shearR
-    );
-
-    models[0].numTrans.push_back(glm::scale(id, glm::vec3(1.0f, 5.0f, 1.0f)));
-
-    models[0].letterAdjust = glm::translate(id, glm::vec3(-3 * ULEN, 0.0f, 0.0f));
-    models[0].numAdjust = glm::translate(id, glm::vec3(ULEN, 0.0f, 0.0f));
-
-    models[0].scale = id;
-    models[0].translation = id;
-    models[0].rotation = id;
-    models[0].letterTranslation = id;
-    models[0].numberTranslation = id;
-    models[0].rotationAngle = 0.0f;
-    models[0].sphereScale = sphereScale;
-    models[0].sphereTranslation = sphereTranslation;
-    models[0].numberRotation = glm::rotate(id, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    models[0].animationTimeValue = 0;
-    models[0].letterRotation = glm::rotate(id, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-}
-
 
