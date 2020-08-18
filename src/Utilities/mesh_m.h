@@ -16,7 +16,7 @@
 struct Vertex {
 	glm::vec3 Position;
 	glm::vec3 Normal;
-	glm::vec3 Color;
+	glm::vec4 Color;
 };
 
 class Mesh_M {

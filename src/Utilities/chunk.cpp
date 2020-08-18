@@ -17,6 +17,8 @@ Chunk::Chunk()
 			m_pVoxels[i][j] = new Voxel[CHUNK_SIZE];
 		}
 	}
+
+	chunkMesh = CreateMesh();
 }
 
 Chunk::~Chunk()
@@ -34,7 +36,7 @@ Chunk::~Chunk()
 	delete [] m_pVoxels;
 }
 
-void Chunk::CreateMesh()
+Mesh_M* Chunk::CreateMesh()
 {
 	for (int x = 0; x < CHUNK_SIZE; x++)
 	{
@@ -52,6 +54,9 @@ void Chunk::CreateMesh()
 			}
 		}
 	}
+
+	Mesh_M m_pMesh(chunkVertices);
+	return &m_pMesh;
 }
 
 void Chunk::CreateCube(int x, int y, int z)
@@ -67,77 +72,108 @@ void Chunk::CreateCube(int x, int y, int z)
 
 	glm::vec3 n1(0.0f);
 
-	unsigned int v1, v2, v3, v4, v5, v6, v7, v8;
+	Vertex v1, v2, v3, v4, v5, v6, v7, v8;
 
 	float r = 1.0f;
 	float g = 1.0f;
 	float b = 1.0f;
 	float a = 1.0f;
 
+	glm::vec4 color(1.0f);
+
 	// Front
-	n1 = Vector3d(0.0f, 0.0f, 1.0f);
+	n1 = glm::vec3(0.0f, 0.0f, 1.0f);
 
-	v1 = m_pRenderer->AddVertexToMesh(m_meshID, p1, n1, r, g, b, a);
-	v2 = m_pRenderer->AddVertexToMesh(m_meshID, p2, n1, r, g, b, a);
-	v3 = m_pRenderer->AddVertexToMesh(m_meshID, p3, n1, r, g, b, a);
-	v4 = m_pRenderer->AddVertexToMesh(m_meshID, p4, n1, r, g, b, a);
+	v1 = {p1, n1, color};
+	v2 = {p2, n1, color};
+	v3 = {p3, n1, color};
+	v4 = {p4, n1, color};
 
-	m_pRenderer->AddTriangleToMesh(m_meshID, v1, v2, v3);
-	m_pRenderer->AddTriangleToMesh(m_meshID, v1, v3, v4);
+	chunkVertices.push_back(v1);
+	chunkVertices.push_back(v2);
+	chunkVertices.push_back(v3);
+	chunkVertices.push_back(v1);
+	chunkVertices.push_back(v3);
+	chunkVertices.push_back(v4);
 
 
 	// Back
-	n1 = Vector3d(0.0f, 0.0f, -1.0f);
+	n1 = glm::vec3(0.0f, 0.0f, -1.0f);
 
-	v5 = m_pRenderer->AddVertexToMesh(m_meshID, p5, n1, r, g, b, a);
-	v6 = m_pRenderer->AddVertexToMesh(m_meshID, p6, n1, r, g, b, a);
-	v7 = m_pRenderer->AddVertexToMesh(m_meshID, p7, n1, r, g, b, a);
-	v8 = m_pRenderer->AddVertexToMesh(m_meshID, p8, n1, r, g, b, a);
+	v5 = {p5, n1, color};
+	v6 = {p6, n1, color};
+	v7 = {p7, n1, color};
+	v8 = {p8, n1, color};
 
-	m_pRenderer->AddTriangleToMesh(m_meshID, v5, v6, v7);
-	m_pRenderer->AddTriangleToMesh(m_meshID, v5, v7, v8);
+	chunkVertices.push_back(v5);
+	chunkVertices.push_back(v6);
+	chunkVertices.push_back(v7);
+	chunkVertices.push_back(v5);
+	chunkVertices.push_back(v7);
+	chunkVertices.push_back(v8);
 
 	// Right
-	n1 = Vector3d(1.0f, 0.0f, 0.0f);
+	n1 = glm::vec3(1.0f, 0.0f, 0.0f);
 
-	v2 = m_pRenderer->AddVertexToMesh(m_meshID, p2, n1, r, g, b, a);
-	v5 = m_pRenderer->AddVertexToMesh(m_meshID, p5, n1, r, g, b, a);
-	v8 = m_pRenderer->AddVertexToMesh(m_meshID, p8, n1, r, g, b, a);
-	v3 = m_pRenderer->AddVertexToMesh(m_meshID, p3, n1, r, g, b, a);
+	v2 = {p5, n1, color};
+	v5 = {p6, n1, color};
+	v8 = {p7, n1, color};
+	v3 = {p8, n1, color};
 
-	m_pRenderer->AddTriangleToMesh(m_meshID, v2, v5, v8);
-	m_pRenderer->AddTriangleToMesh(m_meshID, v2, v8, v3);
+	chunkVertices.push_back(v2);
+	chunkVertices.push_back(v5);
+	chunkVertices.push_back(v8);
+	chunkVertices.push_back(v2);
+	chunkVertices.push_back(v8);
+	chunkVertices.push_back(v3);
 
 	// left
-	n1 = Vector3d(-1.0f, 0.0f, 0.0f);
+	n1 = glm::vec3(-1.0f, 0.0f, 0.0f);
 
-	v6 = m_pRenderer->AddVertexToMesh(m_meshID, p6, n1, r, g, b, a);
-	v1 = m_pRenderer->AddVertexToMesh(m_meshID, p1, n1, r, g, b, a);
-	v4 = m_pRenderer->AddVertexToMesh(m_meshID, p4, n1, r, g, b, a);
-	v7 = m_pRenderer->AddVertexToMesh(m_meshID, p7, n1, r, g, b, a);
+	v6 = {p5, n1, color};
+	v1 = {p6, n1, color};
+	v4 = {p7, n1, color};
+	v7 = {p8, n1, color};
 
-	m_pRenderer->AddTriangleToMesh(m_meshID, v6, v1, v4);
-	m_pRenderer->AddTriangleToMesh(m_meshID, v6, v4, v7);
+	chunkVertices.push_back(v6);
+	chunkVertices.push_back(v1);
+	chunkVertices.push_back(v4);
+	chunkVertices.push_back(v6);
+	chunkVertices.push_back(v4);
+	chunkVertices.push_back(v7);
 
 	// Top
-	n1 = Vector3d(0.0f, 1.0f, 0.0f);
+	n1 = glm::vec3(0.0f, 1.0f, 0.0f);
 
-	v4 = m_pRenderer->AddVertexToMesh(m_meshID, p4, n1, r, g, b, a);
-	v3 = m_pRenderer->AddVertexToMesh(m_meshID, p3, n1, r, g, b, a);
-	v8 = m_pRenderer->AddVertexToMesh(m_meshID, p8, n1, r, g, b, a);
-	v7 = m_pRenderer->AddVertexToMesh(m_meshID, p7, n1, r, g, b, a);
+	v4 = {p5, n1, color};
+	v3 = {p6, n1, color};
+	v8 = {p7, n1, color};
+	v7 = {p8, n1, color};
 
-	m_pRenderer->AddTriangleToMesh(m_meshID, v4, v3, v8);
-	m_pRenderer->AddTriangleToMesh(m_meshID, v4, v8, v7);
+	chunkVertices.push_back(v4);
+	chunkVertices.push_back(v3);
+	chunkVertices.push_back(v8);
+	chunkVertices.push_back(v4);
+	chunkVertices.push_back(v8);
+	chunkVertices.push_back(v7);
 
 	// Bottom
-	n1 = Vector3d(0.0f, -1.0f, 0.0f);
+	n1 = glm::vec3(0.0f, -1.0f, 0.0f);
 
-	v6 = m_pRenderer->AddVertexToMesh(m_meshID, p6, n1, r, g, b, a);
-	v5 = m_pRenderer->AddVertexToMesh(m_meshID, p5, n1, r, g, b, a);
-	v2 = m_pRenderer->AddVertexToMesh(m_meshID, p2, n1, r, g, b, a);
-	v1 = m_pRenderer->AddVertexToMesh(m_meshID, p1, n1, r, g, b, a);
+	v6 = {p5, n1, color};
+	v5 = {p6, n1, color};
+	v2 = {p7, n1, color};
+	v1 = {p8, n1, color};
 
-	m_pRenderer->AddTriangleToMesh(m_meshID, v6, v5, v2);
-	m_pRenderer->AddTriangleToMesh(m_meshID, v6, v2, v1);
+	chunkVertices.push_back(v6);
+	chunkVertices.push_back(v5);
+	chunkVertices.push_back(v2);
+	chunkVertices.push_back(v6);
+	chunkVertices.push_back(v2);
+	chunkVertices.push_back(v1);
+}
+
+void Chunk::Render(Shader &shader)
+{
+	chunkMesh->Draw(shader, GL_TRIANGLES);
 }
