@@ -177,3 +177,26 @@ void Chunk::Render(Shader &shader)
 {
 	chunkMesh->Draw(shader, GL_TRIANGLES);
 }
+void Chunk::Update()
+{
+	chunkVertices.clear();
+
+	for (int x = 0; x < CHUNK_SIZE; x++)
+	{
+		for (int y = 0; y < CHUNK_SIZE; y++)
+		{
+			for (int z = 0; z < CHUNK_SIZE; z++)
+			{
+				if(m_pVoxels[x][y][z].IsActive() == false)
+				{
+					// Don't create triangle data for inactive blocks
+					continue;
+				}
+
+				CreateCube(x, y, z);
+			}
+		}
+	}
+
+	chunkMesh->Update(chunkVertices);
+}
