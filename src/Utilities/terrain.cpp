@@ -53,6 +53,16 @@ void Terrain::Render(Shader &shader, glm::mat4 world, glm::vec2 worldPos) {
             shader.setMat4("model", model);
             cube.Draw(shader, GL_TRIANGLES);
 
+//            glm::vec3 voxelPos2((float) (x - (renderSize / 2.0) - startX) * ULEN,
+//                                (float) height * ULEN,
+//                                (float) (z - (renderSize / 2.0) - startZ) * ULEN);
+//
+//            glm::mat4 model2 = world *  glm::scale(id, glm::vec3(1.0f, 1.0 , 1.0f)) * glm::translate(id, voxelPos2);
+//            shader.setInt("material.diffuse",6);
+//            shader.setMat4("model", model2);
+//            cube.Draw(shader, GL_TRIANGLES);
+
+
             RenderVegetationAndModels(shader, world, startX, startZ, x, z, height);
         }
     }
