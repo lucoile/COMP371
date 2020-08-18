@@ -49,6 +49,7 @@ void Terrain::Render(Shader &shader, glm::mat4 world, glm::vec2 worldPos) {
                               glm::translate(id, voxelPos);
 
             // Render cube with position and height
+            shader.setInt("material.diffuse", 5);
             shader.setMat4("model", model);
             cube.Draw(shader, GL_TRIANGLES);
 
@@ -115,6 +116,7 @@ void Terrain::RenderModel(Shader &shader, const glm::mat4 &world, int startX, in
         glm::mat4 model =
                 world * glm::translate(id, voxelPos2) * models[modelCount].letterTranslation * models[modelCount].rotation *
                 models[modelCount].scale * models[modelCount].letterAdjust * models[modelCount].letterRotation * models[modelCount].letterTrans[i];
+        shader.setInt("material.diffuse",0);
         shader.setMat4("model", model);
 
         cube.Draw(shader, GL_TRIANGLES);
@@ -125,6 +127,7 @@ void Terrain::RenderModel(Shader &shader, const glm::mat4 &world, int startX, in
         glm::mat4 model =
                 world * glm::translate(id, voxelPos2) * models[modelCount].numberTranslation * models[modelCount].rotation *
                 models[modelCount].scale * models[modelCount].numAdjust * models[modelCount].numberRotation * models[modelCount].numTrans[i];
+        shader.setInt("material.diffuse",0);
         shader.setMat4("model", model);
 
         cube.Draw(shader, GL_TRIANGLES);
@@ -134,6 +137,7 @@ void Terrain::RenderModel(Shader &shader, const glm::mat4 &world, int startX, in
     glm::mat4 model =
             world * glm::translate(id, voxelPos2) * glm::translate(id, glm::vec3(0, 5.0 * ULEN, 0)) *
             models[modelCount].rotation * models[modelCount].scale * glm::scale(id, glm::vec3(3.0f, 3.0f, 3.0f));
+    shader.setInt("material.diffuse",0);
     shader.setMat4("model", model);
 
     sphere.Draw(shader, GL_TRIANGLES);
@@ -151,6 +155,7 @@ void Terrain::RenderTree(Shader &shader, const glm::mat4 &world, int startX, int
                 models[modelCount].rotation *
                 models[modelCount].scale * models[modelCount].letterAdjust * models[modelCount].letterRotation *
                 models[modelCount].letterTrans[i];
+        shader.setInt("material.diffuse",8);
         shader.setMat4("model", model);
 
         cube.Draw(shader, GL_TRIANGLES);
@@ -161,6 +166,7 @@ void Terrain::RenderTree(Shader &shader, const glm::mat4 &world, int startX, int
         glm::mat4 model =
                 world * glm::translate(id, voxelPos2) * models[modelCount].numberTranslation * models[modelCount].rotation *
                 models[modelCount].scale * models[modelCount].numAdjust * models[modelCount].numberRotation * models[modelCount].numTrans[i];
+        shader.setInt("material.diffuse",7);
         shader.setMat4("model", model);
 
         cube.Draw(shader, GL_TRIANGLES);

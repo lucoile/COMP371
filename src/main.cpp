@@ -187,6 +187,10 @@ int main() {
     Texture groundTexture("res/textures/ground.jpg");
     Texture shinyTexture("res/textures/yellow.png");
     Texture greyTexture("res/textures/grey.png");
+    Texture dirtTexture("res/textures/dirt.jpg");
+    Texture grassTexture("res/textures/grass.png");
+    Texture leavesTextures("res/textures/leaves.jpg");
+    Texture treeTextures("res/textures/tree-trunk.jpg");
 
 	// bind textures
 	glActiveTexture(GL_TEXTURE0);
@@ -204,6 +208,22 @@ int main() {
 	glActiveTexture(GL_TEXTURE3);
 	glEnable(GL_TEXTURE_2D);
 	greyTexture.bind();
+
+    glActiveTexture(GL_TEXTURE5);
+    glEnable(GL_TEXTURE_2D);
+    dirtTexture.bind();
+
+    glActiveTexture(GL_TEXTURE6);
+    glEnable(GL_TEXTURE_2D);
+    grassTexture.bind();
+
+    glActiveTexture(GL_TEXTURE7);
+    glEnable(GL_TEXTURE_2D);
+    leavesTextures.bind();
+
+    glActiveTexture(GL_TEXTURE8);
+    glEnable(GL_TEXTURE_2D);
+    treeTextures.bind();
 
 
 	// Depth map frame buffer
@@ -285,6 +305,10 @@ int main() {
 		glActiveTexture(GL_TEXTURE3);
 		glEnable(GL_TEXTURE_2D);
 		greyTexture.bind();
+
+        glActiveTexture(GL_TEXTURE8);
+        glEnable(GL_TEXTURE_2D);
+        treeTextures.bind();
 
 		// Set viewport size and bind depth map frame buffer
 		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
