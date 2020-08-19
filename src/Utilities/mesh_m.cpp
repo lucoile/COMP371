@@ -7,21 +7,21 @@
 Mesh_M::Mesh_M(std::vector<Vertex> vertices)
 {
 	this->vertices = vertices;
+//	std::cout << vertices[0].Position.x;
 	setupMesh();
 }
 
-void Mesh_M::Draw(Shader &shader, GLenum type)
+void Mesh_M::Draw()
 {
-	// draw mesh
 	glBindVertexArray(VAO);
-	glDrawArrays(GL_TRIANGLES, VAO, sizeof(vertices));
+	glDrawArrays(GL_TRIANGLES, 0, sizeof(vertices));
 	glBindVertexArray(0);
 }
 
 void Mesh_M::setupMesh()
 {
-	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
+	glGenVertexArrays(1, &VAO);
 
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -44,7 +44,7 @@ void Mesh_M::setupMesh()
 void Mesh_M::Update(std::vector<Vertex> vertices)
 {
 	this->vertices = vertices;
-	glDeleteBuffer(1, &VAO);
+	glDeleteBuffers(1, &VAO);
 	glDeleteBuffers(1, &VBO);
 	setupMesh();
 }

@@ -8,6 +8,9 @@
 #include "shader_m.h"
 #include "voxel.h"
 #include "mesh_m.h"
+#include "terrain.h"
+
+#include <stdlib.h>
 
 class Chunk
 {
@@ -17,18 +20,24 @@ class Chunk
 
 	void Update();
 
-	void Render(Shader &shader);
+	void Setup_Landscape(Terrain terrain);
+
+	void Render();
 
 	static const int CHUNK_SIZE = 16;
 
+	bool IsLoaded();
+	void Load();
  private:
 	// The blocks data
 	Voxel*** m_pVoxels;
 	std::vector<Vertex> chunkVertices;
 	Mesh_M* chunkMesh;
 
-	Mesh_M* CreateMesh();
+	void CreateMesh();
 	void CreateCube(int x, int y, int z);
+
+	bool loaded = false;
 };
 
 #endif //_CHUNK_H_
