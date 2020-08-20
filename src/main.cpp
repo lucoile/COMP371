@@ -87,6 +87,8 @@ glm::vec3 lightPos;
 
 Camera_Movement lastMove;
 
+
+
 int main() {
     // GLFW: Initialize and configure
     glfwInit();
@@ -122,6 +124,9 @@ int main() {
     // Configure Global Opengl State
     glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
+
+	// Enable backface culling
+    glEnable(GL_CULL_FACE);
 
     // Build and Compile our Shader Programs
     Shader sceneShader("../res/shaders/scene.vert", "../res/shaders/scene.frag");
@@ -198,7 +203,7 @@ int main() {
 	glActiveTexture(GL_TEXTURE4);
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, depthMap);
-
+	
 
     // Render Loop
     while (!glfwWindowShouldClose(window)) {
@@ -298,7 +303,6 @@ int main() {
     return 0;
 }
 
-
 void resetTextures(const Shader &shader) {
     shader.setVec3("material.ambient", 0.3f, 0.3f, 0.3f);
     shader.setVec3("material.specular", 0.2f, 0.2f, 0.2f);
@@ -372,3 +376,4 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
         textureOn = 1 - textureOn;
     }
 }
+

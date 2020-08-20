@@ -30,6 +30,9 @@ class Chunk
 
 	bool IsLoaded();
 	void Load();
+
+	bool IsActive(int x, int y, int z);
+
  private:
 	unsigned int VBO, VAO;
 

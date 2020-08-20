@@ -17,7 +17,7 @@ enum VoxelType
 	VoxelType_Wood,
 	VoxelType_Sand,
 
-	VoxelType_NumType
+	VoxelType_NumTypes
 };
 
 class Voxel

@@ -6,7 +6,7 @@
 
 ChunkManager::ChunkManager()
 {
-	Terrain terrain;
+	terrain = new Terrain;
 	for(int x = 0; x < NUM_CHUNKS; x++)
 	{
 		for(int y = 0; y < NUM_CHUNKS; y++)
@@ -15,7 +15,7 @@ ChunkManager::ChunkManager()
 			{
 				// TODO: add terrain map to chunk constructor
 				Chunk* pChunk = new Chunk(x, y, z);
-				pChunk->Setup_Landscape(terrain);
+				pChunk->Setup_Landscape(*terrain);
 				m_vpChunkList.push_back(pChunk);
 			}
 		}
@@ -67,4 +67,19 @@ void ChunkManager::RenderChunks(Shader& shader)
 
 		pChunk->Render(shader);
 	}
+}
+
+bool ChunkManager::IsActive(int x, int y, int z)
+{
+	// Get the x, y, z coordinates of the chunk the voxel is located in
+	int xChunk = round(x / Chunk::CHUNK_SIZE);
+	int yChunk = round(y / Chunk::CHUNK_SIZE);
+	int zChunk = round(z / Chunk::CHUNK_SIZE);
+
+	// Get the x, y, z coordinates of the voxel relative to the chunk
+	x = x - (Chunk::CHUNK_SIZE * xChunk);
+	y = y - (Chunk::CHUNK_SIZE * yChunk);
+	z = z - (Chunk::CHUNK_SIZE * zChunk);
+
+	return m_vpChunkList[(x * NUM_CHUNKS * NUM_CHUNKS) + (y * NUM_CHUNKS) + z]->IsActive(x, y, z);
 }

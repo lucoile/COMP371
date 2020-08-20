@@ -197,7 +197,7 @@ void Chunk::Setup_Landscape(Terrain terrain)
 		{
 			// Use the height map texture to get the height value of x, z
 			int height = round(heightMap[(x + xOffset) * 1000 + (z + zOffset)] * 10.0);
-			std::cout << yOffset << "\n";
+//			std::cout << yOffset << "\n";
 
 			for (int y = (yOffset); y < height; y++)
 			{
@@ -214,4 +214,10 @@ void Chunk::Setup_Landscape(Terrain terrain)
 	}
 
 	Update();
+}
+
+
+bool Chunk::IsActive(int x, int y, int z)
+{
+	return m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z].IsActive();
 }
