@@ -128,7 +128,7 @@ void Chunk::CreateCube(float x, float y, float z, VoxelType type)
     if(type == VoxelType_Grass){
         color = glm::vec4(0.0f, 0.5f, 0.0f, 1.0f);
     }
-    
+
 	chunkVertices.push_back({p0, n1, color});	// triangle 1
 	chunkVertices.push_back({p5, n1, color});
 	chunkVertices.push_back({p6, n1, color});
@@ -202,17 +202,14 @@ void Chunk::Setup_Landscape(Terrain terrain)
 		{
 			// Use the height map texture to get the height value of x, z
 			int height = round(heightMap[(x + xOffset) * 1000 + (z + zOffset)] * 10.0);
-//			std::cout << yOffset << "\n";
+			std::cout << yOffset << "\n";
 
 			for (int y = (yOffset); y < height; y++)
 			{
                 m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z].SetActive(true);
-                std::cout << "height: " << (y - height) << "\n";
 			    if((y - height) == -1){
-			        std::cout<< "grass \n" ;
                   m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z].SetType(VoxelType_Grass);
 			    } else{
-                    std::cout<< "dirt \n";
 			        m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z].SetType(VoxelType_Dirt);
 			    }
 			}
