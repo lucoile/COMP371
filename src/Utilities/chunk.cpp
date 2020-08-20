@@ -17,6 +17,8 @@ Chunk::Chunk()
 			m_pVoxels[i][j] = new Voxel[CHUNK_SIZE];
 		}
 	}
+
+	chunkMesh = CreateMesh();
 }
 
 Chunk::~Chunk()
@@ -34,7 +36,7 @@ Chunk::~Chunk()
 	delete [] m_pVoxels;
 }
 
-void Chunk::CreateMesh()
+Mesh_M* Chunk::CreateMesh()
 {
 	for (int x = 0; x < CHUNK_SIZE; x++)
 	{
@@ -53,8 +55,8 @@ void Chunk::CreateMesh()
 		}
 	}
 
-	chunkMesh = new Mesh_M(chunkVertices);
-	std::cout << chunkMesh->vertices[0].Position.z;
+	Mesh_M m_pMesh(chunkVertices);
+	return &m_pMesh;
 }
 
 void Chunk::CreateCube(int x, int y, int z)
@@ -71,6 +73,11 @@ void Chunk::CreateCube(int x, int y, int z)
 	glm::vec3 n1(0.0f);
 
 	Vertex v1, v2, v3, v4, v5, v6, v7, v8;
+
+	float r = 1.0f;
+	float g = 1.0f;
+	float b = 1.0f;
+	float a = 1.0f;
 
 	glm::vec4 color(1.0f);
 
@@ -166,9 +173,9 @@ void Chunk::CreateCube(int x, int y, int z)
 	chunkVertices.push_back(v1);
 }
 
-void Chunk::Render()
+void Chunk::Render(Shader &shader)
 {
-	chunkMesh->Draw();
+	chunkMesh->Draw(shader, GL_TRIANGLES);
 }
 void Chunk::Update()
 {
@@ -192,34 +199,4 @@ void Chunk::Update()
 	}
 
 	chunkMesh->Update(chunkVertices);
-}
-
-bool Chunk::IsLoaded()
-{
-	return loaded;
-}
-
-void Chunk::Load()
-{
-	loaded = true;
-}
-
-void Chunk::Setup_Landscape(Terrain terrain)
-{
-	float* heightMap = terrain.heightMap;
-
-	for(int x = 0; x < CHUNK_SIZE; x++)
-	{
-		for(int z = 0; z < CHUNK_SIZE; z++)
-		{
-			// Use the height map texture to get the height value of x, z
-			float height = heightMap[x * 1000 + z];
-
-			for (int y = 0; y < height; y++)
-			{
-				m_pVoxels[x][y][z].SetActive(true);
-//				m_pVoxels[x][y][z].SetBlockType(BlockType_Grass);
-			}
-		}
-	}
 }

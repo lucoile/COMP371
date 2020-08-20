@@ -28,7 +28,7 @@ class Mesh_M {
 	Mesh_M(std::vector<Vertex> vertices);
 
 	// Render the mesh
-	void Draw();
+	void Draw(Shader &shader, GLenum type);
 
 	void Update(std::vector<Vertex> vertices);
  private:

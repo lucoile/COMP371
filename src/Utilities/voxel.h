@@ -21,10 +21,10 @@ enum VoxelType
 class Voxel
 {
  public:
-	constexpr static float VOXEL_RENDER_SIZE = 0.1f;
+	static float VOXEL_RENDER_SIZE = 0.1f;
 
-	Voxel() { m_active = false; };
-	~Voxel() {};
+	Voxel();
+	~Voxel();
 
 	bool IsActive()
 	{

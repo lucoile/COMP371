@@ -8,11 +8,11 @@ add_executable(main
         src/Utilities/texture.cpp
         src/Utilities/camera.cpp
         src/Utilities/shader_m.cpp
+        src/Utilities/model.cpp
+        src/Utilities/mesh.cpp
         src/Utilities/terrain.cpp
         src/Utilities/voxel.cpp
         src/Utilities/mesh_m.cpp
-        src/Utilities/chunk.cpp
-        src/Utilities/chunk_manager.cpp
         src/Line/line.cpp)
 set_property(TARGET main PROPERTY CXX_STANDARD 11)
 target_compile_options(main PRIVATE -Wall)

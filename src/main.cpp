@@ -15,10 +15,9 @@
 
 #include "Utilities/shader_m.h"
 #include "Utilities/camera.h"
-//#include "Utilities/model.h"
+#include "Utilities/model.h"
 #include "Utilities/texture.h"
 #include "Utilities/terrain.h"
-#include "Utilities/chunk_manager.h"
 
 
 #include "Line/line.h"
@@ -36,7 +35,8 @@ void moveModelForwardAnimation(float translationX, float translationZ);
 
 void resetTextures(const Shader &shader);
 
-void renderScene(Shader& shader);
+void renderScene(Shader &shader, Model cube, Terrain terrain);
+void renderAlphanum(Shader &shader, Model cube, Model sphere);
 
 
 // Settings
@@ -71,6 +71,9 @@ unsigned int selectedModel = 0;
 // Texture Toggle
 unsigned int textureOn = 1;
 
+// Alphanumeric models data structure
+Alphanum models[5];
+
 // Identity matrix
 glm::mat4 id(1.0f);
 
@@ -90,8 +93,6 @@ glm::mat4 view(1.0f);
 glm::vec3 lightPos;
 
 Camera_Movement lastMove;
-
-ChunkManager ChunkManager;
 
 int main() {
     // GLFW: Initialize and configure
@@ -132,16 +133,14 @@ int main() {
     // Build and Compile our Shader Programs
     Shader sceneShader("../res/shaders/scene.vert", "../res/shaders/scene.frag");
     Shader shadowShader("../res/shaders/shadow.vert", "../res/shaders/shadow.frag");
-	Shader chunkSceneShader("../res/shaders/chunk_scene.vert", "../res/shaders/chunk_scene.frag");
-	Shader chunkShadowShader("../res/shaders/chunk_shadow.vert", "../res/shaders/chunk_shadow.frag");
 
-//    // Cube model
-//    Model cube("../res/models/cube/cube.obj");
-//    // Sphere model
-//    Model sphere("../res/models/sphere/sphere.obj");
+    // Cube model
+    Model cube("../res/models/cube/cube.obj");
+    // Sphere model
+    Model sphere("../res/models/sphere/sphere.obj");
 
     // Initialize terrain
-//	Terrain terrain(TERRAIN_SIZE, cube, sphere, OCTAVE_COUNT, FREQUENCY, PERSISTENCE);
+	Terrain terrain(TERRAIN_SIZE, cube, sphere, OCTAVE_COUNT, FREQUENCY, PERSISTENCE);
 
 
     // Textures
@@ -222,18 +221,17 @@ int main() {
         projection = glm::perspective(45.0f, (float) SCR_WIDTH / (float) SCR_HEIGHT, 0.1f,100.0f);
 
         // Make sure camera isn't colliding with anything
-//		int cameraX = int(round(camera.Position.x));
-//		int cameraZ = int(round(camera.Position.z));
-//
-//      // Update worldPos
-//      worldPos.x = cameraX;
-//		worldPos.y = cameraZ;
+		int cameraX = int(round(camera.Position.x));
+		int cameraZ = int(round(camera.Position.z));
+
+        // Update worldPos
+        worldPos.x = cameraX;
+		worldPos.y = cameraZ;
 
         // Set camera/view matrix
-//		float terrainHeight = terrain.GetValue(worldPos.x, worldPos.y);
-//		glm::vec3 Position = glm::vec3(0.0f,(round(terrainHeight * 10.0f) / 10.0f) + (5.0f * ULEN),0.0f);
-//		view = glm::lookAt(Position, Position + camera.Front, camera.Up);
-		view = camera.get_view_matrix();
+		float terrainHeight = terrain.GetValue(worldPos.x, worldPos.y);
+		glm::vec3 Position = glm::vec3(0.0f,(round(terrainHeight * 10.0f) / 10.0f) + (5.0f * ULEN),0.0f);
+		view = glm::lookAt(Position, Position + camera.Front, camera.Up);
 
 		// Set orthographic frustum for shadows
 		float near_plane = 1.0f, far_plane = 5.0f;
@@ -248,14 +246,14 @@ int main() {
 
 		glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 
-		chunkShadowShader.use();
-		chunkShadowShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
+		shadowShader.use();
+		shadowShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
 
 		// Bind grey texture
 		// Not sure why but if we don't bind it here it just renders as red
-//		glActiveTexture(GL_TEXTURE3);
-//		glEnable(GL_TEXTURE_2D);
-//		greyTexture.bind();
+		glActiveTexture(GL_TEXTURE3);
+		glEnable(GL_TEXTURE_2D);
+		greyTexture.bind();
 
 		// Set viewport size and bind depth map frame buffer
 		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
@@ -263,7 +261,7 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// Render scene with shadow/depth map shader
-		renderScene(chunkShadowShader);
+		renderScene(shadowShader, cube, terrain);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -275,18 +273,18 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Activate scene shader
-        chunkSceneShader.use();
-		chunkSceneShader.setMat4("projection", projection);
-		chunkSceneShader.setMat4("view", view);
-		chunkSceneShader.setMat4("world", worldOrientation);
-		chunkSceneShader.setVec3("viewPos", camera.Position);
-		chunkSceneShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
+        sceneShader.use();
+        sceneShader.setMat4("projection", projection);
+		sceneShader.setMat4("view", view);
+		sceneShader.setMat4("world", worldOrientation);
+		sceneShader.setVec3("viewPos", camera.Position);
+		sceneShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
 
 		// Set shadow map
-		chunkSceneShader.setInt("shadowMap", 4);
+		sceneShader.setInt("shadowMap", 4);
 
 		// Render the scene using shadow map
-		renderScene(sceneShader);
+		renderScene(sceneShader, cube, terrain);
 
 		// Reset framebuffer
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -301,20 +299,89 @@ int main() {
     return 0;
 }
 
-void renderScene(Shader& shader)
+void renderScene(Shader &shader, Model cube, Terrain terrain)
 {
 //	renderAlphanum(shader, cube, sphere);
 
 	resetTextures(shader);
-//	shader.setInt("material.diffuse", 3);
-//	shader.setVec3("material.ambient", glm::vec3(1.0f));
-//	shader.setVec3("light.ambient", glm::vec3(1.0f));
+	shader.setInt("material.diffuse", 3);
+	shader.setVec3("material.ambient", glm::vec3(1.0f));
+	shader.setVec3("light.ambient", glm::vec3(1.0f));
 
-//	terrain.Render(shader, worldOrientation, worldPos);
-
-	ChunkManager.RenderChunks();
+	terrain.Render(shader, worldOrientation, worldPos);
 }
 
+void renderAlphanum(Shader &shader, Model cube, Model sphere)
+{
+	if (textureOn == 1) {
+		shader.setVec3("material.ambient", 0.5f, 0.5f, 0.5f);
+		shader.setVec3("material.specular", 0.2f, 0.2f, 0.2f);
+		shader.setFloat("material.shininess", 32.0f);
+
+		// light properties
+		shader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
+		shader.setVec3("light.diffuse", 1.0f, 1.0f, 1.0f);
+		shader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+		shader.setVec3("light.position", 0.0f, 30.0 * ULEN, 0.0f);
+	} else {
+		resetTextures(shader);
+	}
+
+	// render each alphanumeric pair by looping through the array of models
+	for (unsigned int j = 0; j < 5; j++) {
+		// add box texture
+		if (textureOn == 1) {
+			shader.setInt("material.diffuse", 0);
+		} else {
+			shader.setInt("material.diffuse", 3);
+			resetTextures(shader);
+		}
+		// draw the letter
+		for (unsigned int i = 0; i < models[j].letterTrans.size(); i++) {
+			glm::mat4 model =
+					worldOrientation * models[j].translation * models[j].letterTranslation * models[j].rotation *
+					models[j].scale * models[j].letterAdjust * models[j].letterRotation * models[j].letterTrans[i];
+			shader.setMat4("model", model);
+
+			cube.Draw(shader, type);
+		}
+
+		// add shiny texture
+		if (textureOn == 1) {
+			shader.setInt("material.diffuse", 2);
+			shader.setVec3("material.specular", 1.0f, 1.0f, 1.0f);
+			shader.setFloat("material.shininess", 64.0f);
+		} else {
+			shader.setInt("material.diffuse", 3);
+			resetTextures(shader);
+		}
+
+		// draw the number
+		for (unsigned int i = 0; i < models[j].numTrans.size(); i++) {
+			glm::mat4 model =
+					worldOrientation * models[j].translation * models[j].numberTranslation * models[j].rotation *
+					models[j].scale * models[j].numAdjust * models[j].numberRotation * models[j].numTrans[i];
+			shader.setMat4("model", model);
+
+			cube.Draw(shader, type);
+		}
+
+		// Change to grey diffuse texture and reset material
+		resetTextures(shader);
+		shader.setInt("material.diffuse", 3);
+
+		// Draw Sphere
+		for (unsigned int i = 0; i < models[j].letterTrans.size(); i++) {
+			glm::mat4 model =
+					worldOrientation * models[j].translation * models[j].rotation *
+					models[j].scale * models[j].sphereTranslation * models[j].sphereScale;
+			shader.setMat4("model", model);
+
+			sphere.Draw(shader, type);
+		}
+	}
+
+}
 
 void resetTextures(const Shader &shader) {
     shader.setVec3("material.ambient", 0.3f, 0.3f, 0.3f);
