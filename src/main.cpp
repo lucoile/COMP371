@@ -273,7 +273,7 @@ int main() {
 		chunkSceneShader.use();
 		chunkSceneShader.setMat4("projection", projection);
 		chunkSceneShader.setMat4("view", view);
-		chunkSceneShader.setMat4("world", worldOrientation);
+//		chunkSceneShader.setMat4("world", worldOrientation);
 		chunkSceneShader.setVec3("viewPos", camera.Position);
 		chunkSceneShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
 //		sceneShader.setInt("material.diffuse", 3);

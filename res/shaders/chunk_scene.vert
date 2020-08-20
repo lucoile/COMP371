@@ -10,7 +10,7 @@ out VS_OUT {
     vec4 FragPosLightSpace;
 } vs_out;
 
-uniform mat4 world = mat4(1.0f);
+uniform mat4 world;
 uniform mat4 view;
 uniform mat4 projection;
 uniform mat4 model = mat4(1.0f);

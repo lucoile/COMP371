@@ -17,7 +17,7 @@ class ChunkManager
 	void RenderChunks(Shader& shader);
  private:
 	// Number of chunks per axis
-	static const int NUM_CHUNKS = 4;
+	static const int NUM_CHUNKS = 8;
 	// Number of chunks to load per frame
 	static const int ASYNC_NUM_CHUNKS_PER_FRAME = 8;
 
