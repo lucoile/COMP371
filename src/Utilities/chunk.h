@@ -40,7 +40,7 @@ class Chunk
 	Mesh_M* chunkMesh;
 
 	void CreateMesh();
-	void CreateCube(float x, float y, float z);
+	void CreateCube(float x, float y, float z, VoxelType type);
 
 	bool loaded = false;
 };
