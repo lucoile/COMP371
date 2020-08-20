@@ -17,7 +17,7 @@ class Chunk
 
 	void Update(float dt);
 
-	void Render(Shader &shader);
+	void Render(Shader* pRenderer);
 
 	static const int CHUNK_SIZE = 16;
 
@@ -25,9 +25,9 @@ class Chunk
 	// The blocks data
 	Voxel*** m_pVoxels;
 	std::vector<Vertex> chunkVertices;
-	Mesh_M* chunkMesh;
+	Mesh_M chunkMesh;
 
-	Mesh_M* CreateMesh();
+	void CreateMesh();
 	void CreateCube(int x, int y, int z);
 };
 
