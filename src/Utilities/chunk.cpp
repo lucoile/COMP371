@@ -69,12 +69,7 @@ void Chunk::CreateCube(float x, float y, float z, VoxelType type)
 	glm::vec3 p7(x - voxelAdjust, y - voxelAdjust, z - voxelAdjust);
 
 	// set voxel color
-    glm::vec4 color(1.0f);
-    if(type == VoxelType_Grass){
-        color = glm::vec4(0.0f, 0.5f, 0.0f, 1.0f);
-    } else if(type == VoxelType_Dirt){
-        color = glm::vec4(0.50f, 0.30f, 0.25f, 1.0f);
-    }
+    glm::vec4 color(0.50f, 0.30f, 0.25f, 1.0f);
 
 	// Front
 	glm::vec3 n1 = glm::vec3(0.0f, 0.0f, 1.0f);
@@ -117,25 +112,29 @@ void Chunk::CreateCube(float x, float y, float z, VoxelType type)
 	chunkVertices.push_back({p2, n1, color});
 	chunkVertices.push_back({p1, n1, color});
 
+    // Bottom
+    n1 = glm::vec3(0.0f, -1.0f, 0.0f);
+
+    chunkVertices.push_back({p7, n1, color});	// triangle 1
+    chunkVertices.push_back({p4, n1, color});
+    chunkVertices.push_back({p3, n1, color});
+    chunkVertices.push_back({p3, n1, color});	// triangle 2
+    chunkVertices.push_back({p2, n1, color});
+    chunkVertices.push_back({p7, n1, color});
+
 	// Top
 	n1 = glm::vec3(0.0f, 1.0f, 0.0f);
 
+    if(type == VoxelType_Grass){
+        color = glm::vec4(0.0f, 0.5f, 0.0f, 1.0f);
+    }
+    
 	chunkVertices.push_back({p0, n1, color});	// triangle 1
 	chunkVertices.push_back({p5, n1, color});
 	chunkVertices.push_back({p6, n1, color});
 	chunkVertices.push_back({p6, n1, color});	// triangle 2
 	chunkVertices.push_back({p1, n1, color});
 	chunkVertices.push_back({p0, n1, color});
-
-	// Bottom
-	n1 = glm::vec3(0.0f, -1.0f, 0.0f);
-
-	chunkVertices.push_back({p7, n1, color});	// triangle 1
-	chunkVertices.push_back({p4, n1, color});
-	chunkVertices.push_back({p3, n1, color});
-	chunkVertices.push_back({p3, n1, color});	// triangle 2
-	chunkVertices.push_back({p2, n1, color});
-	chunkVertices.push_back({p7, n1, color});
 }
 
 void Chunk::Render(Shader& shader)
@@ -203,14 +202,17 @@ void Chunk::Setup_Landscape(Terrain terrain)
 		{
 			// Use the height map texture to get the height value of x, z
 			int height = round(heightMap[(x + xOffset) * 1000 + (z + zOffset)] * 10.0);
-			std::cout << yOffset << "\n";
+//			std::cout << yOffset << "\n";
 
 			for (int y = (yOffset); y < height; y++)
 			{
                 m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z].SetActive(true);
-			    if((height - y) < 1){
+                std::cout << "height: " << (y - height) << "\n";
+			    if((y - height) == -1){
+			        std::cout<< "grass \n" ;
                   m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z].SetType(VoxelType_Grass);
 			    } else{
+                    std::cout<< "dirt \n";
 			        m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z].SetType(VoxelType_Dirt);
 			    }
 			}
