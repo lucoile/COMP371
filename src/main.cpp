@@ -35,9 +35,6 @@ void moveModelForwardAnimation(float translationX, float translationZ);
 
 void resetTextures(const Shader &shader);
 
-void renderScene(Shader& shader);
-
-
 // Settings
 unsigned int SCR_WIDTH = 1024;
 unsigned int SCR_HEIGHT = 768;
@@ -261,7 +258,7 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// Render scene with shadow/depth map shader
-		ChunkManager.RenderChunks(shadowShader);
+		ChunkManager.RenderChunks(chunkShadowShader);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -273,20 +270,20 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Activate scene shader
-		sceneShader.use();
-		sceneShader.setMat4("projection", projection);
-		sceneShader.setMat4("view", view);
-		sceneShader.setMat4("world", worldOrientation);
-		sceneShader.setVec3("viewPos", camera.Position);
-		sceneShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
-		sceneShader.setInt("material.diffuse", 3);
+		chunkSceneShader.use();
+		chunkSceneShader.setMat4("projection", projection);
+		chunkSceneShader.setMat4("view", view);
+		chunkSceneShader.setMat4("world", worldOrientation);
+		chunkSceneShader.setVec3("viewPos", camera.Position);
+		chunkSceneShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
+//		sceneShader.setInt("material.diffuse", 3);
 
 		// Set shadow map
-		sceneShader.setInt("shadowMap", 4);
+		chunkSceneShader.setInt("shadowMap", 4);
 
 		// Render the scene using shadow map
-		resetTextures(sceneShader);
-		ChunkManager.RenderChunks(sceneShader);
+		resetTextures(chunkSceneShader);
+		ChunkManager.RenderChunks(chunkSceneShader);
 
 		// Reset framebuffer
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -299,19 +296,6 @@ int main() {
     // Terminate, clearing all previously allocated GLFW resources.
     glfwTerminate();
     return 0;
-}
-
-void renderScene(Shader& shader)
-{
-//	renderAlphanum(shader, cube, sphere);
-
-	resetTextures(shader);
-//	shader.setInt("material.diffuse", 3);
-//	shader.setVec3("material.ambient", glm::vec3(1.0f));
-//	shader.setVec3("light.ambient", glm::vec3(1.0f));
-
-//	terrain.Render(shader, worldOrientation, worldPos);
-
 }
 
 

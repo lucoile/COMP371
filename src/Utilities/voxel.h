@@ -25,7 +25,7 @@ class Voxel
  public:
 	constexpr static float VOXEL_RENDER_SIZE = 0.1f;
 
-	Voxel() { m_active = true; };
+	Voxel() { m_active = false; };
 	~Voxel() {};
 
 	bool IsActive()

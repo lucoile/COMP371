@@ -21,22 +21,13 @@ Chunk::Chunk(int x, int y, int z)
 		}
 	}
 
-	CreateCube();
+	CreateMesh();
 }
 
 Chunk::~Chunk()
 {
-	//TODO: Delete the voxels
-//	for (int i = 0; i < CHUNK_SIZE; ++i)
-//	{
-//		for (int j = 0; j < CHUNK_SIZE; ++j)
-//		{
-//			delete [] m_pVoxels[i][j];
-//		}
-//
-//		delete [] m_pVoxels[i];
-//	}
-//	delete [] m_pVoxels;
+	chunkVertices.clear();
+	m_pVoxels.clear();
 }
 
 void Chunk::CreateMesh()
@@ -53,79 +44,92 @@ void Chunk::CreateMesh()
 					continue;
 				}
 
-//				CreateCube();
+				float voxelAdjust = Voxel::VOXEL_RENDER_SIZE * Voxel::VOXEL_RENDER_SIZE;
+				CreateCube(x * voxelAdjust, y * voxelAdjust, z * voxelAdjust);
 			}
 		}
 	}
 
-//	chunkMesh = new Mesh_M(chunkVertices);
+	chunkMesh = new Mesh_M(chunkVertices);
 }
 
-void Chunk::CreateCube()
+void Chunk::CreateCube(float x, float y, float z)
 {
-	float vertex_data[] = {
-		// Cube
-		// positions          // normals           // texture coords
-		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
-		0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
-		0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
-		0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
+//	std::cout << x << " " << y << " " << z << "\n";
 
-		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
-		0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 0.0f,
-		0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
-		0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 1.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
+	float voxelAdjust = Voxel::VOXEL_RENDER_SIZE * Voxel::VOXEL_RENDER_SIZE;
 
-		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-		-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-		-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
-		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+	glm::vec3 p0(x + voxelAdjust, y + voxelAdjust, z + voxelAdjust);
+	glm::vec3 p1(x - voxelAdjust, y + voxelAdjust, z + voxelAdjust);
+	glm::vec3 p2(x - voxelAdjust, y - voxelAdjust, z + voxelAdjust);
+	glm::vec3 p3(x + voxelAdjust, y - voxelAdjust, z + voxelAdjust);
+	glm::vec3 p4(x + voxelAdjust, y - voxelAdjust, z - voxelAdjust);
+	glm::vec3 p5(x + voxelAdjust, y + voxelAdjust, z - voxelAdjust);
+	glm::vec3 p6(x - voxelAdjust, y + voxelAdjust, z - voxelAdjust);
+	glm::vec3 p7(x - voxelAdjust, y - voxelAdjust, z - voxelAdjust);
 
-		0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-		0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-		0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-		0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-		0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
-		0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+	glm::vec4 color(1.0f);
 
-		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
-		0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
-		0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
-		0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
+	// Front
+	glm::vec3 n1 = glm::vec3(0.0f, 0.0f, 1.0f);
 
-		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
-		0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
-		0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
-		0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
-	};
+	chunkVertices.push_back({p0, n1, color});	// triangle 1
+	chunkVertices.push_back({p1, n1, color});
+	chunkVertices.push_back({p2, n1, color});
+	chunkVertices.push_back({p2, n1, color});	// triangle 2
+	chunkVertices.push_back({p3, n1, color});
+	chunkVertices.push_back({p0, n1, color});
 
 
-	glGenBuffers(1, &VBO);
-	glGenVertexArrays(1, &VAO);
-	// Bind VAO
-	glBindVertexArray(VAO);
-	// Bind VBO and copy vertices into vertex buffer
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data), vertex_data, GL_STATIC_DRAW);
-	// position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-	// normal attribute
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3*sizeof(float)));
-	glEnableVertexAttribArray(1);
-	// texture coordinates attribute
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6*sizeof(float)));
-	glEnableVertexAttribArray(2);
+	// Back
+	n1 = glm::vec3(0.0f, 0.0f, -1.0f);
+
+	chunkVertices.push_back({p4, n1, color});	// triangle 1
+	chunkVertices.push_back({p7, n1, color});
+	chunkVertices.push_back({p6, n1, color});
+	chunkVertices.push_back({p6, n1, color});	// triangle 2
+	chunkVertices.push_back({p5, n1, color});
+	chunkVertices.push_back({p4, n1, color});
+
+	// Right
+	n1 = glm::vec3(1.0f, 0.0f, 0.0f);
+
+	chunkVertices.push_back({p0, n1, color});	// triangle 1
+	chunkVertices.push_back({p3, n1, color});
+	chunkVertices.push_back({p4, n1, color});
+	chunkVertices.push_back({p4, n1, color});	// triangle 2
+	chunkVertices.push_back({p5, n1, color});
+	chunkVertices.push_back({p0, n1, color});
+
+	// left
+	n1 = glm::vec3(-1.0f, 0.0f, 0.0f);
+
+	chunkVertices.push_back({p1, n1, color});	// triangle 1
+	chunkVertices.push_back({p6, n1, color});
+	chunkVertices.push_back({p7, n1, color});
+	chunkVertices.push_back({p7, n1, color});	// triangle 2
+	chunkVertices.push_back({p2, n1, color});
+	chunkVertices.push_back({p1, n1, color});
+
+	// Top
+	n1 = glm::vec3(0.0f, 1.0f, 0.0f);
+
+	chunkVertices.push_back({p0, n1, color});	// triangle 1
+	chunkVertices.push_back({p5, n1, color});
+	chunkVertices.push_back({p6, n1, color});
+	chunkVertices.push_back({p6, n1, color});	// triangle 2
+	chunkVertices.push_back({p1, n1, color});
+	chunkVertices.push_back({p0, n1, color});
+
+	// Bottom
+	n1 = glm::vec3(0.0f, -1.0f, 0.0f);
+
+	chunkVertices.push_back({p7, n1, color});	// triangle 1
+	chunkVertices.push_back({p4, n1, color});
+	chunkVertices.push_back({p3, n1, color});
+	chunkVertices.push_back({p3, n1, color});	// triangle 2
+	chunkVertices.push_back({p2, n1, color});
+	chunkVertices.push_back({p7, n1, color});
 }
 
 void Chunk::Render(Shader& shader)
@@ -134,31 +138,14 @@ void Chunk::Render(Shader& shader)
 	float xOffset = chunkPos.x * CHUNK_SIZE * Voxel::VOXEL_RENDER_SIZE;
 	float yOffset = chunkPos.y * CHUNK_SIZE * Voxel::VOXEL_RENDER_SIZE;
 	float zOffset = chunkPos.z * CHUNK_SIZE * Voxel::VOXEL_RENDER_SIZE;
+//	std::cout << xOffset << " " << yOffset << " " << zOffset << "\n";
 
-	for (int x = 0; x < CHUNK_SIZE; x++)
-	{
-		for (int y = 0; y < CHUNK_SIZE; y++)
-		{
-			for (int z = 0; z < CHUNK_SIZE; z++)
-			{
-				if(m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z].IsActive() == false)
-				{
-					// Don't create triangle data for inactive blocks
-					//	std::cout << x << " " << y << " " << z << "\n";
-					glm::vec3 position(
-						(x * Voxel::VOXEL_RENDER_SIZE) + xOffset,
-						(y * Voxel::VOXEL_RENDER_SIZE) + yOffset,
-						(z * Voxel::VOXEL_RENDER_SIZE) + zOffset);
-					std::cout << position.x << " " << position.y << " " << position.z << "\n";
-					glm::mat4 model = glm::translate(glm::mat4(1.0f), position);
-					shader.setMat4("model", model);
-					glBindVertexArray(VBO);
-					glDrawArrays(GL_TRIANGLES, 0, 36);
-					continue;
-				}
-			}
-		}
-	}
+	glm::vec3 position( xOffset, yOffset, zOffset);
+//	std::cout << position.x << " " << position.y << " " << position.z << "\n";
+	glm::mat4 model = glm::translate(glm::mat4(1.0f), position) *
+		(glm::scale(glm::mat4(1.0f), glm::vec3(1 / Voxel::VOXEL_RENDER_SIZE)));
+	shader.setMat4("model", model);
+	chunkMesh->Draw();
 }
 
 void Chunk::Update()
@@ -177,12 +164,13 @@ void Chunk::Update()
 					continue;
 				}
 
-				CreateCube();
+				float voxelAdjust = Voxel::VOXEL_RENDER_SIZE * Voxel::VOXEL_RENDER_SIZE;
+				CreateCube(x * voxelAdjust, y * voxelAdjust, z * voxelAdjust);
 			}
 		}
 	}
 
-//	chunkMesh->Update(chunkVertices);
+	chunkMesh = new Mesh_M(chunkVertices);
 }
 
 bool Chunk::IsLoaded()
@@ -197,31 +185,33 @@ void Chunk::Load()
 
 void Chunk::Setup_Landscape(Terrain terrain)
 {
-	// TODO: use chunk position to get height
 	float* heightMap = terrain.heightMap;
 
-	int xOffset = chunkPos.x;
-	int yOffset = chunkPos.y;
-	int zOffset = chunkPos.z;
+	int xOffset = chunkPos.x * CHUNK_SIZE;
+	int yOffset = chunkPos.y * CHUNK_SIZE;
+	int zOffset = chunkPos.z * CHUNK_SIZE;
 
 	for(int x = 0; x < CHUNK_SIZE; x++)
 	{
 		for(int z = 0; z < CHUNK_SIZE; z++)
 		{
 			// Use the height map texture to get the height value of x, z
-			float height = heightMap[(x + xOffset) * 1000 + (z + zOffset)];
+			int height = round(heightMap[(x + xOffset) * 1000 + (z + zOffset)] * 10.0);
+			std::cout << yOffset << "\n";
 
-			for (int y = 0; y < height; y++)
+			for (int y = (yOffset); y < height; y++)
 			{
 				m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z].SetActive(true);
 //				m_pVoxels[x][y][z].SetBlockType(BlockType_Grass);
 			}
 
-			for (int y = height + 1; y < CHUNK_SIZE; y++)
-			{
-				m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z].SetActive(false);
-//				m_pVoxels[x][y][z].SetBlockType(BlockType_Grass);
-			}
+//			for (int y = yOffset + height + 1; y < yOffset + CHUNK_SIZE; y++)
+//			{
+//				m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z].SetActive(false);
+////				m_pVoxels[x][y][z].SetBlockType(BlockType_Grass);
+//			}
 		}
 	}
+
+	Update();
 }

@@ -37,9 +37,10 @@ class Chunk
 	std::vector<Voxel> m_pVoxels;
 	std::vector<Vertex> chunkVertices;
 	Mesh_M* voxelMesh;
+	Mesh_M* chunkMesh;
 
 	void CreateMesh();
-	void CreateCube();
+	void CreateCube(float x, float y, float z);
 
 	bool loaded = false;
 };

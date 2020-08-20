@@ -13,7 +13,7 @@ Mesh_M::Mesh_M(std::vector<Vertex> vertices)
 void Mesh_M::Draw()
 {
 	glBindVertexArray(VAO);
-	glDrawArrays(GL_TRIANGLES, 0, sizeof(vertices));
+	glDrawArrays(GL_TRIANGLES, 0, vertices.size());
 	glBindVertexArray(0);
 }
 
