@@ -7,11 +7,18 @@
 ChunkManager::ChunkManager()
 {
 	Terrain terrain;
-	for(int i = 0; i < NUM_CHUNKS; i++)
+	for(int x = 0; x < NUM_CHUNKS; x++)
 	{
-		Chunk* pChunk = new Chunk();
-		pChunk->Setup_Landscape(terrain);
-		m_vpChunkList.push_back(pChunk);
+		for(int y = 0; y < NUM_CHUNKS; y++)
+		{
+			for(int z = 0; z < NUM_CHUNKS; z++)
+			{
+				// TODO: add terrain map to chunk constructor
+				Chunk* pChunk = new Chunk(x, y, z);
+				pChunk->Setup_Landscape(terrain);
+				m_vpChunkList.push_back(pChunk);
+			}
+		}
 	}
 }
 
@@ -41,14 +48,19 @@ void ChunkManager::UpdateChunkList()
 	m_vpChunkLoadList.clear();
 }
 
-void ChunkManager::RenderChunks()
+void ChunkManager::RenderChunks(Shader& shader)
 {
 	std::vector<Chunk*>::iterator iterator;
+
+//	for(int i = 0; i < m_vpChunkList.size(); i++)
+//	{
+//		m_vpChunkList[i]->Render(shader);
+//	}
 
 	for (iterator = m_vpChunkList.begin(); iterator != m_vpChunkList.end(); ++iterator)
 	{
 		Chunk* pChunk = (*iterator);
 
-		pChunk->Render();
+		pChunk->Render(shader);
 	}
 }

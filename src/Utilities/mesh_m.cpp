@@ -7,7 +7,6 @@
 Mesh_M::Mesh_M(std::vector<Vertex> vertices)
 {
 	this->vertices = vertices;
-//	std::cout << vertices[0].Position.x;
 	setupMesh();
 }
 

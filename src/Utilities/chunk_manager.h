@@ -14,9 +14,11 @@ class ChunkManager
 
 	void Update(float dt, glm::vec3 cameraPosition, glm::vec3 cameraView);
 
-	void RenderChunks();
+	void RenderChunks(Shader& shader);
  private:
-	static const int NUM_CHUNKS = 64;
+	// Number of chunks per axis
+	static const int NUM_CHUNKS = 2;
+	// Number of chunks to load per frame
 	static const int ASYNC_NUM_CHUNKS_PER_FRAME = 8;
 
 	glm::vec3 m_cameraPosition;

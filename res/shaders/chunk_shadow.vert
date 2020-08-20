@@ -4,7 +4,7 @@ layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec4 aColor;
 
 uniform mat4 lightSpaceMatrix;
-uniform mat4 model;
+uniform mat4 model = mat4(1.0f);
 
 void main()
 {

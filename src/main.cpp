@@ -20,7 +20,6 @@
 #include "Utilities/terrain.h"
 #include "Utilities/chunk_manager.h"
 
-
 #include "Line/line.h"
 
 #include <iostream>
@@ -53,7 +52,7 @@ float PERSISTENCE = 0.25;
 glm::vec2 worldPos(0.0f);
 
 // Camera
-Camera camera(glm::vec3(0.0f, 10.0 * ULEN, 2.0f));
+Camera camera(glm::vec3(0.0f, 10.0 * ULEN, -2.0 * ULEN));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -90,8 +89,6 @@ glm::mat4 view(1.0f);
 glm::vec3 lightPos;
 
 Camera_Movement lastMove;
-
-ChunkManager ChunkManager;
 
 int main() {
     // GLFW: Initialize and configure
@@ -143,8 +140,9 @@ int main() {
     // Initialize terrain
 //	Terrain terrain(TERRAIN_SIZE, cube, sphere, OCTAVE_COUNT, FREQUENCY, PERSISTENCE);
 
+	ChunkManager ChunkManager;
 
-    // Textures
+	// Textures
     Texture boxTexture("res/textures/box.jpg");
     Texture groundTexture("res/textures/ground.jpg");
     Texture shinyTexture("res/textures/yellow.png");
@@ -263,7 +261,7 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// Render scene with shadow/depth map shader
-		renderScene(chunkShadowShader);
+		ChunkManager.RenderChunks(shadowShader);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -275,18 +273,20 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Activate scene shader
-        chunkSceneShader.use();
-		chunkSceneShader.setMat4("projection", projection);
-		chunkSceneShader.setMat4("view", view);
-		chunkSceneShader.setMat4("world", worldOrientation);
-		chunkSceneShader.setVec3("viewPos", camera.Position);
-		chunkSceneShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
+		sceneShader.use();
+		sceneShader.setMat4("projection", projection);
+		sceneShader.setMat4("view", view);
+		sceneShader.setMat4("world", worldOrientation);
+		sceneShader.setVec3("viewPos", camera.Position);
+		sceneShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
+		sceneShader.setInt("material.diffuse", 3);
 
 		// Set shadow map
-		chunkSceneShader.setInt("shadowMap", 4);
+		sceneShader.setInt("shadowMap", 4);
 
 		// Render the scene using shadow map
-		renderScene(sceneShader);
+		resetTextures(sceneShader);
+		ChunkManager.RenderChunks(sceneShader);
 
 		// Reset framebuffer
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -312,7 +312,6 @@ void renderScene(Shader& shader)
 
 //	terrain.Render(shader, worldOrientation, worldPos);
 
-	ChunkManager.RenderChunks();
 }
 
 

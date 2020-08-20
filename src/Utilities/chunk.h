@@ -15,27 +15,31 @@
 class Chunk
 {
  public:
-	Chunk();
+	Chunk(int x, int y, int z);
 	~Chunk();
 
 	void Update();
 
 	void Setup_Landscape(Terrain terrain);
 
-	void Render();
+	void Render(Shader& shader);
 
 	static const int CHUNK_SIZE = 16;
+
+	glm::vec3 chunkPos;
 
 	bool IsLoaded();
 	void Load();
  private:
+	unsigned int VBO, VAO;
+
 	// The blocks data
-	Voxel*** m_pVoxels;
+	std::vector<Voxel> m_pVoxels;
 	std::vector<Vertex> chunkVertices;
-	Mesh_M* chunkMesh;
+	Mesh_M* voxelMesh;
 
 	void CreateMesh();
-	void CreateCube(int x, int y, int z);
+	void CreateCube();
 
 	bool loaded = false;
 };

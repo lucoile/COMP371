@@ -46,7 +46,7 @@ void Camera::process_mouse_movement(float xoffset, float yoffset, GLboolean cons
 }
 
 void Camera::process_keyboard_input(Camera_Movement direction, float deltaTime) {
-	float velocity = 1.0f;
+	float velocity = MovementSpeed * deltaTime;
 	if (direction == FORWARD)
 		Position += Front * velocity;
 	if (direction == BACKWARD)

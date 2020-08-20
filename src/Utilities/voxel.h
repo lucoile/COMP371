@@ -5,6 +5,8 @@
 #ifndef _VOXEL_H_
 #define _VOXEL_H_
 
+#include "mesh_m.h"
+
 enum VoxelType
 {
 	VoxelType_Default = 0,
@@ -23,7 +25,7 @@ class Voxel
  public:
 	constexpr static float VOXEL_RENDER_SIZE = 0.1f;
 
-	Voxel() { m_active = false; };
+	Voxel() { m_active = true; };
 	~Voxel() {};
 
 	bool IsActive()
