@@ -40,12 +40,3 @@ void Mesh_M::setupMesh()
 
 	glBindVertexArray(0);
 }
-
-void Mesh_M::Update(std::vector<Vertex> vertices)
-{
-	this->vertices = vertices;
-	glDeleteBuffer(1, &VAO);
-	glDeleteBuffers(1, &VBO);
-	setupMesh();
-}
-

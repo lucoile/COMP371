@@ -29,8 +29,6 @@ class Mesh_M {
 
 	// Render the mesh
 	void Draw(Shader &shader, GLenum type);
-
-	void Update(std::vector<Vertex> vertices);
  private:
 	// render data
 	unsigned int VAO, VBO;

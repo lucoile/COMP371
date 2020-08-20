@@ -15,7 +15,7 @@ class Chunk
 	Chunk();
 	~Chunk();
 
-	void Update();
+	void Update(float dt);
 
 	void Render(Shader &shader);
 
