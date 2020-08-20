@@ -45,7 +45,7 @@ void Chunk::CreateMesh()
 				}
 
 				float voxelAdjust = Voxel::VOXEL_RENDER_SIZE * Voxel::VOXEL_RENDER_SIZE;
-				CreateCube(x * voxelAdjust, y * voxelAdjust, z * voxelAdjust);
+                CreateCube(x * voxelAdjust, y * voxelAdjust, z * voxelAdjust, m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z].getType());
 			}
 		}
 	}
@@ -53,7 +53,7 @@ void Chunk::CreateMesh()
 	chunkMesh = new Mesh_M(chunkVertices);
 }
 
-void Chunk::CreateCube(float x, float y, float z)
+void Chunk::CreateCube(float x, float y, float z, VoxelType type)
 {
 //	std::cout << x << " " << y << " " << z << "\n";
 
@@ -68,7 +68,8 @@ void Chunk::CreateCube(float x, float y, float z)
 	glm::vec3 p6(x - voxelAdjust, y + voxelAdjust, z - voxelAdjust);
 	glm::vec3 p7(x - voxelAdjust, y - voxelAdjust, z - voxelAdjust);
 
-	glm::vec4 color(1.0f);
+	// set voxel color
+    glm::vec4 color(0.50f, 0.30f, 0.25f, 1.0f);
 
 	// Front
 	glm::vec3 n1 = glm::vec3(0.0f, 0.0f, 1.0f);
@@ -111,8 +112,22 @@ void Chunk::CreateCube(float x, float y, float z)
 	chunkVertices.push_back({p2, n1, color});
 	chunkVertices.push_back({p1, n1, color});
 
+    // Bottom
+    n1 = glm::vec3(0.0f, -1.0f, 0.0f);
+
+    chunkVertices.push_back({p7, n1, color});	// triangle 1
+    chunkVertices.push_back({p4, n1, color});
+    chunkVertices.push_back({p3, n1, color});
+    chunkVertices.push_back({p3, n1, color});	// triangle 2
+    chunkVertices.push_back({p2, n1, color});
+    chunkVertices.push_back({p7, n1, color});
+
 	// Top
 	n1 = glm::vec3(0.0f, 1.0f, 0.0f);
+
+    if(type == VoxelType_Grass){
+        color = glm::vec4(0.0f, 0.5f, 0.0f, 1.0f);
+    }
 
 	chunkVertices.push_back({p0, n1, color});	// triangle 1
 	chunkVertices.push_back({p5, n1, color});
@@ -120,16 +135,6 @@ void Chunk::CreateCube(float x, float y, float z)
 	chunkVertices.push_back({p6, n1, color});	// triangle 2
 	chunkVertices.push_back({p1, n1, color});
 	chunkVertices.push_back({p0, n1, color});
-
-	// Bottom
-	n1 = glm::vec3(0.0f, -1.0f, 0.0f);
-
-	chunkVertices.push_back({p7, n1, color});	// triangle 1
-	chunkVertices.push_back({p4, n1, color});
-	chunkVertices.push_back({p3, n1, color});
-	chunkVertices.push_back({p3, n1, color});	// triangle 2
-	chunkVertices.push_back({p2, n1, color});
-	chunkVertices.push_back({p7, n1, color});
 }
 
 void Chunk::Render(Shader& shader)
@@ -165,7 +170,7 @@ void Chunk::Update()
 				}
 
 				float voxelAdjust = Voxel::VOXEL_RENDER_SIZE * Voxel::VOXEL_RENDER_SIZE;
-				CreateCube(x * voxelAdjust, y * voxelAdjust, z * voxelAdjust);
+                CreateCube(x * voxelAdjust, y * voxelAdjust, z * voxelAdjust, m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z].getType());
 			}
 		}
 	}
@@ -201,14 +206,18 @@ void Chunk::Setup_Landscape(Terrain terrain)
 
 			for (int y = (yOffset); y < height; y++)
 			{
-				m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z].SetActive(true);
-//				m_pVoxels[x][y][z].SetBlockType(BlockType_Grass);
+                m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z].SetActive(true);
+			    if((y - height) == -1){
+                  m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z].SetType(VoxelType_Grass);
+			    } else{
+			        m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z].SetType(VoxelType_Dirt);
+			    }
 			}
 
 //			for (int y = yOffset + height + 1; y < yOffset + CHUNK_SIZE; y++)
 //			{
 //				m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z].SetActive(false);
-////				m_pVoxels[x][y][z].SetBlockType(BlockType_Grass);
+//				m_pVoxels[x][y][z].SetBlockType(VoxelType_Grass);
 //			}
 		}
 	}

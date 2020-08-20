@@ -25,7 +25,7 @@ class Voxel
  public:
 	constexpr static float VOXEL_RENDER_SIZE = 0.1f;
 
-	Voxel() { m_active = false; };
+	Voxel() { m_active = false; m_voxelType = VoxelType_Default;};
 	~Voxel() {};
 
 	bool IsActive()
@@ -37,6 +37,18 @@ class Voxel
 	{
 		m_active = active;
 	}
+
+	void SetType(VoxelType type)
+	{
+        m_voxelType = type;
+	}
+
+	VoxelType getType()
+	{
+        return m_voxelType;
+	}
+
+
 
  private:
 	bool m_active;
