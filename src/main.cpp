@@ -15,9 +15,8 @@
 
 #include "Utilities/shader_m.h"
 #include "Utilities/camera.h"
-//#include "Utilities/model.h"
+#include "Utilities/player.h"
 #include "Utilities/texture.h"
-#include "Utilities/terrain.h"
 #include "Utilities/chunk_manager.h"
 
 #include "Line/line.h"
@@ -87,6 +86,8 @@ glm::vec3 lightPos;
 
 Camera_Movement lastMove;
 
+Player* pPlayer;
+
 int main() {
     // GLFW: Initialize and configure
     glfwInit();
@@ -129,15 +130,9 @@ int main() {
 	Shader chunkSceneShader("../res/shaders/chunk_scene.vert", "../res/shaders/chunk_scene.frag");
 	Shader chunkShadowShader("../res/shaders/chunk_shadow.vert", "../res/shaders/chunk_shadow.frag");
 
-//    // Cube model
-//    Model cube("../res/models/cube/cube.obj");
-//    // Sphere model
-//    Model sphere("../res/models/sphere/sphere.obj");
-
-    // Initialize terrain
-//	Terrain terrain(TERRAIN_SIZE, cube, sphere, OCTAVE_COUNT, FREQUENCY, PERSISTENCE);
-
-	ChunkManager ChunkManager;
+	ChunkManager* pChunkManager = new ChunkManager;
+	Terrain* terrain = new Terrain;
+	pPlayer = new Player(pChunkManager, terrain);
 
 	// Textures
     Texture boxTexture("res/textures/box.jpg");
@@ -240,7 +235,8 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// Render scene with shadow/depth map shader
-		ChunkManager.RenderChunks(chunkShadowShader);
+		pChunkManager->RenderChunks(chunkShadowShader);
+		pPlayer->Render(chunkShadowShader);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -265,7 +261,8 @@ int main() {
 
 		// Render the scene using shadow map
 		resetTextures(chunkSceneShader);
-		ChunkManager.RenderChunks(chunkSceneShader);
+		pChunkManager->RenderChunks(chunkSceneShader);
+		pPlayer->Render(chunkSceneShader);
 
 		// Reset framebuffer
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -341,13 +338,17 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
     }
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		camera.process_keyboard_input(FORWARD, deltaTime); lastMove = FORWARD;
+		camera.process_keyboard_input(FORWARD, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		camera.process_keyboard_input(BACKWARD, deltaTime); lastMove = BACKWARD;
+		camera.process_keyboard_input(BACKWARD, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		camera.process_keyboard_input(LEFT, deltaTime); lastMove = LEFT;
+		camera.process_keyboard_input(LEFT, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		camera.process_keyboard_input(RIGHT, deltaTime); lastMove = RIGHT;
+		camera.process_keyboard_input(RIGHT, deltaTime);
+
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+		pPlayer->process_keyboard_input(Movement_Direction::P_FORWARD, deltaTime);
+
 
     // Press X to toggle textures
     if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) {

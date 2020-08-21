@@ -63,3 +63,22 @@ void ChunkManager::RenderChunks(Shader& shader)
 		pChunk->Render(shader);
 	}
 }
+
+bool ChunkManager::IsActive(int x, int y, int z)
+{
+	// Get the x, y, z coordinates of the chunk the voxel is located in
+	int xChunk = int(x / Chunk::CHUNK_SIZE);
+	int yChunk = int(y / Chunk::CHUNK_SIZE);
+	int zChunk = int(z / Chunk::CHUNK_SIZE);
+
+
+	// Get the x, y, z coordinates of the voxel relative to the chunk
+	int xVoxel = x - (Chunk::CHUNK_SIZE * xChunk);
+	int yVoxel = y - (Chunk::CHUNK_SIZE * yChunk);
+	int zVoxel = z - (Chunk::CHUNK_SIZE * zChunk);
+
+//	std::cout << xChunk << " " << yChunk << " " << zChunk << "\t";
+//	std::cout << xVoxel << " " << yVoxel << " " << zVoxel << "\n";
+
+	return m_vpChunkList[(xChunk * NUM_CHUNKS * NUM_CHUNKS) + (yChunk * NUM_CHUNKS) + zChunk]->IsActive(xVoxel, yVoxel, zVoxel);
+}

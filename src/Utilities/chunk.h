@@ -30,9 +30,9 @@ class Chunk
 
 	bool IsLoaded();
 	void Load();
- private:
-	unsigned int VBO, VAO;
 
+	bool IsActive(int x, int y, int z);
+ private:
 	// The blocks data
 	std::vector<Voxel> m_pVoxels;
 	std::vector<Vertex> chunkVertices;
