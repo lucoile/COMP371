@@ -46,12 +46,28 @@ void Terrain::Render(Shader &shader, glm::mat4 world, glm::vec2 worldPos) {
                                (float) (z - (renderSize / 2.0) - startZ) * ULEN);
 
             // Scale each voxel to the height in height map rounded to the nearest unit
-            glm::mat4 model = world * glm::scale(id, glm::vec3(1.0f, 1.0 + round(10.0 * height), 1.0f)) *
+            glm::mat4 model = world * glm::scale(id, glm::vec3(1.0f, 1.0 + round(10.0 * height) - 1.0, 1.0f)) *
                               glm::translate(id, voxelPos);
 
             // Render cube with position and height
+            shader.setInt("material.diffuse", 5);
             shader.setMat4("model", model);
             cube.Draw(shader, GL_TRIANGLES);
+
+            glm::mat4 topModel = world * glm::translate(id, glm::vec3(0, (1.0 + round(10.0 * height) )* ULEN, 0)) * glm::translate(id, voxelPos);
+
+            shader.setMat4("model", topModel);
+            cube.Draw(shader, GL_TRIANGLES);
+
+//            glm::vec3 voxelPos2((float) (x - (renderSize / 2.0) - startX) * ULEN,
+//                                (float) height * ULEN,
+//                                (float) (z - (renderSize / 2.0) - startZ) * ULEN);
+//
+//            glm::mat4 model2 = world *  glm::scale(id, glm::vec3(1.0f, 1.0 , 1.0f)) * glm::translate(id, voxelPos2);
+//            shader.setInt("material.diffuse",6);
+//            shader.setMat4("model", model2);
+//            cube.Draw(shader, GL_TRIANGLES);
+
 
             RenderVegetationAndModels(shader, world, startX, startZ, x, z, height);
         }
@@ -156,6 +172,7 @@ void Terrain::RenderModel(Shader &shader, const glm::mat4 &world, int startX, in
         glm::mat4 model =
                 world * glm::translate(id, voxelPos2) * models[modelCount].letterTranslation * models[modelCount].rotation *
                 models[modelCount].scale * models[modelCount].letterAdjust * models[modelCount].letterRotation * models[modelCount].letterTrans[i];
+        shader.setInt("material.diffuse",0);
         shader.setMat4("model", model);
 
         cube.Draw(shader, GL_TRIANGLES);
@@ -166,6 +183,7 @@ void Terrain::RenderModel(Shader &shader, const glm::mat4 &world, int startX, in
         glm::mat4 model =
                 world * glm::translate(id, voxelPos2) * models[modelCount].numberTranslation * models[modelCount].rotation *
                 models[modelCount].scale * models[modelCount].numAdjust * models[modelCount].numberRotation * models[modelCount].numTrans[i];
+        shader.setInt("material.diffuse",0);
         shader.setMat4("model", model);
 
         cube.Draw(shader, GL_TRIANGLES);
@@ -175,6 +193,7 @@ void Terrain::RenderModel(Shader &shader, const glm::mat4 &world, int startX, in
     glm::mat4 model =
             world * glm::translate(id, voxelPos2) * glm::translate(id, glm::vec3(0, 5.0 * ULEN, 0)) *
             models[modelCount].rotation * models[modelCount].scale * glm::scale(id, glm::vec3(3.0f, 3.0f, 3.0f));
+    shader.setInt("material.diffuse",0);
     shader.setMat4("model", model);
 
     sphere.Draw(shader, GL_TRIANGLES);
@@ -192,6 +211,7 @@ void Terrain::RenderTree(Shader &shader, const glm::mat4 &world, int startX, int
                 models[modelCount].rotation *
                 models[modelCount].scale * models[modelCount].letterAdjust * models[modelCount].letterRotation *
                 letterTran;
+        shader.setInt("material.diffuse",8);
         shader.setMat4("model", model);
 
         cube.Draw(shader, GL_TRIANGLES);
@@ -202,6 +222,7 @@ void Terrain::RenderTree(Shader &shader, const glm::mat4 &world, int startX, int
         glm::mat4 model =
                 world * glm::translate(id, voxelPos2) * models[modelCount].numberTranslation * models[modelCount].rotation *
                 models[modelCount].scale * models[modelCount].numAdjust * models[modelCount].numberRotation * numTran;
+        shader.setInt("material.diffuse",7);
         shader.setMat4("model", model);
 
         cube.Draw(shader, GL_TRIANGLES);
@@ -210,16 +231,194 @@ void Terrain::RenderTree(Shader &shader, const glm::mat4 &world, int startX, int
 
 void Terrain::createTreeModel(){
     models[5].letterTrans.push_back(
-            glm::scale(id, glm::vec3(1.0f, 7.0f, 1.0f))
+            glm::translate(id, glm::vec3(0.0, 1.0f * ULEN, 0.0f))
+    );
+    models[5].letterTrans.push_back(
+            glm::translate(id, glm::vec3(0.0, 2.0f * ULEN, 0.0f))
+    );
+    models[5].letterTrans.push_back(
+            glm::translate(id, glm::vec3(0.0, 3.0f * ULEN, 0.0f))
+    );
+    models[5].letterTrans.push_back(
+            glm::translate(id, glm::vec3(0.0, 4.0f * ULEN, 0.0f))
+    );
+    models[5].letterTrans.push_back(
+            glm::translate(id, glm::vec3(0.0, 5.0f * ULEN, 0.0f))
+    );
+    models[5].letterTrans.push_back(
+            glm::translate(id, glm::vec3(0.0, 6.0f * ULEN, 0.0f))
     );
     models[5].numTrans.push_back(
-            glm::translate(id, glm::vec3(0.0, 7.0f * ULEN, 0.0f)) *
-            glm::scale(id, glm::vec3(5.0f, 2.0f, 5.0f))
+            glm::translate(id, glm::vec3(0.0, 7.0f * ULEN, 0.0f))
     );
     models[5].numTrans.push_back(
-            glm::translate(id, glm::vec3(0.0, 9.0f * ULEN, 0.0f)) *
-            glm::scale(id, glm::vec3(3.0f, 1.0f, 3.0f))
+            glm::translate(id, glm::vec3(1.0 * ULEN, 7.0f * ULEN, 0.0f))
     );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(2.0 * ULEN, 7.0f * ULEN, 0.0f))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(-1.0 * ULEN, 7.0f * ULEN, 0.0f))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(-2.0 * ULEN, 7.0f * ULEN, 0.0f))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(0.0, 7.0f * ULEN, 1.0f * ULEN))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(0.0, 7.0f * ULEN, 2.0f * ULEN))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(0.0, 7.0f * ULEN, -1.0f * ULEN))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(0.0, 7.0f * ULEN, -2.0f * ULEN))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(1.0 * ULEN, 7.0f * ULEN, 1.0f * ULEN))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(2.0 * ULEN, 7.0f * ULEN, 2.0f * ULEN))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(-1.0 * ULEN, 7.0f * ULEN, -1.0f * ULEN))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(-2.0 * ULEN, 7.0f * ULEN, -2.0f * ULEN))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(-1.0 * ULEN, 7.0f * ULEN, 1.0f * ULEN))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(-2.0 * ULEN, 7.0f * ULEN, 2.0f * ULEN))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(1.0 * ULEN, 7.0f * ULEN, -1.0f * ULEN))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(2.0 * ULEN, 7.0f * ULEN, -2.0f * ULEN))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(1.0 * ULEN, 7.0f * ULEN, 2.0f * ULEN))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(2.0 * ULEN, 7.0f * ULEN, 1.0f * ULEN))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(-1.0 * ULEN, 7.0f * ULEN, 2.0f * ULEN))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(-2.0 * ULEN, 7.0f * ULEN, 1.0f * ULEN))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(-1.0 * ULEN, 7.0f * ULEN, -2.0f * ULEN))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(-2.0 * ULEN, 7.0f * ULEN, -1.0f * ULEN))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(1.0 * ULEN, 7.0f * ULEN, -2.0f * ULEN))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(2.0 * ULEN, 7.0f * ULEN, -1.0f * ULEN))
+    );
+
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(0.0, 8.0F * ULEN, 0.0f))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(1.0 * ULEN, 8.0F * ULEN, 0.0f))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(2.0 * ULEN, 8.0F * ULEN, 0.0f))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(-1.0 * ULEN, 8.0F * ULEN, 0.0f))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(-2.0 * ULEN, 8.0F * ULEN, 0.0f))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(0.0, 8.0F * ULEN, 1.0f * ULEN))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(0.0, 8.0F * ULEN, 2.0f * ULEN))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(0.0, 8.0F * ULEN, -1.0f * ULEN))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(0.0, 8.0F * ULEN, -2.0f * ULEN))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(1.0 * ULEN, 8.0F * ULEN, 1.0f * ULEN))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(2.0 * ULEN, 8.0F * ULEN, 2.0f * ULEN))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(-1.0 * ULEN, 8.0F * ULEN, -1.0f * ULEN))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(-2.0 * ULEN, 8.0F * ULEN, -2.0f * ULEN))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(-1.0 * ULEN, 8.0F * ULEN, 1.0f * ULEN))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(-2.0 * ULEN, 8.0F * ULEN, 2.0f * ULEN))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(1.0 * ULEN, 8.0F * ULEN, -1.0f * ULEN))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(2.0 * ULEN, 8.0F * ULEN, -2.0f * ULEN))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(1.0 * ULEN, 8.0F * ULEN, 2.0f * ULEN))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(2.0 * ULEN, 8.0F * ULEN, 1.0f * ULEN))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(-1.0 * ULEN, 8.0F * ULEN, 2.0f * ULEN))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(-2.0 * ULEN, 8.0F * ULEN, 1.0f * ULEN))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(-1.0 * ULEN, 8.0F * ULEN, -2.0f * ULEN))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(-2.0 * ULEN, 8.0F * ULEN, -1.0f * ULEN))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(1.0 * ULEN, 8.0F * ULEN, -2.0f * ULEN))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(2.0 * ULEN, 8.0F * ULEN, -1.0f * ULEN))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(0.0, 8.0f * ULEN, 0.0f))
+    );
+
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(0.0, 9.0f * ULEN, 0.0f))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(1.0 * ULEN, 9.0F * ULEN, 0.0f))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(-1.0 * ULEN, 9.0F * ULEN, 0.0f))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(0.0, 9.0F * ULEN, 1.0f * ULEN))
+    );
+    models[5].numTrans.push_back(
+            glm::translate(id, glm::vec3(0.0, 9.0F * ULEN, -1.0f * ULEN))
+    );
+
 
     models[5].numTrans.push_back(
             glm::translate(id, glm::vec3(0.0, 10.0f * ULEN, 0.0f))
