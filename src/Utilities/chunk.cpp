@@ -200,6 +200,7 @@ void Chunk::Load()
 void Chunk::Setup_Landscape(Terrain terrain)
 {
 	float* heightMap = terrain.heightMap;
+	int* vegetationMap = terrain.vegetationMap;
 
 	int xOffset = chunkPos.x * CHUNK_SIZE;
 	int yOffset = chunkPos.y * CHUNK_SIZE;
@@ -211,6 +212,7 @@ void Chunk::Setup_Landscape(Terrain terrain)
 		{
 			// Use the height map texture to get the height value of x, z
 			int height = round(heightMap[(x + xOffset) * 1000 + (z + zOffset)] * 10.0);
+            int vegetationHeight = round(vegetationMap[(x + xOffset) * 1000 + (z + zOffset)] * 10.0);
 			std::cout << yOffset << "\n";
 
 			for (int y = (yOffset); y < height; y++)

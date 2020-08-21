@@ -51,6 +51,8 @@ void Terrain::genHeightMap() {
 		{
 			heightMap[i * size + j] = (float) (((heightMap1.GetValue(i, j) / 2.0) + 0.5) *
 				(((heightMap2.GetValue(i, j) / 2.0) + 0.5) * 2.0f));
+
+            vegetationMap[i * size + j] = (float) ((heightMap1.GetValue(i, j) / 2.0) + 0.5);
 		}
 	}
 
