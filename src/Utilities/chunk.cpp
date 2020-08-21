@@ -227,7 +227,7 @@ void Chunk::Setup_Landscape(Terrain terrain)
 					// random num to determine whether or not trees should be generated
 //					int rdm = rand() % 100; // random number between 0 and 99
                     std::cout << " height: " << vegetationHeight << " x: " << x << " y: " << y << " z: " << z << "\n";
-					if(vegetationHeight > 0.999 && (x < 15) && (y < 12) && (z < 15) && (x > 0) && (z > 0)) {
+					if(vegetationHeight > 0.9 && (x < 15) && (y < 12) && (z < 15) && (x > 0) && (z > 0)) {
 						// Trunk
 						m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + ((y + 1) * CHUNK_SIZE) + z].SetActive(true);
 						m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + ((y + 1) * CHUNK_SIZE) + z].SetType(VoxelType_Wood);
