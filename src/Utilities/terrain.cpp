@@ -14,7 +14,7 @@ Terrain::Terrain(unsigned int size, int octaveCount, float frequency, float pers
     this->renderSize = renderSize;
 
     heightMap = new float[size * size];
-    vegetationMap = new int[size * size];
+    vegetationMap = new float[size * size];
 
     genHeightMap();
 }
@@ -51,10 +51,27 @@ void Terrain::genHeightMap() {
 		{
 			heightMap[i * size + j] = (float) (((heightMap1.GetValue(i, j) / 2.0) + 0.5) *
 				(((heightMap2.GetValue(i, j) / 2.0) + 0.5) * 2.0f));
-
-            vegetationMap[i * size + j] = (float) ((heightMap1.GetValue(i, j) / 2.0) + 0.5);
 		}
 	}
+
+    // Generate vegetation height map using Perlin noise
+    heightMapBuilder.SetSourceModule(PerlinGen);
+    heightMapBuilder.SetDestNoiseMap(heightMap1);
+    heightMapBuilder.SetDestSize(size, size);
+    heightMapBuilder.SetBounds(0.0, 8.0, 0.0, 8.0);
+    heightMapBuilder.Build();
+
+    PerlinGen.SetOctaveCount(octaveCount);
+    PerlinGen.SetFrequency(frequency * 10.0f);
+    PerlinGen.SetPersistence(persistence / 2.0f);
+
+    for(int i = 0; i < size; i++)
+    {
+        for(int j = 0; j < size; j++)
+        {
+            vegetationMap[i * size + j] = (float) ((heightMap1.GetValue(i, j) / 2.0) + 0.5);
+        }
+    }
 
 	heightMap1.ReclaimMem();
 	heightMap2.ReclaimMem();

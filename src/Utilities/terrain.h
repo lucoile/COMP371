@@ -54,7 +54,7 @@ public:
   	noise::utils::NoiseMap heightMap2;
   	float *heightMap;
 
-	int *vegetationMap;
+	float *vegetationMap;
 
     // Alphanumeric models data structure
 //    Alphanum models[6];

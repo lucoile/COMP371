@@ -199,8 +199,9 @@ void Chunk::Load()
 
 void Chunk::Setup_Landscape(Terrain terrain)
 {
+    module::Perlin perlinModule;
 	float* heightMap = terrain.heightMap;
-	int* vegetationMap = terrain.vegetationMap;
+	float* vegetationMap = terrain.vegetationMap;
 
 	int xOffset = chunkPos.x * CHUNK_SIZE;
 	int yOffset = chunkPos.y * CHUNK_SIZE;
@@ -212,19 +213,21 @@ void Chunk::Setup_Landscape(Terrain terrain)
 		{
 			// Use the height map texture to get the height value of x, z
 			int height = round(heightMap[(x + xOffset) * 1000 + (z + zOffset)] * 10.0);
-            int vegetationHeight = round(vegetationMap[(x + xOffset) * 1000 + (z + zOffset)] * 10.0);
-			std::cout << yOffset << "\n";
+            float vegetationHeight = round(vegetationMap[(x + xOffset) * 1000 + (z + zOffset)] * 10.0);
+//			std::cout << yOffset << "\n";
 
 			for (int y = (yOffset); y < height; y++)
 			{
+			    double val = perlinModule.GetValue(x, vegetationHeight, z);
                 m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z].SetActive(true);
 			    if((y - height) == -1)
 			    {// set top layer to grass
                     m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z].SetType(VoxelType_Grass);
 
 					// random num to determine whether or not trees should be generated
-					int rdm = rand() % 100; // random number between 0 and 99
-					if(rdm < 2 && (x < 15) && (y < 12) && (z < 15)) {
+//					int rdm = rand() % 100; // random number between 0 and 99
+                    std::cout << "value: "<< val << " height: " << vegetationHeight << " x: " << x << " y: " << y << " z: " << z << "\n";
+					if(val > 0.999 && (x < 15) && (y < 12) && (z < 15)) {
 						// Trunk
 						m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + ((y + 1) * CHUNK_SIZE) + z].SetActive(true);
 						m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + ((y + 1) * CHUNK_SIZE) + z].SetType(VoxelType_Wood);
@@ -240,7 +243,7 @@ void Chunk::Setup_Landscape(Terrain terrain)
 									m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + ((y + i) * CHUNK_SIZE) + z].SetActive(true);
 									m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + ((y + i) * CHUNK_SIZE) + z].SetType(VoxelType_Wood);
 								}
-								rdm = rand() % 100;
+								int rdm = rand() % 100;
 								if(rdm < 80)
 								{
 									m_pVoxels[((x + j) * CHUNK_SIZE * CHUNK_SIZE) + ((y + i) * CHUNK_SIZE) + (z)].SetActive(true);
