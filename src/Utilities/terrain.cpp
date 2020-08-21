@@ -55,15 +55,17 @@ void Terrain::genHeightMap() {
 	}
 
     // Generate vegetation height map using Perlin noise
+	PerlinGen.SetOctaveCount(octaveCount);
+	PerlinGen.SetSeed(1234);
+	PerlinGen.SetFrequency(frequency * 900.0f);
+	PerlinGen.SetPersistence(persistence );
+
     heightMapBuilder.SetSourceModule(PerlinGen);
     heightMapBuilder.SetDestNoiseMap(heightMap1);
     heightMapBuilder.SetDestSize(size, size);
     heightMapBuilder.SetBounds(0.0, 8.0, 0.0, 8.0);
     heightMapBuilder.Build();
 
-    PerlinGen.SetOctaveCount(octaveCount);
-    PerlinGen.SetFrequency(frequency * 10.0f);
-    PerlinGen.SetPersistence(persistence / 2.0f);
 
     for(int i = 0; i < size; i++)
     {

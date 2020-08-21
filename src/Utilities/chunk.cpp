@@ -213,12 +213,12 @@ void Chunk::Setup_Landscape(Terrain terrain)
 		{
 			// Use the height map texture to get the height value of x, z
 			int height = round(heightMap[(x + xOffset) * 1000 + (z + zOffset)] * 10.0);
-            float vegetationHeight = round(vegetationMap[(x + xOffset) * 1000 + (z + zOffset)] * 10.0);
+            float vegetationHeight = (vegetationMap[(x + xOffset) * 1000 + (z + zOffset)]);
 //			std::cout << yOffset << "\n";
 
 			for (int y = (yOffset); y < height; y++)
 			{
-			    double val = perlinModule.GetValue(x, vegetationHeight, z);
+//			    double val = perlinModule.GetValue(x, vegetationHeight, z);
                 m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z].SetActive(true);
 			    if((y - height) == -1)
 			    {// set top layer to grass
@@ -226,8 +226,8 @@ void Chunk::Setup_Landscape(Terrain terrain)
 
 					// random num to determine whether or not trees should be generated
 //					int rdm = rand() % 100; // random number between 0 and 99
-                    std::cout << "value: "<< val << " height: " << vegetationHeight << " x: " << x << " y: " << y << " z: " << z << "\n";
-					if(val > 0.999 && (x < 15) && (y < 12) && (z < 15)) {
+                    std::cout << " height: " << vegetationHeight << " x: " << x << " y: " << y << " z: " << z << "\n";
+					if(vegetationHeight > 0.999 && (x < 15) && (y < 12) && (z < 15) && (x > 0) && (z > 0)) {
 						// Trunk
 						m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + ((y + 1) * CHUNK_SIZE) + z].SetActive(true);
 						m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + ((y + 1) * CHUNK_SIZE) + z].SetType(VoxelType_Wood);
