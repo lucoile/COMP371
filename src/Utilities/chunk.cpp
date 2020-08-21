@@ -69,7 +69,15 @@ void Chunk::CreateCube(float x, float y, float z, VoxelType type)
 	glm::vec3 p7(x - voxelAdjust, y - voxelAdjust, z - voxelAdjust);
 
 	// set voxel color
-    glm::vec4 color(0.50f, 0.30f, 0.25f, 1.0f);
+    glm::vec4 color(1.0f,1.0f,1.0f, 1.0f);
+    if(type==VoxelType_Wood)
+    {
+        color = glm::vec4(0.50f, 0.30f, 0.25f, 1.0f);
+    }
+    if(type == VoxelType_Leaves)
+    {
+        color = glm::vec4( 0.5f, 1.0f, 0.0f, 1.0f);
+    }
 
 	// Front
 	glm::vec3 n1 = glm::vec3(0.0f, 0.0f, 1.0f);
@@ -208,11 +216,38 @@ void Chunk::Setup_Landscape(Terrain terrain)
 			{
                 m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z].SetActive(true);
 			    if((y - height) == -1){
-                  m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z].SetType(VoxelType_Grass);
+                        // set trees
+                        m_pVoxels[1 + ((height) * CHUNK_SIZE)].SetActive(true);
+                        m_pVoxels[1 + ((height) * CHUNK_SIZE)].SetType(VoxelType_Wood);
+
+                        m_pVoxels[((y+6) * CHUNK_SIZE)].SetActive(true);
+                        m_pVoxels[((y+6) * CHUNK_SIZE)].SetType(VoxelType_Leaves);
+                        m_pVoxels[(1 + (height+6) * CHUNK_SIZE)].SetActive(true);
+                        m_pVoxels[(1 + (height+6) * CHUNK_SIZE)].SetType(VoxelType_Leaves);
+                        m_pVoxels[(1 + (y + 7 * CHUNK_SIZE))].SetActive(true);
+                        m_pVoxels[(1 + (y + 7 * CHUNK_SIZE))].SetType(VoxelType_Leaves);
+                        m_pVoxels[1 + ((y+6) * CHUNK_SIZE)].SetActive(true);
+                        m_pVoxels[1 + ((y+6) * CHUNK_SIZE)].SetType(VoxelType_Leaves);
+
+                        // set top layer to grass
+                    m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z].SetType(VoxelType_Grass);
 			    } else{
 			        m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z].SetType(VoxelType_Dirt);
 			    }
 			}
+
+			// random num to determine whether or not trees should be generated
+//          int rdm = rand() % 100; // random number between 0 and 99
+//			if(rdm < 50) {
+//                for (int y = (yOffset); y < height; y++)
+//                {
+//                    m_pVoxels[-2 * (y - height) * CHUNK_SIZE].SetActive(true);
+//                    m_pVoxels[-2 * (y - height) * CHUNK_SIZE].SetType(VoxelType_Wood);
+//
+//                    m_pVoxels[1 + -2 * (y - height) * CHUNK_SIZE + 1].SetActive(true);
+//                    m_pVoxels[1 + -2 * (y - height) * CHUNK_SIZE + 1].SetType(VoxelType_Wood);
+//                }
+//			}
 
 //			for (int y = yOffset + height + 1; y < yOffset + CHUNK_SIZE; y++)
 //			{

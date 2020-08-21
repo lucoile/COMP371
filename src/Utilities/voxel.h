@@ -16,6 +16,7 @@ enum VoxelType
 	VoxelType_Stone,
 	VoxelType_Wood,
 	VoxelType_Sand,
+	VoxelType_Leaves,
 
 	VoxelType_NumTypes
 };

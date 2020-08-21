@@ -95,8 +95,8 @@ public:
 	float persistence;
 
 	// Cube model used for voxels
-//	Model cube = Model("../../../res/models/cube/cube.obj");
-//    Model sphere = Model("../../../res/models/sphere/sphere.obj");
+    // Model cube = Model("../../../res/models/cube/cube.obj");
+    // Model sphere = Model("../../../res/models/sphere/sphere.obj");
 
     // Height map generation function
 	void genHeightMap();
