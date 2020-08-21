@@ -216,27 +216,15 @@ int main() {
         // Set projection matrix
         projection = glm::perspective(45.0f, (float) SCR_WIDTH / (float) SCR_HEIGHT, 0.1f,100.0f);
 
-        // Make sure camera isn't colliding with anything
-//		int cameraX = int(round(camera.Position.x));
-//		int cameraZ = int(round(camera.Position.z));
-//
-//      // Update worldPos
-//      worldPos.x = cameraX;
-//		worldPos.y = cameraZ;
-
-        // Set camera/view matrix
-//		float terrainHeight = terrain.GetValue(worldPos.x, worldPos.y);
-//		glm::vec3 Position = glm::vec3(0.0f,(round(terrainHeight * 10.0f) / 10.0f) + (5.0f * ULEN),0.0f);
-//		view = glm::lookAt(Position, Position + camera.Front, camera.Up);
 		view = camera.get_view_matrix();
 
 		// Set orthographic frustum for shadows
 		float near_plane = 1.0f, far_plane = 5.0f;
-		glm::mat4 lightProjection = glm::frustum(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+		glm::mat4 lightProjection = glm::frustum(-5.0f, 5.0f, -5.0f, 5.0f, near_plane, far_plane);
 
 		// View matrix from light perspective
 		// Shadows only render correctly if the light is offset by some amount >0
-		lightPos = glm::vec3(0.001f, 50.0 * ULEN, 0.001f);
+		lightPos = glm::vec3(3.2f, 50.0 * ULEN, 3.2f);
 		glm::mat4 lightView = glm::lookAt(lightPos,
 				glm::vec3( 0.0f, 0.0f,  0.0f),
 				glm::vec3( 0.0f, 1.0f,  0.0f));
@@ -245,12 +233,6 @@ int main() {
 
 		chunkShadowShader.use();
 		chunkShadowShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
-
-		// Bind grey texture
-		// Not sure why but if we don't bind it here it just renders as red
-//		glActiveTexture(GL_TEXTURE3);
-//		glEnable(GL_TEXTURE_2D);
-//		greyTexture.bind();
 
 		// Set viewport size and bind depth map frame buffer
 		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);

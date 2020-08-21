@@ -52,10 +52,9 @@ void ChunkManager::RenderChunks(Shader& shader)
 {
 	std::vector<Chunk*>::iterator iterator;
 
-//	for(int i = 0; i < m_vpChunkList.size(); i++)
-//	{
-//		m_vpChunkList[i]->Render(shader);
-//	}
+	shader.setMat4("world", glm::translate(glm::mat4(1.0f),
+		glm::vec3(-(NUM_CHUNKS / 2) * Chunk::CHUNK_SIZE * Voxel::VOXEL_RENDER_SIZE,
+			0.0f, -(NUM_CHUNKS / 2) * Chunk::CHUNK_SIZE * Voxel::VOXEL_RENDER_SIZE)));
 
 	for (iterator = m_vpChunkList.begin(); iterator != m_vpChunkList.end(); ++iterator)
 	{
