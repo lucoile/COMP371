@@ -74,8 +74,6 @@ public:
 		float persistence = 0.5,
 		int renderSize = 100);
 
-	// Render terrain
-	void Render(Shader &shader, glm::mat4 world, glm::vec2 worldPos);
 
 	float GetValue(int x, int y);
 	int GetVegetationValue(int x, int y);
@@ -94,23 +92,9 @@ public:
 	float frequency;
 	float persistence;
 
-	// Cube model used for voxels
-    // Model cube = Model("../../../res/models/cube/cube.obj");
-    // Model sphere = Model("../../../res/models/sphere/sphere.obj");
-
     // Height map generation function
 	void genHeightMap();
-//    void RenderModel(Shader &shader, const glm::mat4 &world, int startX, int startZ, int x, int z, float height);
-//    void RenderTree(Shader &shader, const glm::mat4 &world, int startX, int startZ, int x, int z, float height);
-//    void RenderVegetationAndModels(Shader &shader, const glm::mat4 &world, int startX, int startZ, int x, int z, float height);
-//
-//    void createR1Model();
-//	void createH6Model();
-//	void createN5Model();
-//	void create08Model();
-//	void createK5Model();
-//
-//	void createTreeModel();
+
 };
 
 
