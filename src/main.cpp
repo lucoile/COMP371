@@ -148,10 +148,10 @@ int main() {
     Texture groundTexture("res/textures/ground.jpg");
     Texture shinyTexture("res/textures/yellow.png");
     Texture greyTexture("res/textures/grey.png");
-    Texture dirtTexture("res/textures/dirt.jpg");
+    Texture dirtTexture("res/textures/dirt.png");
     Texture grassTexture("res/textures/grass.png");
     Texture leavesTextures("res/textures/leaves.jpg");
-    Texture treeTextures("res/textures/tree-trunk.jpg");
+    Texture treeTextures("res/textures/treetrunk.png");
 
 	// bind textures
 	glActiveTexture(GL_TEXTURE0);
@@ -234,7 +234,7 @@ int main() {
         // Input
         process_input(window);
 
-        glClearColor(0.0f, 0.0784f, 0.1607f, 1.0f);
+        glClearColor(0.098f, 0.85f, 0.992f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Set projection matrix
