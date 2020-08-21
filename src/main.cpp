@@ -61,25 +61,14 @@ float lastFrame = 0.0f;
 // Render Type
 GLenum type = GL_TRIANGLES;
 
-// Selected Model
-unsigned int selectedModel = 0;
-
 // Texture Toggle
 unsigned int textureOn = 1;
 
 // Identity matrix
 glm::mat4 id(1.0f);
 
-// World Orientation
+// Render matrices
 glm::mat4 worldOrientation(1.0f);
-glm::mat4 worldRotation(1.0f);
-
-// Sphere Scaling
-glm::mat4 sphereScale = glm::scale(id, glm::vec3(5.0f, 5.0f, 5.0f));
-
-// Sphere Translation
-glm::mat4 sphereTranslation = glm::translate(id, glm::vec3(0.0f, 6.0 * ULEN, 0.0f));
-
 glm::mat4 projection(1.0f);
 glm::mat4 view(1.0f);
 
@@ -370,10 +359,5 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
 		camera.process_keyboard_input(LEFT, deltaTime); lastMove = LEFT;
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		camera.process_keyboard_input(RIGHT, deltaTime); lastMove = RIGHT;
-
-    // Press X to toggle textures
-    if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) {
-        textureOn = 1 - textureOn;
-    }
 }
 
