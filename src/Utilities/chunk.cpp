@@ -222,20 +222,36 @@ void Chunk::Setup_Landscape(Terrain terrain)
 
 					// random num to determine whether or not trees should be generated
 					int rdm = rand() % 100; // random number between 0 and 99
-					if(rdm < 2) {
+					if(rdm < 2 && (x < 15) && (y < 12) && (z < 15)) {
 						// Trunk
 						m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + ((y + 1) * CHUNK_SIZE) + z].SetActive(true);
 						m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + ((y + 1) * CHUNK_SIZE) + z].SetType(VoxelType_Wood);
 						m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + ((y + 2) * CHUNK_SIZE) + z].SetActive(true);
 						m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + ((y + 2) * CHUNK_SIZE) + z].SetType(VoxelType_Wood);
 						// Leaves
-						m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + ((y + 3) * CHUNK_SIZE) + z].SetActive(true);
-						m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + ((y + 3) * CHUNK_SIZE) + z].SetType(VoxelType_Leaves);
-						m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + ((y + 4) * CHUNK_SIZE) + z].SetActive(true);
-						m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + ((y + 4) * CHUNK_SIZE) + z].SetType(VoxelType_Leaves);
-						m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + ((y + 5) * CHUNK_SIZE) + z].SetActive(true);
-						m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + ((y + 5) * CHUNK_SIZE) + z].SetType(VoxelType_Leaves);
+						for(int i = 3; i < 6; i++)
+						{
+							for(int j = -1; j <= 1; j++)
+							{
+								if(j == 0)
+								{
+									m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + ((y + i) * CHUNK_SIZE) + z].SetActive(true);
+									m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + ((y + i) * CHUNK_SIZE) + z].SetType(VoxelType_Wood);
+								}
+								rdm = rand() % 100;
+								if(rdm < 80)
+								{
+									m_pVoxels[((x + j) * CHUNK_SIZE * CHUNK_SIZE) + ((y + i) * CHUNK_SIZE) + (z)].SetActive(true);
+									m_pVoxels[((x + j) * CHUNK_SIZE * CHUNK_SIZE) + ((y + i) * CHUNK_SIZE) + (z)].SetType(VoxelType_Leaves);
 
+									m_pVoxels[((x) * CHUNK_SIZE * CHUNK_SIZE) + ((y + i) * CHUNK_SIZE) + (z + j)].SetActive(true);
+									m_pVoxels[((x) * CHUNK_SIZE * CHUNK_SIZE) + ((y + i) * CHUNK_SIZE) + (z + j)].SetType(VoxelType_Leaves);
+								}
+							}
+
+						}
+						m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + ((y + 6) * CHUNK_SIZE) + z].SetActive(true);
+						m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + ((y + 6) * CHUNK_SIZE) + z].SetType(VoxelType_Leaves);
 					}
 			    }
 			    else
