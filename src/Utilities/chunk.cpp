@@ -57,7 +57,7 @@ void Chunk::CreateCube(float x, float y, float z, VoxelType type)
 {
 //	std::cout << x << " " << y << " " << z << "\n";
 
-	float voxelAdjust = Voxel::VOXEL_RENDER_SIZE * Voxel::VOXEL_RENDER_SIZE;
+	float voxelAdjust = Voxel::VOXEL_RENDER_SIZE * Voxel::VOXEL_RENDER_SIZE / 2;
 
 	glm::vec3 p0(x + voxelAdjust, y + voxelAdjust, z + voxelAdjust);
 	glm::vec3 p1(x - voxelAdjust, y + voxelAdjust, z + voxelAdjust);
@@ -70,7 +70,8 @@ void Chunk::CreateCube(float x, float y, float z, VoxelType type)
 
 	// set voxel color
     glm::vec4 color(1.0f,1.0f,1.0f, 1.0f);
-    if(type==VoxelType_Wood)
+
+    if(type == VoxelType_Wood)
     {
         color = glm::vec4(0.50f, 0.30f, 0.25f, 1.0f);
     }
@@ -215,45 +216,33 @@ void Chunk::Setup_Landscape(Terrain terrain)
 			for (int y = (yOffset); y < height; y++)
 			{
                 m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z].SetActive(true);
-			    if((y - height) == -1){
-                        // set trees
-                        m_pVoxels[1 + ((height) * CHUNK_SIZE)].SetActive(true);
-                        m_pVoxels[1 + ((height) * CHUNK_SIZE)].SetType(VoxelType_Wood);
-
-                        m_pVoxels[((y+6) * CHUNK_SIZE)].SetActive(true);
-                        m_pVoxels[((y+6) * CHUNK_SIZE)].SetType(VoxelType_Leaves);
-                        m_pVoxels[(1 + (height+6) * CHUNK_SIZE)].SetActive(true);
-                        m_pVoxels[(1 + (height+6) * CHUNK_SIZE)].SetType(VoxelType_Leaves);
-                        m_pVoxels[(1 + (y + 7 * CHUNK_SIZE))].SetActive(true);
-                        m_pVoxels[(1 + (y + 7 * CHUNK_SIZE))].SetType(VoxelType_Leaves);
-                        m_pVoxels[1 + ((y+6) * CHUNK_SIZE)].SetActive(true);
-                        m_pVoxels[1 + ((y+6) * CHUNK_SIZE)].SetType(VoxelType_Leaves);
-
-                        // set top layer to grass
+			    if((y - height) == -1)
+			    {// set top layer to grass
                     m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z].SetType(VoxelType_Grass);
-			    } else{
+
+					// random num to determine whether or not trees should be generated
+					int rdm = rand() % 100; // random number between 0 and 99
+					if(rdm < 2) {
+						// Trunk
+						m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + ((y + 1) * CHUNK_SIZE) + z].SetActive(true);
+						m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + ((y + 1) * CHUNK_SIZE) + z].SetType(VoxelType_Wood);
+						m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + ((y + 2) * CHUNK_SIZE) + z].SetActive(true);
+						m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + ((y + 2) * CHUNK_SIZE) + z].SetType(VoxelType_Wood);
+						// Leaves
+						m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + ((y + 3) * CHUNK_SIZE) + z].SetActive(true);
+						m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + ((y + 3) * CHUNK_SIZE) + z].SetType(VoxelType_Leaves);
+						m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + ((y + 4) * CHUNK_SIZE) + z].SetActive(true);
+						m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + ((y + 4) * CHUNK_SIZE) + z].SetType(VoxelType_Leaves);
+						m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + ((y + 5) * CHUNK_SIZE) + z].SetActive(true);
+						m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + ((y + 5) * CHUNK_SIZE) + z].SetType(VoxelType_Leaves);
+
+					}
+			    }
+			    else
+			    {
 			        m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z].SetType(VoxelType_Dirt);
 			    }
 			}
-
-			// random num to determine whether or not trees should be generated
-//          int rdm = rand() % 100; // random number between 0 and 99
-//			if(rdm < 50) {
-//                for (int y = (yOffset); y < height; y++)
-//                {
-//                    m_pVoxels[-2 * (y - height) * CHUNK_SIZE].SetActive(true);
-//                    m_pVoxels[-2 * (y - height) * CHUNK_SIZE].SetType(VoxelType_Wood);
-//
-//                    m_pVoxels[1 + -2 * (y - height) * CHUNK_SIZE + 1].SetActive(true);
-//                    m_pVoxels[1 + -2 * (y - height) * CHUNK_SIZE + 1].SetType(VoxelType_Wood);
-//                }
-//			}
-
-//			for (int y = yOffset + height + 1; y < yOffset + CHUNK_SIZE; y++)
-//			{
-//				m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z].SetActive(false);
-//				m_pVoxels[x][y][z].SetBlockType(VoxelType_Grass);
-//			}
 		}
 	}
 
