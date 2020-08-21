@@ -148,10 +148,10 @@ int main() {
     Texture groundTexture("res/textures/ground.jpg");
     Texture shinyTexture("res/textures/yellow.png");
     Texture greyTexture("res/textures/grey.png");
-    Texture dirtTexture("res/textures/dirt.png");
+    Texture dirtTexture("res/textures/grass.jpg");
     Texture grassTexture("res/textures/grass.png");
     Texture leavesTextures("res/textures/leaves.jpg");
-    Texture treeTextures("res/textures/treetrunk.png");
+    Texture treeTextures("res/textures/tree.jpg");
 
 	// bind textures
 	glActiveTexture(GL_TEXTURE0);
