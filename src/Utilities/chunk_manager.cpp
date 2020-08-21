@@ -4,21 +4,28 @@
 
 #include "chunk_manager.h"
 
-ChunkManager::ChunkManager()
+ChunkManager::ChunkManager(Terrain* terrain)
 {
-	terrain = new Terrain;
+	this->terrain = terrain;
 	for(int x = 0; x < NUM_CHUNKS; x++)
 	{
 		for(int y = 0; y < NUM_CHUNKS; y++)
 		{
 			for(int z = 0; z < NUM_CHUNKS; z++)
 			{
-				// TODO: add terrain map to chunk constructor
 				Chunk* pChunk = new Chunk(x, y, z);
-				pChunk->Setup_Landscape(*terrain);
+//				pChunk->Setup_Landscape(*terrain);
 				m_vpChunkList.push_back(pChunk);
 			}
 		}
+	}
+
+	std::vector<Chunk*>::iterator iterator;
+
+	for (iterator = m_vpChunkList.begin(); iterator != m_vpChunkList.end(); ++iterator)
+	{
+		Chunk* pChunk = (*iterator);
+		pChunk->Setup_Landscape(*terrain);
 	}
 }
 
@@ -72,14 +79,29 @@ void ChunkManager::RenderChunks(Shader& shader)
 bool ChunkManager::IsActive(int x, int y, int z)
 {
 	// Get the x, y, z coordinates of the chunk the voxel is located in
-	int xChunk = round(x / Chunk::CHUNK_SIZE);
-	int yChunk = round(y / Chunk::CHUNK_SIZE);
-	int zChunk = round(z / Chunk::CHUNK_SIZE);
+	int xChunk = int(x / Chunk::CHUNK_SIZE);
+	int yChunk = int(y / Chunk::CHUNK_SIZE);
+	int zChunk = int(z / Chunk::CHUNK_SIZE);
+
 
 	// Get the x, y, z coordinates of the voxel relative to the chunk
-	x = x - (Chunk::CHUNK_SIZE * xChunk);
-	y = y - (Chunk::CHUNK_SIZE * yChunk);
-	z = z - (Chunk::CHUNK_SIZE * zChunk);
+	int xVoxel = x - (Chunk::CHUNK_SIZE * xChunk);
+	int yVoxel = y - (Chunk::CHUNK_SIZE * yChunk);
+	int zVoxel = z - (Chunk::CHUNK_SIZE * zChunk);
 
-	return m_vpChunkList[(x * NUM_CHUNKS * NUM_CHUNKS) + (y * NUM_CHUNKS) + z]->IsActive(x, y, z);
+//	std::cout << xChunk << " " << yChunk << " " << zChunk << "\t";
+//	std::cout << xVoxel << " " << yVoxel << " " << zVoxel << "\n";
+
+	return m_vpChunkList[(xChunk * NUM_CHUNKS * NUM_CHUNKS) + (yChunk * NUM_CHUNKS) + zChunk]->IsActive(xVoxel, yVoxel, zVoxel);
+}
+
+void ChunkManager::Setup()
+{
+	std::vector<Chunk*>::iterator iterator;
+
+	for (iterator = m_vpChunkList.begin(); iterator != m_vpChunkList.end(); ++iterator)
+	{
+		Chunk* pChunk = (*iterator);
+		pChunk->Setup_Landscape(*terrain);
+	}
 }

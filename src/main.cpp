@@ -87,7 +87,7 @@ glm::vec3 lightPos;
 
 Camera_Movement lastMove;
 
-
+ChunkManager* chunkManager;
 
 int main() {
     // GLFW: Initialize and configure
@@ -134,15 +134,8 @@ int main() {
 	Shader chunkSceneShader("../res/shaders/chunk_scene.vert", "../res/shaders/chunk_scene.frag");
 	Shader chunkShadowShader("../res/shaders/chunk_shadow.vert", "../res/shaders/chunk_shadow.frag");
 
-//    // Cube model
-//    Model cube("../res/models/cube/cube.obj");
-//    // Sphere model
-//    Model sphere("../res/models/sphere/sphere.obj");
-
-    // Initialize terrain
-//	Terrain terrain(TERRAIN_SIZE, cube, sphere, OCTAVE_COUNT, FREQUENCY, PERSISTENCE);
-
-	ChunkManager ChunkManager;
+	Terrain* terrain = new Terrain;
+	chunkManager = new ChunkManager(terrain);
 
 	// Textures
     Texture boxTexture("res/textures/box.jpg");
@@ -203,7 +196,7 @@ int main() {
 	glActiveTexture(GL_TEXTURE4);
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, depthMap);
-	
+
 
     // Render Loop
     while (!glfwWindowShouldClose(window)) {
@@ -221,18 +214,6 @@ int main() {
         // Set projection matrix
         projection = glm::perspective(45.0f, (float) SCR_WIDTH / (float) SCR_HEIGHT, 0.1f,100.0f);
 
-        // Make sure camera isn't colliding with anything
-//		int cameraX = int(round(camera.Position.x));
-//		int cameraZ = int(round(camera.Position.z));
-//
-//      // Update worldPos
-//      worldPos.x = cameraX;
-//		worldPos.y = cameraZ;
-
-        // Set camera/view matrix
-//		float terrainHeight = terrain.GetValue(worldPos.x, worldPos.y);
-//		glm::vec3 Position = glm::vec3(0.0f,(round(terrainHeight * 10.0f) / 10.0f) + (5.0f * ULEN),0.0f);
-//		view = glm::lookAt(Position, Position + camera.Front, camera.Up);
 		view = camera.get_view_matrix();
 
 		// Set orthographic frustum for shadows
@@ -251,19 +232,13 @@ int main() {
 		chunkShadowShader.use();
 		chunkShadowShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
 
-		// Bind grey texture
-		// Not sure why but if we don't bind it here it just renders as red
-//		glActiveTexture(GL_TEXTURE3);
-//		glEnable(GL_TEXTURE_2D);
-//		greyTexture.bind();
-
 		// Set viewport size and bind depth map frame buffer
 		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
 		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// Render scene with shadow/depth map shader
-		ChunkManager.RenderChunks(chunkShadowShader);
+		chunkManager->RenderChunks(chunkShadowShader);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -288,7 +263,7 @@ int main() {
 
 		// Render the scene using shadow map
 		resetTextures(chunkSceneShader);
-		ChunkManager.RenderChunks(chunkSceneShader);
+		chunkManager->RenderChunks(chunkSceneShader);
 
 		// Reset framebuffer
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -350,26 +325,14 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
         glfwSetWindowShouldClose(window, true);
     }
 
-    // Switch rendering type
-    // Pressing P = Points
-    // Pressing L = Lines
-    // Pressing T = Triangles
-    if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
-        type = GL_POINTS;
-    } else if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) {
-        type = GL_LINES;
-    } else if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) {
-        type = GL_TRIANGLES;
-    }
-
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		camera.process_keyboard_input(FORWARD, deltaTime); lastMove = FORWARD;
+		camera.process_keyboard_input(FORWARD, deltaTime, chunkManager); lastMove = FORWARD;
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		camera.process_keyboard_input(BACKWARD, deltaTime); lastMove = BACKWARD;
+		camera.process_keyboard_input(BACKWARD, deltaTime, chunkManager); lastMove = BACKWARD;
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		camera.process_keyboard_input(LEFT, deltaTime); lastMove = LEFT;
+		camera.process_keyboard_input(LEFT, deltaTime, chunkManager); lastMove = LEFT;
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		camera.process_keyboard_input(RIGHT, deltaTime); lastMove = RIGHT;
+		camera.process_keyboard_input(RIGHT, deltaTime, chunkManager); lastMove = RIGHT;
 
     // Press X to toggle textures
     if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) {

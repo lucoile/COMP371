@@ -10,7 +10,7 @@
 class ChunkManager
 {
  public:
-	ChunkManager();
+	ChunkManager(Terrain* terrain);
 
 	void Update(float dt, glm::vec3 cameraPosition, glm::vec3 cameraView);
 
@@ -22,6 +22,11 @@ class ChunkManager
 	Terrain* terrain;
 
 	bool IsActive(int x, int y, int z);
+
+	bool initialized = false;
+
+	void Setup();
+
  private:
 	// Number of chunks to load per frame
 	static const int ASYNC_NUM_CHUNKS_PER_FRAME = 8;

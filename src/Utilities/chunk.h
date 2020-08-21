@@ -37,7 +37,7 @@ class Chunk
 	unsigned int VBO, VAO;
 
 	// The blocks data
-	std::vector<Voxel> m_pVoxels;
+	std::vector<Voxel*> m_pVoxels;
 	std::vector<Vertex> chunkVertices;
 	Mesh_M* voxelMesh;
 	Mesh_M* chunkMesh;

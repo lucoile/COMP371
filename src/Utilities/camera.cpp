@@ -7,6 +7,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "chunk_manager.h"
+
 // constructor with vector
 Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch) :
         Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM) {
@@ -45,10 +47,29 @@ void Camera::process_mouse_movement(float xoffset, float yoffset, GLboolean cons
     update_camera_vectors();
 }
 
-void Camera::process_keyboard_input(Camera_Movement direction, float deltaTime) {
+void Camera::process_keyboard_input(Camera_Movement direction, float deltaTime, ChunkManager* chunkManager)
+{
 	float velocity = MovementSpeed * deltaTime;
-	if (direction == FORWARD)
-		Position += Front * velocity;
+
+	if (direction == FORWARD) {
+//		Position += Front * velocity;
+
+		glm::vec3 newPosition = Position + (Front * velocity);
+		int xVoxel = int((newPosition.x * 10.0) + ((ChunkManager::NUM_CHUNKS / 2) * Chunk::CHUNK_SIZE));
+		int xVoxelPos = int((Position.x * 10.0) + ((ChunkManager::NUM_CHUNKS / 2) * Chunk::CHUNK_SIZE));
+		int yVoxelPos = int((Position.y * 10.0) + ((ChunkManager::NUM_CHUNKS / 2) * Chunk::CHUNK_SIZE));
+		int zVoxel = int((newPosition.z * 10.0) + ((ChunkManager::NUM_CHUNKS / 2) * Chunk::CHUNK_SIZE));
+		int zVoxelPos = int((Position.z * 10.0) + ((ChunkManager::NUM_CHUNKS / 2) * Chunk::CHUNK_SIZE));
+//		std::cout << xVoxel << " " << yVoxelPos << " " << zVoxel << "\n";
+
+		if(chunkManager->IsActive(xVoxel, yVoxelPos, zVoxelPos) == false)
+			Position += glm::vec3(Front.x, 0.0f, 0.0f) * velocity;
+		if(chunkManager->IsActive(xVoxelPos, yVoxelPos, zVoxel) == false)
+			Position += glm::vec3(0.0f, 0.0f, Front.z) * velocity;
+
+//		if(chunkManager->IsActive(xVoxel, yVoxel, zVoxel))
+//			Position += glm::vec3(Front.x, 0.0f, Front.z) * velocity;
+	}
 	if (direction == BACKWARD)
 		Position -= Front * velocity;
 	if (direction == LEFT)

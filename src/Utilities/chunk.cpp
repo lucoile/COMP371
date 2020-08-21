@@ -15,13 +15,13 @@ Chunk::Chunk(int x, int y, int z)
 		{
 			for(int k = 0; k < CHUNK_SIZE; k++)
 			{
-				Voxel voxel;
-				m_pVoxels.push_back(voxel);
+				Voxel* pVoxel = new Voxel(false);
+				m_pVoxels.push_back(pVoxel);
 			}
 		}
 	}
 
-	CreateMesh();
+//	CreateMesh();
 }
 
 Chunk::~Chunk()
@@ -38,14 +38,15 @@ void Chunk::CreateMesh()
 		{
 			for (int z = 0; z < CHUNK_SIZE; z++)
 			{
-				if(m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z].IsActive() == false)
+				if(m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z]->IsActive() == false)
 				{
 					// Don't create triangle data for inactive blocks
 					continue;
 				}
 
 				float voxelAdjust = Voxel::VOXEL_RENDER_SIZE * Voxel::VOXEL_RENDER_SIZE;
-                CreateCube(x * voxelAdjust, y * voxelAdjust, z * voxelAdjust, m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z].getType());
+                CreateCube(x * voxelAdjust, y * voxelAdjust, z * voxelAdjust,
+                	m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z]->getType());
 			}
 		}
 	}
@@ -126,7 +127,7 @@ void Chunk::CreateCube(float x, float y, float z, VoxelType type)
 	n1 = glm::vec3(0.0f, 1.0f, 0.0f);
 
     if(type == VoxelType_Grass){
-        color = glm::vec4(0.0f, 0.5f, 0.0f, 1.0f);
+        color = glm::vec4(0.1f, 0.3f, 0.1f, 1.0f);
     }
 
 	chunkVertices.push_back({p0, n1, color});	// triangle 1
@@ -163,14 +164,15 @@ void Chunk::Update()
 		{
 			for (int z = 0; z < CHUNK_SIZE; z++)
 			{
-				if(m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z].IsActive() == false)
+				if(m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z]->IsActive() == false)
 				{
 					// Don't create triangle data for inactive blocks
 					continue;
 				}
 
 				float voxelAdjust = Voxel::VOXEL_RENDER_SIZE * Voxel::VOXEL_RENDER_SIZE;
-                CreateCube(x * voxelAdjust, y * voxelAdjust, z * voxelAdjust, m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z].getType());
+                CreateCube(x * voxelAdjust, y * voxelAdjust, z * voxelAdjust,
+                	m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z]->getType());
 			}
 		}
 	}
@@ -206,19 +208,17 @@ void Chunk::Setup_Landscape(Terrain terrain)
 
 			for (int y = (yOffset); y < height; y++)
 			{
-                m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z].SetActive(true);
-			    if((y - height) == -1){
-                  m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z].SetType(VoxelType_Grass);
-			    } else{
-			        m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z].SetType(VoxelType_Dirt);
+                m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z]->SetActive(true);
+
+			    if((y - height) == -1)
+			    {
+                  m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z]->SetType(VoxelType_Grass);
+                  continue;
 			    }
+
+			    m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z]->SetType(VoxelType_Dirt);
 			}
 
-//			for (int y = yOffset + height + 1; y < yOffset + CHUNK_SIZE; y++)
-//			{
-//				m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z].SetActive(false);
-//				m_pVoxels[x][y][z].SetBlockType(VoxelType_Grass);
-//			}
 		}
 	}
 
@@ -228,5 +228,16 @@ void Chunk::Setup_Landscape(Terrain terrain)
 
 bool Chunk::IsActive(int x, int y, int z)
 {
-	return m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z].IsActive();
+//	for (int x = 0; x < CHUNK_SIZE; x++)
+//	{
+//		for (int y = 0; y < CHUNK_SIZE; y++)
+//		{
+//			for (int z = 0; z < CHUNK_SIZE; z++)
+//			{
+//				std::cout << m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z]->IsActive();
+//			}
+//		}
+//	}
+
+	return m_pVoxels[(x * CHUNK_SIZE * CHUNK_SIZE) + (y * CHUNK_SIZE) + z]->IsActive();
 }

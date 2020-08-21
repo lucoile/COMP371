@@ -89,7 +89,7 @@ void Terrain::genHeightMap() {
 		for(int j = 0; j < size; j++)
 		{
 			heightMap[i * size + j] = (float) (((heightMap1.GetValue(i, j) / 2.0) + 0.5) *
-				(((heightMap2.GetValue(i, j) / 2.0) + 0.5) * 2.0f));
+				(((heightMap2.GetValue(i, j) / 2.0) + 0.5) * 5.0f));
 		}
 	}
 
